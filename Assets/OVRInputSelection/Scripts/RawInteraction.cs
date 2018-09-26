@@ -82,7 +82,7 @@ public class RawInteraction : MonoBehaviour {
 			if (bu != null)
 			{
 				//Debug.Log("      --> script");
-				bu.SetMyResidueSelect(true);
+				bu.SetMyResidueSelect(false);
 			}
 			//t.gameObject.GetComponent<Renderer>().material = oldHoverMat;
 		}
@@ -97,7 +97,7 @@ public class RawInteraction : MonoBehaviour {
 			if (bu != null)
 			{
 				//Debug.Log("      --> script");
-				bu.SetMyResidueSelect(false);
+				bu.SetMyResidueSelect(true);
 			}
 			//t.gameObject.GetComponent<Renderer>().material = oldHoverMat;
 		}
@@ -127,33 +127,79 @@ public class RawInteraction : MonoBehaviour {
 		}
 	}
 
-	public void OnPrimarySelectedButtonDown(Transform t, Ray pointer)
+	public void OnPrimarySelectedButtonDownAxis(Transform t, Ray pointer, float axisValue)
 	{
-		Debug.Log("Primary Select Button Down" + t.gameObject.name);
+		//Debug.Log("Primary Select Button Down" + t.gameObject.name);
 
 		GameObject go = t.gameObject;
-		BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
-		if (bu != null)
+		//BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
+		//if (bu != null)
 		{
 			//Debug.Log("      --> script");
-			bu.TractorBeam(pointer, true);
+			//bu.TractorBeam(pointer.origin, false, 1.0f);
+			//Debug.Log(axisValue);
+			TractorBeam(go, pointer.origin, false, axisValue * 1.5f);
 		}
 
 	}
 
-	public void OnSecondarySelectedButtonDown(Transform t, Ray pointer)
+	public void OnSecondarySelectedButtonDownAxis(Transform t, Ray pointer, float axisValue)
 	{
-		Debug.Log("Secondary Select Button Down" + t.gameObject.name);
+		//Debug.Log("Secondary Select Button Down" + t.gameObject.name);
 
 
 		GameObject go = t.gameObject;
-		BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
-		if (bu != null)
+		//BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
+		//if (bu != null)
 		{
 			//Debug.Log("      --> script");
-			bu.TractorBeam(pointer, false);
+			//bu.TractorBeam(pointer.origin, true, 1.0f);
+			//Debug.Log(axisValue);
+			TractorBeam(go, pointer.origin, true, axisValue * 1.5f);
+
 		}
 
 	}
 
+	public void RemoteGrabInteraction(Transform t, Vector3 destination)
+	{
+		//Debug.Log("do  RemoteGrabInteraction!");
+
+		GameObject go = t.gameObject;
+		//BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
+		//if (bu != null)
+		{
+			//Debug.Log("      --> script");
+			//bu.TractorBeam(destination, true, 3.0f);
+			TractorBeam(go, destination, true, 5.0f);
+		}
+
+
+	}
+
+	public void TractorBeam(GameObject go, Vector3 position, bool attract, float scale)
+		{
+
+			//Debug.Log("tractor beam me!");
+
+			float tractorBeamAttractionFactor = scale * 100.0f;
+			float tractorBeamMax = scale * 100.0f;
+			float tractorBeamDistanceRatio = 400f / scale; // larger = weaker
+
+
+			Vector3 tractorBeam = position - go.transform.position;
+			if (!attract)
+			{
+				// repel
+				tractorBeam = go.transform.position - position;
+			}
+			float tractorBeamScale = Mathf.Max(tractorBeamMax, tractorBeamAttractionFactor * (Vector3.Magnitude(tractorBeam) / tractorBeamDistanceRatio));
+
+			go.GetComponent<Rigidbody>().AddForce((tractorBeam * tractorBeamScale), ForceMode.Acceleration);
+			// add scaling for 'size' of target?
+
+
+	}
 }
+
+

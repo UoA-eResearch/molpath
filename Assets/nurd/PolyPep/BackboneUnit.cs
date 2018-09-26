@@ -16,14 +16,64 @@ public class BackboneUnit : MonoBehaviour {
 	private bool activeSequenceSelectLast = false;
 	public bool controllerHoverOn = false;
 	public bool controllerSelectOn = false;
+	public bool remoteGrabSelectOn = false;
+
+	public Residue myResidue;
+	public PolyPepBuilder myPolyPepBuilder;
+
+	// 
+	private Renderer rendererPhi;	// amide only
+	private Renderer rendererPsi;   // calpha only
+	private Renderer rendererPeptide; // carbonyl only
+
+	//private Renderer[] rendererAtoms;
+	private List<Renderer> renderersAtoms = new List<Renderer>();
 
 	// Use this for initialization
 	void Start () {
 
+		// init my references to renderers
+		{
+			Renderer[] allChildRenderers = gameObject.GetComponentsInChildren<Renderer>();
+			foreach (Renderer childRenderer in allChildRenderers)
+			{
+				//Debug.Log(childRenderer.transform.gameObject.name);
+				//Debug.Log(childRenderer.transform.gameObject.layer);
+
+				//bonds
+				if (childRenderer.transform.gameObject.name == "bond_N_CA")
+				{
+					rendererPhi = childRenderer;
+				}
+				if (childRenderer.transform.gameObject.name == "bond_CA_CO")
+				{
+					rendererPsi = childRenderer;
+				}
+				if (childRenderer.transform.gameObject.name == "bond_CO_N")
+				{
+					rendererPeptide = childRenderer;
+				}
+
+				//atoms
+				if (childRenderer.transform.gameObject.layer == LayerMask.NameToLayer("Atom"))
+				{
+					//Debug.Log("got one!");
+					renderersAtoms.Add(childRenderer);
+				}
+			}
+			//Debug.Log("bu " + gameObject + " --> " + gameObject.transform.parent.parent.gameObject);
+
+		}
+
+		// init parent script references
+
+
+		myResidue = (gameObject.transform.parent.gameObject.GetComponent("Residue") as Residue);
+		myPolyPepBuilder = (gameObject.transform.parent.parent.gameObject.GetComponent("PolyPepBuilder") as PolyPepBuilder);
+
 		shaderStandard = Shader.Find("Standard");
 		shaderToonOutline = Shader.Find("Toon/Basic Outline");
 		UpdateRenderMode();
-
 	}
 
 	public void SetBackboneUnitControllerHover(bool flag)
@@ -34,13 +84,13 @@ public class BackboneUnit : MonoBehaviour {
 
 	public void SetMyResidueSelect(bool flag)
 	{
-		Residue res = (gameObject.transform.parent.gameObject.GetComponent("Residue") as Residue);
-		if (res)
+		//Residue res = (gameObject.transform.parent.gameObject.GetComponent("Residue") as Residue);
+		if (myResidue)
 		{
 			//Debug.Log("             " + res);
-			BackboneUnit buAmide = res.amide_pf.GetComponent("BackboneUnit") as BackboneUnit;
-			BackboneUnit buCalpha = res.calpha_pf.GetComponent("BackboneUnit") as BackboneUnit;
-			BackboneUnit buCarbonyl = res.carbonyl_pf.GetComponent("BackboneUnit") as BackboneUnit;
+			BackboneUnit buAmide = myResidue.amide_pf.GetComponent("BackboneUnit") as BackboneUnit;
+			BackboneUnit buCalpha = myResidue.calpha_pf.GetComponent("BackboneUnit") as BackboneUnit;
+			BackboneUnit buCarbonyl = myResidue.carbonyl_pf.GetComponent("BackboneUnit") as BackboneUnit;
 
 			buAmide.SetBackboneUnitSelect(flag);
 			buCalpha.SetBackboneUnitSelect(flag);
@@ -64,88 +114,109 @@ public class BackboneUnit : MonoBehaviour {
 		}
 	}
 
-	public void TractorBeam(Ray pointer, bool attract)
-	{
-		Debug.Log("tractor beam me!");
-
-		float tractorBeamAttractionFactor = 50.0f;
-
-		Vector3 tractorBeam = pointer.origin - gameObject.transform.position;
-		if (!attract)
-		{
-			// repel
-			tractorBeam = gameObject.transform.position - pointer.origin;
-		}
-		float tractorBeamScale = Mathf.Max(100.0f, tractorBeamAttractionFactor * (Vector3.Magnitude(tractorBeam) / 500.0f));
-		gameObject.GetComponent<Rigidbody>().AddForce((tractorBeam * tractorBeamScale), ForceMode.Acceleration);
-
-	}
-
 	private void SetRenderingMode(GameObject go, string shaderName)
 	{
-		Renderer[] allChildRenderers = go.GetComponentsInChildren<Renderer>();
-		foreach (Renderer childRenderer in allChildRenderers)
+
+		//Renderer[] allChildRenderers = go.GetComponentsInChildren<Renderer>();
+		//if (_type.ToString() != "UnityEngine.ParticleSystemRenderer")
+
+		foreach (Renderer _rendererAtom in renderersAtoms)
 		{
-			//Debug.Log(child.GetType());
-
-			var _type = childRenderer.GetType();
-			if (_type.ToString() != "UnityEngine.ParticleSystemRenderer")
-
 			{
 				switch (shaderName)
 
 				{
 					case "ToonOutlineGreen":
 						{
-							Renderer _renderer = childRenderer.GetComponent<Renderer>();
-							_renderer.material.shader = shaderToonOutline;
-							_renderer.material.SetColor("_OutlineColor", Color.green);
-							_renderer.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.shader = shaderStandard;
+						}
+						{
+							_rendererAtom.material.shader = shaderToonOutline;
+							_rendererAtom.material.SetColor("_OutlineColor", Color.green);
+							_rendererAtom.material.SetFloat("_Outline", 0.005f);
 						}
 						break;
 
 					case "ToonOutlineRed":
 						{
-							Renderer _renderer = childRenderer.GetComponent<Renderer>();
-							_renderer.material.shader = shaderToonOutline;
-							_renderer.material.SetColor("_OutlineColor", Color.red);
-							_renderer.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.shader = shaderToonOutline;
+							_rendererAtom.material.SetColor("_OutlineColor", Color.red);
+							_rendererAtom.material.SetFloat("_Outline", 0.005f);
 						}
 						break;
 
 					case "ToonOutlineYellow":
 						{
-							Renderer _renderer = childRenderer.GetComponent<Renderer>();
-							_renderer.material.shader = shaderToonOutline;
-							_renderer.material.SetColor("_OutlineColor", Color.yellow);
-							_renderer.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.shader = shaderToonOutline;
+							_rendererAtom.material.SetColor("_OutlineColor", Color.yellow);
+							_rendererAtom.material.SetFloat("_Outline", 0.005f);
 						}
 						break;
 
 					case "Standard":
 						{
-							childRenderer.GetComponent<Renderer>().material.shader = shaderStandard;
+							_rendererAtom.material.shader = shaderStandard;
 						}
 						break;
-
 				}
+			}
+		}
+
+		bool doBondCartoonRendering = false;
+		if (rendererPhi)
+		{
+			if (doBondCartoonRendering)//myResidue.drivePhiPsiOn)
+			{
+				rendererPhi.material.shader = shaderToonOutline;
+				rendererPhi.material.SetColor("_OutlineColor", Color.cyan);
+				rendererPhi.material.SetFloat("_Outline", 0.005f);
 			}
 			else
 			{
-				// particle system
+				rendererPhi.material.shader = shaderStandard;
 			}
 		}
+
+		if (rendererPsi)
+		{
+			if (doBondCartoonRendering)//myResidue.drivePhiPsiOn)
+			{
+				rendererPsi.material.shader = shaderToonOutline;
+				rendererPsi.material.SetColor("_OutlineColor", Color.magenta);
+				rendererPsi.material.SetFloat("_Outline", 0.005f);
+			}
+			else
+			{
+				rendererPsi.material.shader = shaderStandard;
+			}
+		}
+
+		if (rendererPeptide)
+		{
+			if (doBondCartoonRendering)
+			{
+				rendererPeptide.material.shader = shaderToonOutline;
+				rendererPeptide.material.SetColor("_OutlineColor", Color.black);
+				rendererPeptide.material.SetFloat("_Outline", 0.005f);
+			}
+			else
+			{
+				rendererPeptide.material.shader = shaderStandard;
+			}
+		}
+
 	}
+
 
 	public void UpdateRenderMode()
 	{
-		if (controllerHoverOn)
-		{
-			SetRenderingMode(gameObject, "ToonOutlineRed");
-		}
-		else if (activeSequenceSelect)
+		if (remoteGrabSelectOn)
 		{
 			SetRenderingMode(gameObject, "ToonOutlineGreen");
+		}
+		else if (controllerHoverOn)
+		{
+			SetRenderingMode(gameObject, "ToonOutlineRed");
 		}
 		else if (controllerSelectOn)
 		{

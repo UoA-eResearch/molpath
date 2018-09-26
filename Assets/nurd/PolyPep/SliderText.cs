@@ -5,15 +5,23 @@ using UnityEngine.UI;
 
 public class SliderText : MonoBehaviour {
 
-	Text textComponent;
+	public Text textComponent;
 
-	void Start()
+	void Awake()
 	{
-		textComponent = GetComponent<Text>();
+		
+		textComponent = gameObject.GetComponent<Text>();
+		//Debug.Log(gameObject + " " + textComponent);
+	}
+
+	private void Start()
+	{
+
 	}
 
 	public void SetSliderValue(float sliderValue)
 	{
+		//Debug.Log(sliderValue);
 		textComponent.text = Mathf.Round(sliderValue/1).ToString();
 	}
 

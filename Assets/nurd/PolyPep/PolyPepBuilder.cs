@@ -24,7 +24,7 @@ public class PolyPepBuilder : MonoBehaviour {
 
 	public int secondaryStructure { get; set; } // = 0;
 
-	public int numResidues = 30;
+	public int numResidues = 0;
 
 	public GameObject[] polyArr;
 	private int polyLength;
@@ -40,17 +40,16 @@ public class PolyPepBuilder : MonoBehaviour {
 	public JointDrive[] chainPhiJointDrives;
 	private JointDrive[] chainPsiJointDrives;
 
-	public bool useColliders { get; set; } //= true;
+	//public bool UseColliders { get; set; } //= true;
 	public bool setTargetPhiPsi { get; set; }
 	public bool setDrivePhiPsi { get; set; }
 	public bool ActiveHbondSpringConstraints { get; set; }
 
-	private Slider phiSliderUI;
-	private Slider psiSliderUI;
+	public float hbondStrength = 0f; // updated by PolyPepManager
 
-
-	private Slider vdwSliderUI;
-	private Slider scaleSliderUI;
+	public float drivePhiPsiMaxForce = 200.0f; // 100.0f
+	public float drivePhiPsiPosSpring = 200.0f; // 100.0f
+	public int drivePhiPsiPosDamper = 1;
 
 	private Slider hbondSliderUI;
 
@@ -92,54 +91,6 @@ public class PolyPepBuilder : MonoBehaviour {
 		//Debug.Log("LOAD FILE = " + LoadPhiPsiData("Assets/Data/1xda_phi_psi.txt")); 
 
 		secondaryStructure = 0;
-
-		{
-			//UI
-			// initialise phi psi slider values (hacky?)
-
-			GameObject temp = GameObject.Find("Slider_Phi");
-
-
-			phiSliderUI = temp.GetComponent<Slider>();
-			phiSliderUI.value = 0;
-
-			temp = GameObject.Find("Slider_Psi");
-
-			psiSliderUI = temp.GetComponent<Slider>();
-			psiSliderUI.value = 0;
-
-			temp = GameObject.Find("Slider_Vdw");
-
-			vdwSliderUI = temp.GetComponent<Slider>();
-			vdwSliderUI.value = 10;
-
-
-			temp = GameObject.Find("Slider_HbondStrength");
-
-			hbondSliderUI = temp.GetComponent<Slider>();
-			hbondSliderUI.value = 2000;
-
-			temp = GameObject.Find("Slider_ResStart");
-
-			resStartSliderUI = temp.GetComponent<Slider>();
-			resStartSliderUI.maxValue = numResidues;
-			resStartSliderUI.value = 1;
-
-			temp = GameObject.Find("Slider_ResEnd");
-
-			Assert.IsNotNull(temp);
-
-			resEndSliderUI = temp.GetComponent<Slider>();
-			resEndSliderUI.maxValue = numResidues;
-			resEndSliderUI.value = 3; // numResidues; // initial value (+1)
-
-			//temp = GameObject.Find("Slider_Scale");
-
-			//scaleSliderUI = temp.GetComponent<Slider>();
-			//scaleSliderUI.value = 10;
-
-		}
-
 
 	}
 
@@ -249,7 +200,7 @@ public class PolyPepBuilder : MonoBehaviour {
 
 			ScaleVDW(1.0f);
 			SetRbDrag(polyArr[i]);
-			SetCollidersGameObject(polyArr[i]);
+			//SetCollidersGameObject(polyArr[i]);
 
 
 			{
@@ -268,6 +219,20 @@ public class PolyPepBuilder : MonoBehaviour {
 			}
 
 		}
+
+		SetAllColliderIsTrigger (true);
+
+		for (int i = 0; i < polyLength; i++)
+		{
+			var rigidBodies = polyArr[i].GetComponentsInChildren<Rigidbody>();
+			foreach (var rb in rigidBodies)
+			{
+				rb.mass = 1;
+				rb.drag = 5;
+				rb.angularDrag = 5;
+			}
+		}
+
 
 		// assign references in chainArr
 		for (int resid = 0; resid < numResidues; resid ++)
@@ -289,7 +254,7 @@ public class PolyPepBuilder : MonoBehaviour {
 		chainArr[index].name = "Residue_" + (index).ToString();
 	}
 
-	void ScaleVDW(float scale)
+	public void ScaleVDW(float scale)
 	{
 		{
 			float scaleVDW = scale;
@@ -332,42 +297,6 @@ public class PolyPepBuilder : MonoBehaviour {
 		}
 	}
 
-	public void ScaleVDWFromUI()
-	{
-		// slider value is 10x
-		ScaleVDW(vdwSliderUI.value / 10.0f);
-	}
-
-	//public void UpdateScaleFromUI()
-	//{
-	//	// slider value is 10x
-	//	float scale = scaleSliderUI.value / 10.0f;
-	//	gameObject.transform.localScale = new Vector3(scale, scale, scale);
-
-	//	for (int resid = 0; resid < numResidues; resid++)
-	//	{
-	//		var cjPhi_NCa = GetAmideForResidue(resid).GetComponent<ConfigurableJoint>();
-
-	//		cjPhi_NCa.anchor = new Vector3(bondLengthAmideCalpha, 0f, 0f) * scale;
-	//		//cjPhi_NCa.connectedAnchor = cjPhi_NCa.connectedAnchor * scale;
-
-	//		var cjPsi_CaCO = GetCalphaForResidue(resid).GetComponent<ConfigurableJoint>();
-
-	//		cjPsi_CaCO.anchor = new Vector3(bondLengthCalphaCarbonyl, 0f, 0f) * scale;
-	//		//cjPsi_CaCO.connectedAnchor = cjPsi_CaCO.connectedAnchor * scale;
-
-
-	//		var cjPeptide_CON = GetCarbonylForResidue(resid).GetComponent<ConfigurableJoint>();
-
-	//		if (cjPeptide_CON != null)
-	//		{
-	//			cjPeptide_CON.anchor = new Vector3(bondLengthPeptide, 0f, 0f) * scale;
-	//			//cjPeptide_CON.connectedAnchor = cjPeptide_CON.connectedAnchor * scale;
-	//		}
-
-	//	}
-
-	//}
 
 	void SetRbDrag(GameObject go)
 	{
@@ -381,15 +310,17 @@ public class PolyPepBuilder : MonoBehaviour {
 
 	}
 
-	void SetCollidersGameObject(GameObject go)
+	public void SetAllColliderIsTrigger(bool value)
 	{
-		var colliders = go.GetComponentsInChildren<Collider>();
-		foreach (var col in colliders)
+		for (int i = 0; i < polyLength; i++)
 		{
-			col.isTrigger = !useColliders;
+			var colliders = polyArr[i].GetComponentsInChildren<Collider>();
+			foreach (var col in colliders)
+			{
+				col.isTrigger = value;
+			}
 		}
 	}
-
 
 	void AddBackboneTopologyConstraint(int index)
 	{
@@ -653,8 +584,6 @@ public class PolyPepBuilder : MonoBehaviour {
 					ParticleSystem.EmissionModule em = hbondBackbonePsPf[resid].GetComponent<ParticleSystem>().emission;
 					em.rateOverTime = 0.0f;
 				}
-
-
 			}
 			else
 			{
@@ -678,7 +607,7 @@ public class PolyPepBuilder : MonoBehaviour {
 		float hbondCastScale = 3.0f; // length of cast in NH bond lengths ;)
 
 		for (int resid = 0; resid < numResidues; resid++)
-		//int resid = 7;
+		//int resid = 1;
 		{
 			GameObject donorGO = GetAmideForResidue(resid);
 			var hbond_sj = hbondBackboneSj_HO[resid];
@@ -715,25 +644,26 @@ public class PolyPepBuilder : MonoBehaviour {
 					{
 						
 						//Debug.Log(resid + " hit " + hit.collider.gameObject + " " + hit.collider.transform.parent.parent.name);
-						GameObject go =  GameObject.Find(hit.collider.transform.parent.parent.name);
+						GameObject acceptorGO = hit.collider.transform.parent.parent.gameObject;
+						//Debug.Log(acceptorGO);
 
-						if (go.GetComponent<BackboneUnit>() != null)
+						if (acceptorGO.GetComponent<BackboneUnit>() != null)
 						{
-							int targetAcceptorResid = go.GetComponent<BackboneUnit>().residue;
+							int targetAcceptorResid = acceptorGO.GetComponent<BackboneUnit>().residue;
 							//Debug.Log(resid + "---> " + targetAcceptorResid);
-							int offset = 3;
-							if ( ((resid + offset) <= targetAcceptorResid) || ((resid - offset) >= targetAcceptorResid) ) 
+							//int offset = 3;
+							//if ( ((resid + offset) <= targetAcceptorResid) || ((resid - offset) >= targetAcceptorResid) ) 
 							{
 								foundAcceptor = true;
 								//DrawLine(donorHLocation, hit.point, Color.red, 0.02f);
-								SetAcceptorForBackboneHbondConstraint(resid, targetAcceptorResid);
+								SetAcceptorForBackboneHbondConstraint(resid, acceptorGO);
 								SwitchOnBackboneHbondConstraint(resid);
 							}
-							else
-							{
-								//found CO but too close in chain
-								//DrawLine(donorHLocation, hit.point, Color.magenta, 0.02f);
-							}
+							//else
+							//{
+							//	//found CO but too close in chain
+							//	//DrawLine(donorHLocation, hit.point, Color.magenta, 0.02f);
+							//}
 						}
 					}
 					else
@@ -769,7 +699,7 @@ public class PolyPepBuilder : MonoBehaviour {
 	{
 		if (ActiveHbondSpringConstraints)
 		{
-			SetSpringJointValuesForBackboneHbondConstraint(resid, (int)hbondSliderUI.value, 5); // empirical values
+			SetSpringJointValuesForBackboneHbondConstraint(resid, (int)hbondStrength, 5); // empirical values
 		}
 	}
 
@@ -784,11 +714,11 @@ public class PolyPepBuilder : MonoBehaviour {
 		hbondBackboneSj_NO[resid].damper = springDamper;
 	}
 
-	void SetAcceptorForBackboneHbondConstraint(int donorResid, int acceptorResid)
+	void SetAcceptorForBackboneHbondConstraint(int donorResid, GameObject acceptorGO)
 	{
 
 		GameObject donorGO = GetAmideForResidue(donorResid);
-		GameObject acceptorGO = GetCarbonylForResidue(acceptorResid);
+		//GameObject acceptorGO = GetCarbonylForResidue(acceptorResid);
 
 		// HO spring
 		SpringJoint sjHbond = hbondBackboneSj_HO[donorResid];
@@ -894,7 +824,7 @@ public class PolyPepBuilder : MonoBehaviour {
 				if (resid > ((-offset) - 1))
 				{
 					//GameObject acceptorGO = GetCarbonylForResidue(resid + offset);
-					SetAcceptorForBackboneHbondConstraint(resid, (resid + offset));
+					//SetAcceptorForBackboneHbondConstraint(resid, (resid + offset));
 					//Debug.Log(i + " " + donorGO + " " + acceptorGO);
 				}
 				else
@@ -993,88 +923,8 @@ public class PolyPepBuilder : MonoBehaviour {
 		}
 	}
 
-	public void SetPhiPsiDataForSelection()
+	public void SetPhiPsiForSelection(float phi, float psi)
 	{
-		float phi = 0.0f;
-		float psi = 0.0f;
-
-		//Debug.Log("Secondary Structure " + secondaryStructure);
-
-		switch (secondaryStructure)
-		{
-			case 0:		// not defined
-
-				phi = phiSliderUI.value; 
-				psi = psiSliderUI.value; 
-				//ClearChainHBonds();
-				break;
-
-			case 1:     //alpha helix (right handed) (phi + ps ~ -105)
-
-				phi = -57.0f;
-				psi = -47.0f;
-				//SetChainAlphaHelicalHBonds();
-				break;
-
-			case 2:     //310 helix (phi + psi ~ -75)
-
-				phi = -49.0f;// -74.0f;
-				psi = -26.0f;// -4.0f;
-				//SetChain310HelicalHBonds();
-				break;
-
-			case 3:		//anti beta sheet
-				
-				phi = -139.0f;
-				psi = 135.0f;
-				//ClearChainHBonds();
-				break;
-
-			case 4:     //parallel beta sheet
-
-				phi = -119.0f;
-				psi = 113.0f;
-				//ClearChainHBonds();
-				break;
-
-			case 5:     //pi helix (phi + ps ~ -125)
-
-				phi = -55.0f;
-				psi = -70.0f;
-				//SetChainPiHelicalHBonds();
-				break;
-
-			case 6:     //alpha helix (left handed)
-
-				phi = 47.0f;
-				psi = 57.0f;
-				//SetChainAlphaHelicalHBonds();
-
-
-				break;
-		}
-
-		phiSliderUI.value = Mathf.RoundToInt(phi);
-		psiSliderUI.value = Mathf.RoundToInt(psi);
-
-		////for (int resid = 0; resid < numResidues; resid++)
-		//for (int resid = residSelectStart; resid <= residSelectEnd; resid++)
-		//{
-		//	Residue residue = chainArr[resid].GetComponent<Residue>();
-		//	if (setTargetPhiPsi)
-		//	{
-		//		//residue.phiTarget = phi;
-		//		//residue.psiTarget = psi;
-		//		SetPhiPsiForResidue(resid, phi, psi);
-		//	}
-		//	if (setDrivePhiPsi)
-		//	{
-		//		residue.drivePhiPsiOn = true;
-		//	}
-		//}
-		//UpdatePhiPsiDrives();
-
-		//Test
 		// use 'painted' selection from controller i.e. controllerSelectOn
 		for (int resid = 0; resid < numResidues; resid++)
 		{
@@ -1084,7 +934,7 @@ public class PolyPepBuilder : MonoBehaviour {
 			{
 				SetPhiPsiForResidue(resid, phi, psi);
 				residue.drivePhiPsiOn = true;
-				Debug.Log("hello");
+				//Debug.Log("hello");
 			}
 		}
 		UpdatePhiPsiDrives();
@@ -1128,23 +978,17 @@ public class PolyPepBuilder : MonoBehaviour {
 		RbCarbonyl.WakeUp();
 	}
 
-	public void SetColliders()
-	{
-		for (int i = 0; i < polyLength; i++)
-		{
-			SetCollidersGameObject(polyArr[i]);
-		}
-	}
-
 	public void UpdatePhiPsiDrives()
 	{
 		// Note that 'Position' is actually a rotation ;)
 		//
 		// values are empirical
 		//
-		float drivePhiPsiMaxForce = 200.0f;	// 100.0f
-		float drivePhiPsiPosSpring = 200.0f; // 100.0f
-		int drivePhiPsiPosDamper = 1;
+
+		//float drivePhiPsiMaxForce = 200.0f;	// 100.0f
+		//float drivePhiPsiPosSpring = 200.0f; // 100.0f
+
+		//int drivePhiPsiPosDamper = 1;
 		int drivePhiPsiPosDamperPassive = 0;
 
 
@@ -1333,18 +1177,6 @@ public class PolyPepBuilder : MonoBehaviour {
 		SetPhiPsiForResidue(myResid, myPhi, myPsi);
 	}
 
-	public void UpdatePsiPhiFromUI()
-	{
-		if (!disablePhiPsiUIInput)
-		{
-			if ((phiSliderUI != null) && (psiSliderUI != null))
-			{
-				SetPhiPsiDataForSelection();
-				//Debug.Log(phiAll + " " + psiAll);
-			}
-		}
-	}
-
 	public void UpdateHbondStrengthFromUI()
 	{
 		//TODO  Update Hbonds with new strength!
@@ -1477,6 +1309,16 @@ public class PolyPepBuilder : MonoBehaviour {
 		Bounds b = GetNAtomBounds();
 		Gizmos.color = Color.red;
 		Gizmos.DrawWireCube(b.center, b.extents);
+	}
+
+	public void SetGlobalSelect(bool value)
+	{
+		for (int i = 0; i < polyLength; i++)
+		{
+			BackboneUnit _bbu = (polyArr[i].GetComponent("BackboneUnit") as BackboneUnit);
+			Assert.IsTrue(_bbu);
+			_bbu.SetBackboneUnitSelect(value);
+		}
 	}
 
 	public void ResetLevel()

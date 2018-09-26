@@ -29,8 +29,10 @@ namespace ControllerSelection {
         public class HoverCallback : UnityEvent<Transform> { }
         [System.Serializable]
         public class SelectionCallback : UnityEvent<Transform, Ray> { }
+		[System.Serializable]
+		public class SelectionCallbackAxis : UnityEvent<Transform, Ray, float> { }
 
-        [Header("(Optional) Tracking space")]
+		[Header("(Optional) Tracking space")]
         [Tooltip("Tracking space of the OVRCameraRig.\nIf tracking space is not set, the scene will be searched.\nThis search is expensive.")]
         public Transform trackingSpace = null;
 
@@ -49,6 +51,8 @@ namespace ControllerSelection {
         [Tooltip("Maximum raycast distance")]
         public float raycastDistance = 500;
 
+		public RawInteraction myRawInteraction;
+
         [Header("Hover Callbacks")]
         public OVRRawRaycaster.HoverCallback onHoverEnter;
         public OVRRawRaycaster.HoverCallback onHoverExit;
@@ -61,8 +65,8 @@ namespace ControllerSelection {
         public OVRRawRaycaster.SelectionCallback onPrimarySelect;
         public OVRRawRaycaster.SelectionCallback onSecondarySelect;
 
-		public OVRRawRaycaster.SelectionCallback onPrimarySelectDown;
-		public OVRRawRaycaster.SelectionCallback onSecondarySelectDown;
+		public OVRRawRaycaster.SelectionCallbackAxis onPrimarySelectDownAxis;
+		public OVRRawRaycaster.SelectionCallbackAxis onSecondarySelectDownAxis;
 
 		//protected Ray pointer;
 		public Transform lastHit = null;
@@ -70,6 +74,25 @@ namespace ControllerSelection {
         public Transform secondaryDown = null;
 		public Transform aDown = null;
 		public Transform bDown = null;
+
+		public Transform remoteGrab = null;
+		public float remoteGrabDistance;
+		//public Vector3 remoteGrabOffset;
+
+		private Vector3 remoteGrabStartPos = new Vector3(0f, 0f, 0f);
+		private Vector3 remoteGrabTargetPos = new Vector3(0f, 0f, 0f);
+		private Quaternion remoteGrabObjectStartQ = Quaternion.identity;
+		private Quaternion remoteGrabObjectTargetQ = Quaternion.identity;
+		private Quaternion remoteGrabControllerStartQ = Quaternion.identity;
+
+		private bool tractorBeaming = false;
+		private int tractorTime = 0;
+		private int tractorDelay = 3; // frames before tractorbeam begins
+
+		private Ray prevPointer;
+		private float remoteGrabPoke;
+		private int remoteGrabTime = 0;
+		private float approxMovingAvgPoke;
 
 		//[HideInInspector]
 		public OVRInput.Controller activeController = OVRInput.Controller.None;
@@ -96,7 +119,17 @@ namespace ControllerSelection {
             }
         }
 
-        void Update() {
+		void OnDrawGizmos()
+		{
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawWireSphere(remoteGrabStartPos, 0.04f);
+			Gizmos.color = Color.green;
+			Gizmos.DrawWireSphere(remoteGrabTargetPos, 0.04f);
+			//Gizmos.color = Color.red;
+			//Gizmos.DrawWireSphere(gizmoPos3, 0.04f);
+		}
+
+		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
             Ray pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
 
@@ -195,15 +228,48 @@ namespace ControllerSelection {
 					onHoverBDown.Invoke(bDown);
 				}
 
-				if (primaryDown)
+				if (primaryDown && !secondaryDown)
 				{
 					//Debug.Log(primaryDown);
-					onPrimarySelectDown.Invoke(primaryDown, pointer);
+					//Debug.Log(axisValue);
+					if (!tractorBeaming)
+					{
+						tractorBeaming = true;
+						tractorTime = 0;
+					}
+					else
+					{
+						tractorTime++;
+						if (tractorTime > tractorDelay)
+						{
+							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, activeController);
+							onPrimarySelectDownAxis.Invoke(primaryDown, pointer, axisValue);
+						}
+					}
 				}
-				if (secondaryDown)
+				else if (secondaryDown && !primaryDown)
 				{
 					//Debug.Log(secondaryDown);
-					onSecondarySelectDown.Invoke(secondaryDown, pointer);
+					//Debug.Log(axisValue);
+					if (!tractorBeaming)
+					{
+						tractorBeaming = true;
+						tractorTime = 0;
+					}
+					else
+					{
+						tractorTime++;
+						if (tractorTime > tractorDelay)
+						{
+							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, activeController);
+							onSecondarySelectDownAxis.Invoke(secondaryDown, pointer, axisValue);
+						}
+					}
+
+				}
+				else
+				{
+					tractorBeaming = false;
 				}
 
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -224,6 +290,48 @@ namespace ControllerSelection {
                 }
             }
 #endif
+
+				//REMOTE GRAB
+				if (!remoteGrab)
+				{
+					// remoteGrab not set - looking for candidate
+					if (lastHit)
+					{
+						if (primaryDown && secondaryDown)
+						{
+							if (lastHit == primaryDown && lastHit == secondaryDown)
+							{
+								// START remote grabbing
+								//Debug.Log(lastHit + " is candidate for remoteGrab");
+								remoteGrab = lastHit;
+								remoteGrabDistance = hit.distance;
+								//Debug.Log("   --->" + hit.distance);
+								remoteGrabStartPos = hit.point;
+								approxMovingAvgPoke = 0f;
+								remoteGrabTime = 0;
+
+								remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
+								remoteGrabControllerStartQ = OVRInput.GetLocalControllerRotation(activeController);
+
+								BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+								if (bu != null)
+								{
+									bu.remoteGrabSelectOn = true;
+									bu.UpdateRenderMode();
+								}
+
+								//Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
+								//remoteGrabOffset = hitRigidBody.position - hit.point;
+
+
+							}
+						}
+					}
+				}
+				else
+				{
+
+				}
 			}
             // Nothing was hit, handle exit callback
             else if (lastHit != null) {
@@ -232,6 +340,88 @@ namespace ControllerSelection {
                 }
                 lastHit = null;
             }
+
+			//REMOTE GRAB UPDATE (outside of hit test)
+			if (remoteGrab)
+			{
+				if ( (OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController)))
+				{
+					// still remote grabbing
+
+
+					// poke (detecting sustained controller movement along pointer axis)
+					remoteGrabTime++;
+
+					Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
+
+					float poke = Vector3.Dot(deltaPointer, pointer.direction);
+
+					approxMovingAvgPoke -= approxMovingAvgPoke / 5;
+					approxMovingAvgPoke += poke / 5;
+
+					//if (Mathf.Abs(poke) > 0.001f)
+					//{
+					//	Debug.Log("poke = " + poke);
+					//}
+
+
+					if (remoteGrabTime > 5)
+					{
+						// scale remoteGrabDistance 
+						remoteGrabDistance *= (1.0f + (poke * 5.0f));
+					}
+					
+					prevPointer = pointer;
+
+					remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
+
+					// tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
+					myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
+
+					//add ROLL - torque from wrist twist
+					Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
+					Quaternion remoteGrabControllerDeltaQ =   remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
+					remoteGrabObjectTargetQ =   remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
+
+					//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
+
+					Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
+					Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
+					Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
+
+
+					//Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
+
+					float zRot = vDelta.z;
+					if (zRot > 180.0f)
+					{
+						zRot -= 360.0f;
+					}
+
+					//Debug.Log(zRot);
+
+					if (Mathf.Abs(zRot) > 15.0f) // threshold 
+					{
+						remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
+					}
+
+					//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, q, 0.1f);
+
+				}
+				else
+				{
+					//END remote grabbing
+					BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+					if (bu != null)
+					{
+						bu.remoteGrabSelectOn = false;
+						bu.UpdateRenderMode();
+					}
+					remoteGrab = null;
+				}
+			}
         }
     }
 }
+// Useful ref:
+// https://developer.oculus.com/documentation/unity/latest/concepts/unity-integration-ovrinput/
