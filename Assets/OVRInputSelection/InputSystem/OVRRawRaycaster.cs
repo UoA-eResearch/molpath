@@ -196,7 +196,6 @@ namespace ControllerSelection {
 
 				lastHit = hit.transform;
 
-<<<<<<< HEAD
 				// TODO: Testing vive input
 				// if (hand != null) {
 				// 	if (hand.controller.GetPressDown(grip)) {
@@ -207,16 +206,6 @@ namespace ControllerSelection {
                 if (activeController != OVRInput.Controller.None) {
                     if (OVRInput.GetDown(secondaryButton, activeController)) {
                         secondaryDown = lastHit;
-=======
-				// Handle selection callbacks. An object is selected if the button selecting it was
-				// pressed AND released while hovering over the object.
-
-				if (activeController != OVRInput.Controller.None)
-				{
-					if (OVRInput.GetDown(secondaryButton, activeController))
-					{
-						secondaryDown = lastHit;
->>>>>>> master
 						//Debug.Log("1");
 					}
 					else if (OVRInput.GetUp(secondaryButton, activeController))
