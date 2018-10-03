@@ -22,6 +22,7 @@ limitations under the License.
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using Valve.VR.InteractionSystem;
 
 namespace ControllerSelection {
     public class OVRRawRaycaster : MonoBehaviour {
@@ -145,7 +146,22 @@ namespace ControllerSelection {
 
 		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
-            Ray pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+
+			// TODO: testing ray using vive control override.
+			Hand hand = null;
+			ulong grip = SteamVR_Controller.ButtonMask.Grip;
+			if (GameObject.Find("VivePlayer") != null) {
+				hand = GameObject.Find("VivePlayer").GetComponentInChildren<Hand>();
+			}
+
+			Ray pointer;
+			if (trackingSpace != null) {
+				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+			} else {
+				pointer = new Ray(hand.transform.position, hand.transform.forward);
+				Debug.DrawRay(hand.transform.position, hand.transform.forward);
+			}
+
 
             RaycastHit hit; // Was anything hit?
 			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
@@ -180,14 +196,16 @@ namespace ControllerSelection {
 
 				lastHit = hit.transform;
 
-				// Handle selection callbacks. An object is selected if the button selecting it was
-				// pressed AND released while hovering over the object.
+				// TODO: Testing vive input
+				// if (hand != null) {
+				// 	if (hand.controller.GetPressDown(grip)) {
+				// 	Debug.Log("gripping on " + hit.transform.name);
+				// 	}	
+				// }
 
-				if (activeController != OVRInput.Controller.None)
-				{
-					if (OVRInput.GetDown(secondaryButton, activeController))
-					{
-						secondaryDown = lastHit;
+                if (activeController != OVRInput.Controller.None) {
+                    if (OVRInput.GetDown(secondaryButton, activeController)) {
+                        secondaryDown = lastHit;
 						//Debug.Log("1");
 					}
 					else if (OVRInput.GetUp(secondaryButton, activeController))

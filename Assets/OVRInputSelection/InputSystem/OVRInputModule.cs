@@ -627,6 +627,7 @@ namespace ControllerSelection
         /// <returns></returns>
         protected MouseState GetGazePointerData()
         {
+            Debug.Log("gaze pointer firing");
             // Get the OVRRayPointerEventData reference
             OVRRayPointerEventData leftData;
             GetPointerData(kMouseLeftId, out leftData, true );
@@ -647,6 +648,7 @@ namespace ControllerSelection
 
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             // We're only interested in intersections from OVRRaycasters
+            Debug.Log(ovrRaycaster.transform.parent.name);
             if (ovrRaycaster) 
             {
                 // The Unity UI system expects event data to have a screen position
