@@ -53,6 +53,8 @@ namespace ControllerSelection {
 
 		public RawInteraction myRawInteraction;
 
+		public OVRPointerVisualizer myOVRPointerVisualizer;
+
         [Header("Hover Callbacks")]
         public OVRRawRaycaster.HoverCallback onHoverEnter;
         public OVRRawRaycaster.HoverCallback onHoverExit;
@@ -75,6 +77,8 @@ namespace ControllerSelection {
 		public Transform aDown = null;
 		public Transform bDown = null;
 
+		public Vector3 myHitPos;
+
 		public Transform remoteGrab = null;
 		public float remoteGrabDistance;
 		//public Vector3 remoteGrabOffset;
@@ -85,9 +89,13 @@ namespace ControllerSelection {
 		private Quaternion remoteGrabObjectTargetQ = Quaternion.identity;
 		private Quaternion remoteGrabControllerStartQ = Quaternion.identity;
 
+		private Transform centreEyeAnchor;
+
 		private bool tractorBeaming = false;
 		private int tractorTime = 0;
 		private int tractorDelay = 3; // frames before tractorbeam begins
+		private float tractorLerp = 0.01f;
+		private float tractorAxisInputFiltered = 0.0f;
 
 		private Ray prevPointer;
 		private float remoteGrabPoke;
@@ -101,7 +109,9 @@ namespace ControllerSelection {
             if (trackingSpace == null) {
                 Debug.LogWarning("OVRRawRaycaster did not have a tracking space set. Looking for one");
                 trackingSpace = OVRInputHelpers.FindTrackingSpace();
+				
             }
+			centreEyeAnchor =  trackingSpace.transform.Find("CenterEyeAnchor");
         }
 
         void OnEnable() {
@@ -125,8 +135,12 @@ namespace ControllerSelection {
 			Gizmos.DrawWireSphere(remoteGrabStartPos, 0.04f);
 			Gizmos.color = Color.green;
 			Gizmos.DrawWireSphere(remoteGrabTargetPos, 0.04f);
-			//Gizmos.color = Color.red;
-			//Gizmos.DrawWireSphere(gizmoPos3, 0.04f);
+			if (lastHit)
+			{
+				Gizmos.color = Color.black;
+				Gizmos.DrawWireSphere(myHitPos, 0.04f);
+			}
+
 		}
 
 		void Update() {
@@ -134,61 +148,84 @@ namespace ControllerSelection {
             Ray pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
 
             RaycastHit hit; // Was anything hit?
-            if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers)) {
-                if (lastHit != null && lastHit != hit.transform) {
-                    if (onHoverExit != null) {
-                        onHoverExit.Invoke(lastHit);
-                    }
-                    lastHit = null;
-                }
+			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
+			{
 
-                if (lastHit == null) {
-                    if (onHoverEnter != null) {
-                        onHoverEnter.Invoke(hit.transform);
-                    }
-                }
+				myHitPos = hit.point;
+				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
+				//Debug.Log(hit.distance);
 
-                if (onHover != null) {
-                    onHover.Invoke(hit.transform);
-                }
 
-                lastHit = hit.transform;
+				if (lastHit != null && lastHit != hit.transform)
+				{
+					if (onHoverExit != null)
+					{
+						onHoverExit.Invoke(lastHit);
+					}
+					lastHit = null;
+				}
 
-                // Handle selection callbacks. An object is selected if the button selecting it was
-                // pressed AND released while hovering over the object.
+				if (lastHit == null)
+				{
+					if (onHoverEnter != null)
+					{
+						onHoverEnter.Invoke(hit.transform);
+					}
+				}
 
-                if (activeController != OVRInput.Controller.None) {
-                    if (OVRInput.GetDown(secondaryButton, activeController)) {
-                        secondaryDown = lastHit;
+				if (onHover != null)
+				{
+					onHover.Invoke(hit.transform);
+				}
+
+				lastHit = hit.transform;
+
+				// Handle selection callbacks. An object is selected if the button selecting it was
+				// pressed AND released while hovering over the object.
+
+				if (activeController != OVRInput.Controller.None)
+				{
+					if (OVRInput.GetDown(secondaryButton, activeController))
+					{
+						secondaryDown = lastHit;
 						//Debug.Log("1");
-                    }
-                    else if (OVRInput.GetUp(secondaryButton, activeController)) {
-                        if (secondaryDown != null && secondaryDown == lastHit) {
-                            if (onSecondarySelect != null) {
-                                onSecondarySelect.Invoke(secondaryDown, pointer);
+					}
+					else if (OVRInput.GetUp(secondaryButton, activeController))
+					{
+						if (secondaryDown != null && secondaryDown == lastHit)
+						{
+							if (onSecondarySelect != null)
+							{
+								onSecondarySelect.Invoke(secondaryDown, pointer);
 								//Debug.Log("2");
 							}
-                        }
-                    }
-                    if (!OVRInput.Get(secondaryButton, activeController)) {
-                        secondaryDown = null;
+						}
+					}
+					if (!OVRInput.Get(secondaryButton, activeController))
+					{
+						secondaryDown = null;
 						//Debug.Log("3");
 					}
 
-                    if (OVRInput.GetDown(primaryButton, activeController)) {
-                        primaryDown = lastHit;
+					if (OVRInput.GetDown(primaryButton, activeController))
+					{
+						primaryDown = lastHit;
 						//Debug.Log("4");
 					}
-                    else if (OVRInput.GetUp(primaryButton, activeController)) {
-                        if (primaryDown != null && primaryDown == lastHit) {
-                            if (onPrimarySelect != null) {
-                                onPrimarySelect.Invoke(primaryDown, pointer);
+					else if (OVRInput.GetUp(primaryButton, activeController))
+					{
+						if (primaryDown != null && primaryDown == lastHit)
+						{
+							if (onPrimarySelect != null)
+							{
+								onPrimarySelect.Invoke(primaryDown, pointer);
 								//Debug.Log("5");
 							}
-                        }
-                    }
-                    if (!OVRInput.Get(primaryButton, activeController)) {
-                        primaryDown = null;
+						}
+					}
+					if (!OVRInput.Get(primaryButton, activeController))
+					{
+						primaryDown = null;
 						//Debug.Log("6");
 					}
 				}
@@ -236,6 +273,7 @@ namespace ControllerSelection {
 					{
 						tractorBeaming = true;
 						tractorTime = 0;
+						tractorAxisInputFiltered = 0.0f;
 					}
 					else
 					{
@@ -243,7 +281,8 @@ namespace ControllerSelection {
 						if (tractorTime > tractorDelay)
 						{
 							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, activeController);
-							onPrimarySelectDownAxis.Invoke(primaryDown, pointer, axisValue);
+							tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
+							onPrimarySelectDownAxis.Invoke(primaryDown, pointer, tractorAxisInputFiltered);
 						}
 					}
 				}
@@ -255,6 +294,7 @@ namespace ControllerSelection {
 					{
 						tractorBeaming = true;
 						tractorTime = 0;
+						tractorAxisInputFiltered = 0.0f;
 					}
 					else
 					{
@@ -262,7 +302,8 @@ namespace ControllerSelection {
 						if (tractorTime > tractorDelay)
 						{
 							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, activeController);
-							onSecondarySelectDownAxis.Invoke(secondaryDown, pointer, axisValue);
+							tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
+							onSecondarySelectDownAxis.Invoke(secondaryDown, pointer, tractorAxisInputFiltered);
 						}
 					}
 
@@ -333,13 +374,19 @@ namespace ControllerSelection {
 
 				}
 			}
-            // Nothing was hit, handle exit callback
-            else if (lastHit != null) {
-                if (onHoverExit != null) {
-                    onHoverExit.Invoke(lastHit);
-                }
-                lastHit = null;
-            }
+			// Nothing was hit, handle exit callback
+			else
+			{
+				myOVRPointerVisualizer.rayDrawDistance = 10.0f;
+
+				if (lastHit != null) {
+					if (onHoverExit != null) {
+						onHoverExit.Invoke(lastHit);
+					}
+					lastHit = null;
+				}
+			}
+
 
 			//REMOTE GRAB UPDATE (outside of hit test)
 			if (remoteGrab)
@@ -378,34 +425,55 @@ namespace ControllerSelection {
 					// tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
 					myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
 
-					//add ROLL - torque from wrist twist
-					Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
-					Quaternion remoteGrabControllerDeltaQ =   remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
-					remoteGrabObjectTargetQ =   remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
 
-					//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
-
-					Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
-					Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
-					Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
-
-
-					//Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
-
-					float zRot = vDelta.z;
-					if (zRot > 180.0f)
+					BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+					if (bu != null)
 					{
-						zRot -= 360.0f;
+						//add ROLL - torque from wrist twist
+						Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
+						Quaternion remoteGrabControllerDeltaQ =   remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
+						remoteGrabObjectTargetQ =   remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
+
+						//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
+
+
+						Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
+						Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
+						Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
+
+						//Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
+
+						float zRot = vDelta.z;
+						if (zRot > 180.0f)
+						{
+							zRot -= 360.0f;
+						}
+
+						//Debug.Log(zRot);
+
+						if (Mathf.Abs(zRot) > 15.0f) // threshold 
+						{
+							remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
+						}
+					}
+					else
+					{
+						// not bu - UI - make the 'front' face the pointer
+						// flipped because go was initially set up with z facing away
+
+						//Use pointer position
+						//Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
+
+						//Use HMD (possibly better - maybe a bit queasy)
+						Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + centreEyeAnchor.forward;
+
+						remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+
+
 					}
 
-					//Debug.Log(zRot);
 
-					if (Mathf.Abs(zRot) > 15.0f) // threshold 
-					{
-						remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
-					}
 
-					//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, q, 0.1f);
 
 				}
 				else
