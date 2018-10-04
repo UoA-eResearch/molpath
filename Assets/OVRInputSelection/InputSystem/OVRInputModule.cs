@@ -646,7 +646,9 @@ namespace ControllerSelection
             leftData.pointerCurrentRaycast = raycast;
             m_RaycastResultCache.Clear();
 
+            Debug.Log(raycast);
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
+            Debug.Log(ovrRaycaster);
             // We're only interested in intersections from OVRRaycasters
             Debug.Log(ovrRaycaster.transform.parent.name);
             if (ovrRaycaster) 
