@@ -294,6 +294,7 @@ MonoBehaviour:
   phiTarget: 0
   psiTarget: 0
   phiPsiDrive: 100
+  doCartoonBondRendering: 0
   phiSliderUI: {fileID: 0}
   psiSliderUI: {fileID: 0}
   vdwSliderUI: {fileID: 0}
@@ -444,7 +445,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4602273990852288, guid: 9d985ad4c0de3664ca7de0ca1a34ae54, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -4
       objectReference: {fileID: 0}
     - target: {fileID: 4602273990852288, guid: 9d985ad4c0de3664ca7de0ca1a34ae54, type: 2}
       propertyPath: m_LocalRotation.x
@@ -481,7 +482,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4523328226048858, guid: 9d985ad4c0de3664ca7de0ca1a34ae54, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -3.5
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9d985ad4c0de3664ca7de0ca1a34ae54, type: 2}
