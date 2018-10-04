@@ -23,6 +23,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using Valve.VR.InteractionSystem;
 
 namespace ControllerSelection 
 {
@@ -646,7 +647,7 @@ namespace ControllerSelection
             leftData.pointerCurrentRaycast = raycast;
             m_RaycastResultCache.Clear();
 
-            Debug.Log(raycast);
+            // Debug.Log(raycast);
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             Debug.Log(ovrRaycaster);
             // We're only interested in intersections from OVRRaycasters
@@ -853,6 +854,19 @@ namespace ControllerSelection
             if (activeController != OVRInput.Controller.None) {
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
+            } else if (GameObject.Find("VivePlayer") != null) {
+                Hand[] hands = GameObject.Find("VivePlayer").GetComponentsInChildren<Hand>();
+                Hand hand1 = hands[0];
+                Hand hand2 = hands[1];
+                ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
+                if (hand1.controller.GetPress(touchpad) || hand2.controller.GetPress(touchpad)) {
+                    Debug.Log("one of the hands it pressing");
+                    pressed = true;
+                    released = false;
+                } else {
+                    pressed = false;
+                    released = true;
+                }
             }
             else {
                 pressed = OVRInput.GetDown(joyPadClickButton);
