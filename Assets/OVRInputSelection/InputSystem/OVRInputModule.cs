@@ -661,6 +661,7 @@ namespace ControllerSelection
                 RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
                 if (graphicRect != null)
                 {
+                    Debug.Log("ww: hitting a graphic rect");
                     // Set are gaze indicator with this world position and normal
                    // Vector3 worldPos = raycast.worldPosition;
                     //Vector3 normal = GetRectTransformNormal(graphicRect);

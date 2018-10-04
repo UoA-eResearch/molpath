@@ -20,13 +20,14 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 namespace ControllerSelection {
     public class OVRInputHelpers {
         // Given a controller and tracking spcae, return the ray that controller uses.
         // Will fall back to center eye or camera on Gear if no controller is present.
         public static Ray GetSelectionRay(OVRInput.Controller activeController, Transform trackingSpace) {
-            if (trackingSpace != null && activeController != OVRInput.Controller.None) {
+            if (trackingSpace != null && trackingSpace.parent.gameObject.activeInHierarchy && activeController != OVRInput.Controller.None) {
                 Quaternion orientation = OVRInput.GetLocalControllerRotation(activeController);
                 Vector3 localStartPoint = OVRInput.GetLocalControllerPosition(activeController);
 
@@ -37,20 +38,37 @@ namespace ControllerSelection {
                 return new Ray(worldStartPoint, worldOrientation);
             }
 
-            Transform cameraTransform = Camera.main.transform;
-
-            if (OVRManager.instance != null && GameObject.Find("VivePlayer") == null) {
-                OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
+            // check if vive player exists, returns ray from vive if present.
+            Transform vivePlayer = GameObject.Find("VivePlayer").transform;
+            if (vivePlayer != null) {
+                // grabs the camera hopefully lol.
+                Transform viveCamera = vivePlayer.GetComponent<Player>().hmdTransforms[0];
+                if (viveCamera != null) {
+                    return new Ray(viveCamera.position, viveCamera.forward);
+                } else {
+                    return new Ray(vivePlayer.position, vivePlayer.forward);
+                }
+            } else {
+                Transform cameraTransform = Camera.main.transform;
+                if (OVRManager.instance != null && GameObject.Find("VivePlayer") == null) {
+                    OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
                 if (cameraRig != null) {
                     cameraTransform = cameraRig.centerEyeAnchor;
                 }
+                }
+                Debug.Log(cameraTransform.parent.name);
+                return new Ray(cameraTransform.position, cameraTransform.forward);    
             }
-
-            return new Ray(cameraTransform.position, cameraTransform.forward);
         }
 
         // Search the scene to find a tracking spce. This method can be expensive! Try to avoid it if possible.
         public static Transform FindTrackingSpace() {
+            // Vive adaption:
+            if (GameObject.Find("VivePlayer")) {
+                Debug.Log("Using VivePlayer root as the tracking space transform.");
+                return GameObject.Find("VivePlayer").transform;
+            }
+
             // There should be an OVRManager in the scene
             if (OVRManager.instance != null) {
                 Transform trackingSpace = OVRManager.instance.transform.Find("TrackingSpace");
