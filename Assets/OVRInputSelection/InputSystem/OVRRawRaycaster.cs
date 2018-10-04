@@ -158,8 +158,12 @@ namespace ControllerSelection {
 			if (trackingSpace != null) {
 				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
 			} else {
-				pointer = new Ray(hand.transform.position, hand.transform.forward);
-				Debug.DrawRay(hand.transform.position, hand.transform.forward);
+				// pointer = new Ray(hand.transform.position, hand.transform.forward);
+				// Debug.DrawRay(hand.transform.position, hand.transform.forward);
+				
+				// should evaluate to viveplayer camera
+				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
+				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
 			}
 
 
@@ -171,7 +175,7 @@ namespace ControllerSelection {
 				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
 				//Debug.Log(hit.distance);
 
-
+				Debug.Log(hit.transform.name);
 				if (lastHit != null && lastHit != hit.transform)
 				{
 					if (onHoverExit != null)
@@ -202,6 +206,8 @@ namespace ControllerSelection {
 				// 	Debug.Log("gripping on " + hit.transform.name);
 				// 	}	
 				// }
+
+				Debug.Log(activeController);
 
                 if (activeController != OVRInput.Controller.None) {
                     if (OVRInput.GetDown(secondaryButton, activeController)) {

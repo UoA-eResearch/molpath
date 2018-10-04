@@ -64,7 +64,7 @@ namespace ControllerSelection {
 
         public void SetPointer(Ray ray) {
             if (linePointer != null) {
-                Debug.Log("WWWW ray origin: " + ray.origin);
+                Debug.Log("Vive test: ray origin: " + ray.origin);
                 linePointer.SetPosition(0, ray.origin);
 				linePointer.SetPosition(1, ray.origin + ray.direction * rayDrawDistance);
             }
@@ -75,6 +75,7 @@ namespace ControllerSelection {
         }
 
         public void SetPointerVisibility() {
+            // TODO: Vive: Add condition to track VivePlayer hand as well.
             if (trackingSpace != null && activeController != OVRInput.Controller.None) {
                 if (linePointer != null) {
 					linePointer.enabled = true;
