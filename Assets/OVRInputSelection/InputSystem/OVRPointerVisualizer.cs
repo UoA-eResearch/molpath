@@ -74,8 +74,8 @@ namespace ControllerSelection {
             }
         }
 
+        public GameObject hand;
         public void SetPointerVisibility() {
-            // TODO: Vive: Add condition to track VivePlayer hand as well.
             if (trackingSpace != null && activeController != OVRInput.Controller.None) {
                 if (linePointer != null) {
 					linePointer.enabled = true;
@@ -84,7 +84,15 @@ namespace ControllerSelection {
                     gazePointer.gameObject.SetActive(false);
                 }
             }
-            else {
+            //Vive: Add condition to track VivePlayer hand as well.
+            else if (hand.activeInHierarchy) {
+                if (linePointer != null) {
+					linePointer.enabled = true;
+                }
+                if (gazePointer != null) {
+                    gazePointer.gameObject.SetActive(false);
+                }
+            } else {
                 if (linePointer != null) {
                     linePointer.enabled = false;
                 }

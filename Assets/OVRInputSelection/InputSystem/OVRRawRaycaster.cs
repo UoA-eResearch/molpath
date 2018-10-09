@@ -144,10 +144,16 @@ namespace ControllerSelection {
 
 		}
 
-		// private void TractorBeam(Transform targ, Ray pointer, float value) {
-		// 	float axisValue = 100f;
-		// 	onPrimarySelectDownAxis.Invoke(primaryDown, )
-		// }
+		// WIP.
+		private void HandleViveHandInput(Hand hand, Transform hit, Ray pointer){
+			ulong grip = SteamVR_Controller.ButtonMask.Grip;
+			if (hand.controller.GetPress(grip)) {
+				float axisValue =hand.controller.GetAxis().y;
+				float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
+				tractorAxisInputFiltered *= -100;
+				onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+			}
+		}
 
 		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
@@ -198,52 +204,26 @@ namespace ControllerSelection {
 
 				lastHit = hit.transform;
 
-				// TODO: Testing vive input
-				// if (hand != null) {
-				// 	if (hand.controller.GetPressDown(grip)) {
-				// 	Debug.Log("gripping on " + hit.transform.name);
-				// 	}	
-				// }
-				// Polling for vive inputs:
-				// TODO: testing ray using vive control override.
-				Hand hand = null;
-				ulong trigger = SteamVR_Controller.ButtonMask.Trigger;
-				// if (GameObject.Find("VivePlayer") != null) {
-				// 	hand = GameObject.Find("VivePlayer").GetComponentInChildren<Hand>();
-				// }
-				// if (hand.controller.GetHairTriggerDown()) {
-				// 	primaryDown = lastHit;
-				// } else if (hand.controller.GetHairTriggerUp()){
-				// 	Debug.Log("gripping");
-				// 	if (primaryDown != null && primaryDown == lastHit)
-				// 		{
-				// 			if (onPrimarySelect != null)
-				// 			{
-				// 				Debug.Log("Invoking from trigger");
-				// 				onPrimarySelect.Invoke(primaryDown, pointer);
-				// 				//Debug.Log("5");
-				// 			}
-				// 		}
-				// }
-				// TEST:
+				// start of vive input handling
 				GameObject vP = GameObject.Find("VivePlayer");
 				if (vP != null) {
 					Debug.Log(vP.name);
 					Hand h1 = vP.GetComponent<Player>().hands[0];
 					Hand h2 = vP.GetComponent<Player>().hands[1];
-					if (h1 || h2) {
-						Debug.Log("one of the hands is not null.");
-						ulong grip = SteamVR_Controller.ButtonMask.Grip;
-						if (h2.controller.GetPress(grip)) {
-							float axisValue = h2.controller.GetAxis().y;
-							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
-							tractorAxisInputFiltered *= 100;
-							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
-						}
+					ulong grip = SteamVR_Controller.ButtonMask.Grip;
+					if (h1) {
 						if (h1.controller.GetPress(grip)) {
 							float axisValue = h1.controller.GetAxis().y;
 							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
 							tractorAxisInputFiltered *= -100;
+							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+						}
+					}
+					if (h2) {
+						if (h2.controller.GetPress(grip)) {
+							float axisValue = h2.controller.GetAxis().y;
+							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
+							tractorAxisInputFiltered *= 100;
 							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
 						}
 					}
