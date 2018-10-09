@@ -421,8 +421,9 @@ namespace ControllerSelection {
 								BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
 								if (bu != null)
 								{
-									bu.remoteGrabSelectOn = true;
-									bu.UpdateRenderMode();
+									bu.SetRemoteGrabSelect(true);
+									//bu.remoteGrabSelectOn = true;
+									//bu.UpdateRenderMode();
 								}
 
 								//Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
@@ -546,8 +547,9 @@ namespace ControllerSelection {
 					BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
 					if (bu != null)
 					{
-						bu.remoteGrabSelectOn = false;
-						bu.UpdateRenderMode();
+						bu.SetRemoteGrabSelect(false);
+						//bu.remoteGrabSelectOn = false;
+						//bu.UpdateRenderMode();
 					}
 					remoteGrab = null;
 				}
