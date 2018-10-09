@@ -108,7 +108,7 @@ public class RawInteraction : MonoBehaviour {
         if (t.gameObject.name == "BackButton") {
             SceneManager.LoadScene("main", LoadSceneMode.Single);
         }
-        //Debug.Log("Clicked on " + t.gameObject.name);
+        Debug.Log("Clicked on " + t.gameObject.name);
         if (outText != null) {
             outText.text = "<b>Last Interaction:</b>\nClicked On:" + t.gameObject.name;
         }
@@ -131,6 +131,16 @@ public class RawInteraction : MonoBehaviour {
 	{
 		//Debug.Log("Primary Select Button Down" + t.gameObject.name);
 
+		// Vive adaptation. If no system specified default to Oculus
+		bool attract = false;
+		if (GameObject.Find("VivePlayer") != null) {
+			if (axisValue > -0.5f) {
+				attract = true;
+			} else {
+				attract = false;
+			}
+		}
+
 		GameObject go = t.gameObject;
 		//BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
 		//if (bu != null)
@@ -138,7 +148,7 @@ public class RawInteraction : MonoBehaviour {
 			//Debug.Log("      --> script");
 			//bu.TractorBeam(pointer.origin, false, 1.0f);
 			//Debug.Log(axisValue);
-			TractorBeam(go, pointer.origin, false, axisValue * 1.5f);
+			TractorBeam(go, pointer.origin, attract, axisValue * 1.5f);
 		}
 
 	}

@@ -628,7 +628,7 @@ namespace ControllerSelection
         /// <returns></returns>
         protected MouseState GetGazePointerData()
         {
-            Debug.Log("gaze pointer firing");
+            Debug.Log("Get gaze pointer data called.");
             // Get the OVRRayPointerEventData reference
             OVRRayPointerEventData leftData;
             GetPointerData(kMouseLeftId, out leftData, true );
@@ -648,10 +648,10 @@ namespace ControllerSelection
             m_RaycastResultCache.Clear();
 
             // Debug.Log(raycast);
+            Debug.Log(raycast.module);
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             Debug.Log(ovrRaycaster);
             // We're only interested in intersections from OVRRaycasters
-            Debug.Log(ovrRaycaster.transform.parent.name);
             if (ovrRaycaster) 
             {
                 // The Unity UI system expects event data to have a screen position
@@ -675,6 +675,7 @@ namespace ControllerSelection
                 }
             }
             OVRPhysicsRaycaster physicsRaycaster = raycast.module as OVRPhysicsRaycaster;
+            Debug.Log(physicsRaycaster);
             if (physicsRaycaster)
             {
                 leftData.position = physicsRaycaster.GetScreenPos(raycast.worldPosition);
@@ -855,12 +856,13 @@ namespace ControllerSelection
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
             } else if (GameObject.Find("VivePlayer") != null) {
+                // adaption for vive input
                 Hand[] hands = GameObject.Find("VivePlayer").GetComponentsInChildren<Hand>();
                 Hand hand1 = hands[0];
                 Hand hand2 = hands[1];
                 ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
                 if (hand1.controller.GetPress(touchpad) || hand2.controller.GetPress(touchpad)) {
-                    Debug.Log("one of the hands it pressing");
+                    // Debug.Log("one of the hands it pressing");
                     pressed = true;
                     released = false;
                 } else {

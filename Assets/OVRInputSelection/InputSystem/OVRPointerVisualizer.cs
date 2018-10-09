@@ -64,7 +64,7 @@ namespace ControllerSelection {
 
         public void SetPointer(Ray ray) {
             if (linePointer != null) {
-                Debug.Log("Vive test: ray origin: " + ray.origin);
+                // Debug.Log("Vive test: ray origin: " + ray.origin);
                 linePointer.SetPosition(0, ray.origin);
 				linePointer.SetPosition(1, ray.origin + ray.direction * rayDrawDistance);
             }
@@ -100,7 +100,7 @@ namespace ControllerSelection {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
             Ray selectionRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
             SetPointerVisibility();
-            Debug.Log("selection ray origin in pointer vis " + selectionRay.origin);
+            // Debug.Log("selection ray origin in pointer vis " + selectionRay.origin);
             SetPointer(selectionRay);
         }
     }

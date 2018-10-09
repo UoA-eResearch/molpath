@@ -144,15 +144,15 @@ namespace ControllerSelection {
 
 		}
 
+		// private void TractorBeam(Transform targ, Ray pointer, float value) {
+		// 	float axisValue = 100f;
+		// 	onPrimarySelectDownAxis.Invoke(primaryDown, )
+		// }
+
 		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
 
-			// TODO: testing ray using vive control override.
-			Hand hand = null;
-			ulong grip = SteamVR_Controller.ButtonMask.Grip;
-			if (GameObject.Find("VivePlayer") != null) {
-				hand = GameObject.Find("VivePlayer").GetComponentInChildren<Hand>();
-			}
+			
 
 			Ray pointer;
 			if (trackingSpace != null) {
@@ -170,12 +170,10 @@ namespace ControllerSelection {
             RaycastHit hit; // Was anything hit?
 			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
 			{
-
+				Debug.Log("From raw raycast if something was hit" + hit.transform.name);
 				myHitPos = hit.point;
 				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
 				//Debug.Log(hit.distance);
-
-				Debug.Log(hit.transform.name);
 				if (lastHit != null && lastHit != hit.transform)
 				{
 					if (onHoverExit != null)
@@ -206,8 +204,50 @@ namespace ControllerSelection {
 				// 	Debug.Log("gripping on " + hit.transform.name);
 				// 	}	
 				// }
-
-				Debug.Log(activeController);
+				// Polling for vive inputs:
+				// TODO: testing ray using vive control override.
+				Hand hand = null;
+				ulong trigger = SteamVR_Controller.ButtonMask.Trigger;
+				// if (GameObject.Find("VivePlayer") != null) {
+				// 	hand = GameObject.Find("VivePlayer").GetComponentInChildren<Hand>();
+				// }
+				// if (hand.controller.GetHairTriggerDown()) {
+				// 	primaryDown = lastHit;
+				// } else if (hand.controller.GetHairTriggerUp()){
+				// 	Debug.Log("gripping");
+				// 	if (primaryDown != null && primaryDown == lastHit)
+				// 		{
+				// 			if (onPrimarySelect != null)
+				// 			{
+				// 				Debug.Log("Invoking from trigger");
+				// 				onPrimarySelect.Invoke(primaryDown, pointer);
+				// 				//Debug.Log("5");
+				// 			}
+				// 		}
+				// }
+				// TEST:
+				GameObject vP = GameObject.Find("VivePlayer");
+				if (vP != null) {
+					Debug.Log(vP.name);
+					Hand h1 = vP.GetComponent<Player>().hands[0];
+					Hand h2 = vP.GetComponent<Player>().hands[1];
+					if (h1 || h2) {
+						Debug.Log("one of the hands is not null.");
+						ulong grip = SteamVR_Controller.ButtonMask.Grip;
+						if (h2.controller.GetPress(grip)) {
+							float axisValue = h2.controller.GetAxis().y;
+							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
+							tractorAxisInputFiltered *= 100;
+							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+						}
+						if (h1.controller.GetPress(grip)) {
+							float axisValue = h1.controller.GetAxis().y;
+							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
+							tractorAxisInputFiltered *= -100;
+							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+						}
+					}
+				}
 
                 if (activeController != OVRInput.Controller.None) {
                     if (OVRInput.GetDown(secondaryButton, activeController)) {

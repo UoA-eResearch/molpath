@@ -52,9 +52,9 @@ namespace ControllerSelection {
                 Transform cameraTransform = Camera.main.transform;
                 if (OVRManager.instance != null && GameObject.Find("VivePlayer") == null) {
                     OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
-                if (cameraRig != null) {
-                    cameraTransform = cameraRig.centerEyeAnchor;
-                }
+                    if (cameraRig != null) {
+                        cameraTransform = cameraRig.centerEyeAnchor;
+                    }
                 }
                 Debug.Log(cameraTransform.parent.name);
                 return new Ray(cameraTransform.position, cameraTransform.forward);    
