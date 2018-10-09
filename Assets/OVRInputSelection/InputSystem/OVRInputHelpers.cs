@@ -39,14 +39,22 @@ namespace ControllerSelection {
             }
 
             // check if vive player exists, returns ray from vive if present.
-            Transform vivePlayer = GameObject.Find("VivePlayer").transform;
-            if (vivePlayer != null) {
-                // grabs the camera hopefully lol.
-                Transform viveCamera = vivePlayer.GetComponent<Player>().hmdTransforms[0];
+            Transform vivePlayerTransform = GameObject.Find("VivePlayer").transform;
+            if (vivePlayerTransform != null) {
+                Player vivePlayer = vivePlayerTransform.GetComponent<Player>();
+
+                // try for hand first
+                Transform hand = vivePlayer.hands[0].transform;
+                if (hand != null) {
+                    Debug.Log("get selection ray using hand transform");
+                    return new Ray(hand.position, hand.forward);
+                }
+                // use vive camera as fallback
+                Transform viveCamera = vivePlayer.hmdTransforms[0];
                 if (viveCamera != null) {
                     return new Ray(viveCamera.position, viveCamera.forward);
                 } else {
-                    return new Ray(vivePlayer.position, vivePlayer.forward);
+                    return new Ray(vivePlayerTransform.position, vivePlayerTransform.forward);
                 }
             } else {
                 Transform cameraTransform = Camera.main.transform;
