@@ -96,6 +96,7 @@ public class BackboneUnit : MonoBehaviour {
 	public void SetBackboneUnitControllerHover(bool flag)
 	{
 		controllerHoverOn = flag;
+		myResidue.residueHovered = flag;
 		UpdateRenderMode();
 	}
 
@@ -112,6 +113,9 @@ public class BackboneUnit : MonoBehaviour {
 			buAmide.SetBackboneUnitSelect(flag);
 			buCalpha.SetBackboneUnitSelect(flag);
 			buCarbonyl.SetBackboneUnitSelect(flag);
+
+			//Debug.Log(res + " " + flag);
+			myResidue.residueSelected = flag;
 		}
 	}
 
@@ -129,6 +133,13 @@ public class BackboneUnit : MonoBehaviour {
 			UpdateRenderMode();
 			activeSequenceSelectLast = activeSequenceSelect;	
 		}
+	}
+
+	public void SetRemoteGrabSelect(bool value)
+	{
+		remoteGrabSelectOn = value;
+		myResidue.residueGrabbed = value;
+		UpdateRenderMode();
 	}
 
 	private void SetRenderingMode(GameObject go, string shaderName)
