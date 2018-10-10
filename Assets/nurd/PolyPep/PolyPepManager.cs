@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Valve.VR.InteractionSystem;
 
 
 public class PolyPepManager : MonoBehaviour {
@@ -307,6 +308,7 @@ public class PolyPepManager : MonoBehaviour {
 			Transform polyPepTransform = polyPepBuilder.transform;
 			foreach (BackboneUnit bbu in polyPepTransform.GetComponentsInChildren<BackboneUnit>()) {
 				Debug.Log(bbu.transform.name);
+				// bbu.transform.gameObject.AddComponent<Interactable>();
 			}
 		}
 	}

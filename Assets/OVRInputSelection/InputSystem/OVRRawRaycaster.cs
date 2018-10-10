@@ -144,17 +144,6 @@ namespace ControllerSelection {
 
 		}
 
-		// WIP.
-		private void HandleViveHandInput(Hand hand, Transform hit, Ray pointer){
-			ulong grip = SteamVR_Controller.ButtonMask.Grip;
-			if (hand.controller.GetPress(grip)) {
-				float axisValue =hand.controller.GetAxis().y;
-				float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
-				tractorAxisInputFiltered *= -100;
-				onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
-			}
-		}
-
 		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
 
