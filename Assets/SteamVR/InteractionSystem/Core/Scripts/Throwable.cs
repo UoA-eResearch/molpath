@@ -103,6 +103,7 @@ namespace Valve.VR.InteractionSystem
 			//Trigger got pressed
 			if ( hand.GetStandardInteractionButtonDown() )
 			{
+				Debug.Log("hand standard interaction button pressed in throwable. Should attach game object.");
 				hand.AttachObject( gameObject, attachmentFlags, attachmentPoint );
 				ControllerButtonHints.HideButtonHint( hand, Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger );
 			}

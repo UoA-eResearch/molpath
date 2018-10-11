@@ -806,7 +806,9 @@ namespace Valve.VR.InteractionSystem
 			}
 			else if ( controller != null )
 			{
-				return controller.GetHairTriggerDown();
+				Debug.Log("from hand.cs - using standard interaction button down");
+				// return controller.GetHairTriggerDown();
+				return controller.GetPressDown(EVRButtonId.k_EButton_Grip);
 			}
 
 			return false;
@@ -824,7 +826,8 @@ namespace Valve.VR.InteractionSystem
 			}
 			else if ( controller != null )
 			{
-				return controller.GetHairTriggerUp();
+				// return controller.GetHairTriggerUp();
+				return controller.GetPressUp(EVRButtonId.k_EButton_Grip);
 			}
 
 			return false;
@@ -842,7 +845,8 @@ namespace Valve.VR.InteractionSystem
 			}
 			else if ( controller != null )
 			{
-				return controller.GetHairTrigger();
+				// return controller.GetHairTrigger();
+				return controller.GetPress(EVRButtonId.k_EButton_Grip);
 			}
 
 			return false;

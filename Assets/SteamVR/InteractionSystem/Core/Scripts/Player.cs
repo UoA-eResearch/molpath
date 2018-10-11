@@ -402,19 +402,5 @@ namespace Valve.VR.InteractionSystem
 		{
 			//Do something appropriate here
 		}
-
-		public void PickUpObject() {
-			// TODO: This probably won't work
-			// Add pickup code for segments.
-			foreach (var hand in hands) {
-				if (hand.hoveringInteractable != null) {
-					if (hand.hoveringInteractable.GetComponent<Interactable>() != null) {
-						if (hand.controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip)){
-						hand.AttachObject(hand.hoveringInteractable.gameObject);
-						}
-					}
-				}
-			}
-		}
 	}
 }

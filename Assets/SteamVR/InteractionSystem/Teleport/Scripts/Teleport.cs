@@ -1089,9 +1089,7 @@ namespace Valve.VR.InteractionSystem
 				}
 				else
 				{
-					// return hand.controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad );
-					Debug.Log(hand.controller.GetAxis(EVRButtonId.k_EButton_SteamVR_Trigger));
-					return hand.controller.GetHairTriggerUp();
+					return hand.controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad );
 				}
 			}
 
@@ -1110,8 +1108,7 @@ namespace Valve.VR.InteractionSystem
 				}
 				else
 				{
-					// return hand.controller.GetPress( SteamVR_Controller.ButtonMask.Touchpad );
-					return hand.controller.GetHairTrigger();
+					return hand.controller.GetPress( SteamVR_Controller.ButtonMask.Touchpad );
 				}
 			}
 
@@ -1130,8 +1127,7 @@ namespace Valve.VR.InteractionSystem
 				}
 				else
 				{
-					// return hand.controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad );
-					return hand.controller.GetHairTriggerDown();
+					return hand.controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad );
 				}
 			}
 
