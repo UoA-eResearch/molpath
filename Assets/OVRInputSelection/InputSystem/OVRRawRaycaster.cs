@@ -165,7 +165,6 @@ namespace ControllerSelection {
             RaycastHit hit; // Was anything hit?
 			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
 			{
-				Debug.Log("From raw raycast if something was hit" + hit.transform.name);
 				myHitPos = hit.point;
 				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
 				//Debug.Log(hit.distance);
@@ -196,7 +195,6 @@ namespace ControllerSelection {
 				// start of vive input handling
 				GameObject vP = GameObject.Find("VivePlayer");
 				if (vP != null) {
-					Debug.Log(vP.name);
 					Hand h1 = vP.GetComponent<Player>().hands[0];
 					Hand h2 = vP.GetComponent<Player>().hands[1];
 					if (h1) {

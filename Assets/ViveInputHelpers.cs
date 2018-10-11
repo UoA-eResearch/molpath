@@ -20,10 +20,11 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
+using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-namespace ControllerSelection {
-    public class OVRInputHelpers {
+
+    public class ViveInputHelpers {
         // Given a controller and tracking spcae, return the ray that controller uses.
         // Will fall back to center eye or camera on Gear if no controller is present.
         public static Ray GetSelectionRay(OVRInput.Controller activeController, Transform trackingSpace) {
@@ -75,34 +76,6 @@ namespace ControllerSelection {
                 Debug.Log("Using VivePlayer root as the tracking space transform.");
                 return GameObject.Find("VivePlayer").transform;
             }
-
-            // There should be an OVRManager in the scene
-            if (OVRManager.instance != null) {
-                Transform trackingSpace = OVRManager.instance.transform.Find("TrackingSpace");
-                if (trackingSpace != null) {
-                    return trackingSpace;
-                }
-            }
-
-            Debug.LogWarning("OVRManager is not in scene, finding tracking space is going to be expensive!");
-
-            // Look for any CameraRig objects
-            OVRCameraRig[] cameraRigs = UnityEngine.Object.FindObjectsOfType(typeof(OVRCameraRig)) as OVRCameraRig[];
-            foreach (OVRCameraRig cameraRig in cameraRigs) {
-                if (cameraRig.gameObject.activeSelf) {
-                    Transform trackingSpace = cameraRig.transform.Find("TrackingSpace");
-                    if (trackingSpace != null) {
-                        return trackingSpace;
-                    }
-                }
-            }
-
-            // Last resort, look for a tracking space
-            GameObject trackingSpaceGO = UnityEngine.GameObject.Find("TrackingSpace");
-            if (trackingSpaceGO != null) {
-                return trackingSpaceGO.transform;
-            }
-
             // Guess it doesn't exist
             return null;
         }

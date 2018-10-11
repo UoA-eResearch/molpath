@@ -628,7 +628,6 @@ namespace ControllerSelection
         /// <returns></returns>
         protected MouseState GetGazePointerData()
         {
-            Debug.Log("Get gaze pointer data called.");
             // Get the OVRRayPointerEventData reference
             OVRRayPointerEventData leftData;
             GetPointerData(kMouseLeftId, out leftData, true );
@@ -649,6 +648,9 @@ namespace ControllerSelection
 
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             // We're only interested in intersections from OVRRaycasters
+            bool aimingAtUI = false;
+            GameObject teleporting = GameObject.Find("Teleporting");
+            Teleport tele = teleporting.GetComponent<Teleport>();
             if (ovrRaycaster) 
             {
                 // The Unity UI system expects event data to have a screen position
@@ -658,9 +660,17 @@ namespace ControllerSelection
 
                 // Find the world position and normal the Graphic the ray intersected
                 RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
-                if (graphicRect != null)
+                    
+                // TEST: Seeing is disabling teleporting prefab here will fix the teleporting through UI
+                if (raycast.gameObject.layer == 11)
+                // if (graphicRect != null || raycast.gameObject.layer == 11)
                 {
-                    Debug.Log("ovrinputmodule: hitting ui element.");
+                    Debug.Log("Aiming at UI Element.");
+                    // disable teleport prefab while aiming at UI.
+                    if (teleporting != null && teleporting.activeInHierarchy) {
+                        aimingAtUI = true;
+                    }
+
                     // Set are gaze indicator with this world position and normal
                    // Vector3 worldPos = raycast.worldPosition;
                     //Vector3 normal = GetRectTransformNormal(graphicRect);
@@ -670,6 +680,12 @@ namespace ControllerSelection
                     }
                 }
             }
+            if (!aimingAtUI) {
+                tele.ShowTeleportHint();
+            } else {
+                tele.CancelTeleportHint();
+            }
+
             OVRPhysicsRaycaster physicsRaycaster = raycast.module as OVRPhysicsRaycaster;
             if (physicsRaycaster)
             {
