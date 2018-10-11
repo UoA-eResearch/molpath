@@ -148,7 +148,7 @@ public class RawInteraction : MonoBehaviour {
 			//Debug.Log("      --> script");
 			//bu.TractorBeam(pointer.origin, false, 1.0f);
 			//Debug.Log(axisValue);
-			TractorBeam(go, pointer.origin, attract, axisValue * 1.5f);
+			TractorBeam(go, pointer.origin, attract, axisValue * 5.0f);
 		}
 
 	}

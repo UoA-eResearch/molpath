@@ -199,21 +199,19 @@ namespace ControllerSelection {
 					Debug.Log(vP.name);
 					Hand h1 = vP.GetComponent<Player>().hands[0];
 					Hand h2 = vP.GetComponent<Player>().hands[1];
-					ulong grip = SteamVR_Controller.ButtonMask.Grip;
 					if (h1) {
-						if (h1.controller.GetPress(grip)) {
-							float axisValue = h1.controller.GetAxis().y;
-							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
-							tractorAxisInputFiltered *= -100;
-							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+						if (h1.controller.GetHairTrigger()) {
+							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+							Debug.Log("Trigger value is: " + val);
+							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
 						}
 					}
 					if (h2) {
-						if (h2.controller.GetPress(grip)) {
-							float axisValue = h2.controller.GetAxis().y;
-							float tractorAxisInputFiltered = Mathf.Lerp(0.0f, axisValue, tractorLerp);
-							tractorAxisInputFiltered *= 100;
-							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, tractorAxisInputFiltered);
+						if (h1.controller.GetHairTrigger()) {
+							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+							Debug.Log("Trigger value is: " + val);
+							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+
 						}
 					}
 				}

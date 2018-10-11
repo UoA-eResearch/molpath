@@ -132,6 +132,10 @@ public class SteamVR_Controller
 			hairTriggerLimit = hairTriggerState ? Mathf.Max(hairTriggerLimit, value) : Mathf.Min(hairTriggerLimit, value);
 		}
 
+		public float GetTriggerValue() {
+			return state.rAxis1.x;
+		}
+
 		public bool GetHairTrigger() { Update(); return hairTriggerState; }
 		public bool GetHairTriggerDown() { Update(); return hairTriggerState && !hairTriggerPrevState; }
 		public bool GetHairTriggerUp() { Update(); return !hairTriggerState && hairTriggerPrevState; }
