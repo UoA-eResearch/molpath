@@ -153,10 +153,7 @@ namespace ControllerSelection {
 			if (trackingSpace != null) {
 				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
 			} else {
-				// pointer = new Ray(hand.transform.position, hand.transform.forward);
-				// Debug.DrawRay(hand.transform.position, hand.transform.forward);
-				
-				// should evaluate to viveplayer camera
+				// activates when ovr player inactive in hierarchy ie when using Vive setting in XRDeviceManager
 				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
 				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
 			}
@@ -201,15 +198,22 @@ namespace ControllerSelection {
 						if (h1.controller.GetHairTrigger()) {
 							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
 							Debug.Log("Trigger value is: " + val);
-							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+							if (hit.transform.gameObject.layer != 11) {
+								onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+							} else {
+								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
+							}
 						}
 					}
 					if (h2) {
 						if (h1.controller.GetHairTrigger()) {
 							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
 							Debug.Log("Trigger value is: " + val);
-							onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-
+							if (hit.transform.gameObject.layer != 11) {
+								onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+							} else {
+								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
+							}
 						}
 					}
 				}
