@@ -161,7 +161,7 @@ public class BackboneUnit : MonoBehaviour {
 						{
 							_rendererAtom.material.shader = shaderToonOutline;
 							_rendererAtom.material.SetColor("_OutlineColor", Color.green);
-							_rendererAtom.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.SetFloat("_Outline", myPolyPepManager.toonRenderScale * 2.0f);
 						}
 						break;
 
@@ -169,7 +169,7 @@ public class BackboneUnit : MonoBehaviour {
 						{
 							_rendererAtom.material.shader = shaderToonOutline;
 							_rendererAtom.material.SetColor("_OutlineColor", Color.red);
-							_rendererAtom.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.SetFloat("_Outline", myPolyPepManager.toonRenderScale * 1.5f);
 						}
 						break;
 
@@ -177,7 +177,7 @@ public class BackboneUnit : MonoBehaviour {
 						{
 							_rendererAtom.material.shader = shaderToonOutline;
 							_rendererAtom.material.SetColor("_OutlineColor", Color.yellow);
-							_rendererAtom.material.SetFloat("_Outline", 0.005f);
+							_rendererAtom.material.SetFloat("_Outline", myPolyPepManager.toonRenderScale);
 						}
 						break;
 
@@ -193,14 +193,15 @@ public class BackboneUnit : MonoBehaviour {
 		//bool doBondCartoonRendering = true;
 		if (myPolyPepManager.doCartoonBondRendering)
 		{
-			float bondToonRenderScale = (myPolyPepManager.phiPsiDrive / 400.0f) * 2.5f;
+			//float bondToonRenderScale = (myPolyPepManager.phiPsiDrive / 400.0f) * 3.0f;
+			float bondToonRenderScale = (myResidue.drivePhiPsiTorqValue / 400.0f) * 5.0f;
 			if (rendererPhi)
 			{
 				if (myPolyPepManager.showDrivenBondsOn && myResidue.drivePhiPsiOn)
 				{
 					rendererPhi.material.shader = shaderToonOutline;
 					rendererPhi.material.SetColor("_OutlineColor", Color.cyan);
-					rendererPhi.material.SetFloat("_Outline", 0.005f * bondToonRenderScale);
+					rendererPhi.material.SetFloat("_Outline", myPolyPepManager.toonRenderScale * bondToonRenderScale);
 				}
 				else
 				{
@@ -214,7 +215,8 @@ public class BackboneUnit : MonoBehaviour {
 				{
 					rendererPsi.material.shader = shaderToonOutline;
 					rendererPsi.material.SetColor("_OutlineColor", Color.magenta);
-					rendererPsi.material.SetFloat("_Outline", 0.005f * bondToonRenderScale);
+					rendererPsi.material.SetFloat("_Outline", myPolyPepManager.toonRenderScale
+						* bondToonRenderScale);
 				}
 				else
 				{

@@ -22,8 +22,10 @@ public class PolyPepManager : MonoBehaviour {
 	public float psiTarget = 0f;
 	public float phiPsiDrive = 100.0f;
 
-	public bool showDrivenBondsOn = false;
+	public bool showDrivenBondsOn = true;
 	public bool doCartoonBondRendering = true;
+
+	public float toonRenderScale = 0.002f;
 
 	public Slider phiSliderUI;
 	public Slider psiSliderUI;
@@ -66,8 +68,8 @@ public class PolyPepManager : MonoBehaviour {
 			psiSliderUI.GetComponent<Slider>().value = 0;
 			vdwSliderUI.GetComponent<Slider>().value = 10;
 			hbondSliderUI.GetComponent<Slider>().value = 200;
-			phiPsiDriveSliderUI.GetComponent<Slider>().value = 200;
-			spawnLengthSliderUI.GetComponent<Slider>().value = 12;
+			phiPsiDriveSliderUI.GetComponent<Slider>().value = 100;
+			spawnLengthSliderUI.GetComponent<Slider>().value = 10;
 
 			//temp = GameObject.Find("Slider_ResStart");
 
@@ -183,7 +185,7 @@ public class PolyPepManager : MonoBehaviour {
 		showDrivenBondsOn = value;
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
-			_ppb.UpdateRenderModeBbu();
+			_ppb.UpdateRenderModeAllBbu();
 		}
 	}
 
@@ -209,7 +211,7 @@ public class PolyPepManager : MonoBehaviour {
 			_ppb.drivePhiPsiMaxForce = phiPsiDrive;
 			_ppb.drivePhiPsiPosSpring = phiPsiDrive;
 			_ppb.UpdatePhiPsiDrives();
-			_ppb.UpdateRenderModeBbu();
+			_ppb.UpdateRenderModeAllBbu();
 
 
 			// drivePhiPsiPosDamper ?
@@ -222,6 +224,16 @@ public class PolyPepManager : MonoBehaviour {
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
 			_ppb.SetGlobalSelect(value);
+		}
+	}
+
+	public void SetSelectionDriveFromUI (bool value)
+	{
+		//Debug.Log("hello from the manager! ---> SetSelectionDriveOffFromUI");
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.SetPhiPsiDriveForSelection(value);
+			_ppb.UpdateRenderModeAllBbu();
 		}
 	}
 
@@ -301,7 +313,7 @@ public class PolyPepManager : MonoBehaviour {
 	{
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
-			_ppb.SetPhiPsiForSelection(phiTarget, psiTarget);
+			_ppb.SetPhiPsiTargetValuesForSelection(phiTarget, psiTarget);
 		}
 	}
 
