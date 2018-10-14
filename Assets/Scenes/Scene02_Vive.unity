@@ -294,7 +294,9 @@ MonoBehaviour:
   phiTarget: 0
   psiTarget: 0
   phiPsiDrive: 100
+  showDrivenBondsOn: 0
   doCartoonBondRendering: 0
+  toonRenderScale: 0.002
   phiSliderUI: {fileID: 0}
   psiSliderUI: {fileID: 0}
   vdwSliderUI: {fileID: 0}
@@ -827,6 +829,33 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 98047eb084056d04d9c000b3606e91e9, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1010030005 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1247434126680356, guid: 9d985ad4c0de3664ca7de0ca1a34ae54,
+    type: 2}
+  m_PrefabInternal: {fileID: 635559211}
+--- !u!114 &1010030006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1010030005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8edbb36f9231e6647a28ecc336f411ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  menus:
+  - {fileID: 1722166613}
+  activeMenuIndex: 0
+  myPlayer: {fileID: 1010030007}
+  myHands: []
+--- !u!114 &1010030007 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114820079730037380, guid: 9d985ad4c0de3664ca7de0ca1a34ae54,
+    type: 2}
+  m_PrefabInternal: {fileID: 635559211}
+  m_Script: {fileID: 11500000, guid: 202a6e24b48d1684398409c47161adcb, type: 3}
 --- !u!1 &1065230784 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1475388355029730, guid: 9d985ad4c0de3664ca7de0ca1a34ae54,
@@ -2080,6 +2109,7 @@ MonoBehaviour:
   residueHovered: 0
   residueGrabbed: 0
   drivePhiPsiOn: 0
+  drivePhiPsiTorqValue: 0
 --- !u!1001 &1820199266
 Prefab:
   m_ObjectHideFlags: 0
