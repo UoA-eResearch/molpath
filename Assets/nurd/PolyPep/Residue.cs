@@ -25,7 +25,8 @@ public class Residue : MonoBehaviour {
 	public bool residueHovered = false;
 	public bool residueGrabbed = false;
 
-	public bool drivePhiPsiOn = false;
+	public bool drivePhiPsiOn;
+	public float drivePhiPsiTorqValue;
 
 	// Use this for initialization
 	private void Awake()
@@ -101,6 +102,12 @@ public class Residue : MonoBehaviour {
 		myPlotCube.transform.position = ramaPlot.transform.position + (ramaPlot.transform.right * ramaPlotScale * phiCurrent) + (ramaPlot.transform.up * ramaPlotScale * psiCurrent) + deltaPos;
 		deltaScale = Mathf.Lerp(deltaScale, targetDeltaScale, 0.2f);
 		myPlotCube.transform.localScale = myPlotCubeBaseScale * deltaScale;
+	}
+
+	public bool IsResidueSelected()
+	{
+		BackboneUnit buAmide = amide_pf.GetComponent("BackboneUnit") as BackboneUnit;
+		return buAmide.controllerSelectOn;
 	}
 
 	// Update is called once per frame
