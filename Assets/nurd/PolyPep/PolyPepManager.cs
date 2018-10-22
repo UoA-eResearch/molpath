@@ -14,8 +14,12 @@ public class PolyPepManager : MonoBehaviour {
 	public bool collidersOn = false;
 	public float vdwScale = 1.0f;
 
+	public bool dragHigh = false;
+	public float jiggleStrength = 0.0f;
+
 	public bool hbondsOn = false;
 	public float hbondStrength = 100.0f;
+	public float hbondScale = 500.0f; // multiplier between UI slider strength and value used in config joint
 
 	public int UIDefinedSecondaryStructure { get; set; }
 
@@ -35,6 +39,7 @@ public class PolyPepManager : MonoBehaviour {
 	public Slider hbondSliderUI;
 	public Slider phiPsiDriveSliderUI;
 	public Slider spawnLengthSliderUI;
+	public Slider jiggleStrengthSliderUI;
 
 	void Awake()
 	{
@@ -56,6 +61,9 @@ public class PolyPepManager : MonoBehaviour {
 			temp = GameObject.Find("Slider_SpawnLength");
 			spawnLengthSliderUI = temp.GetComponent<Slider>();
 
+			temp = GameObject.Find("Slider_JiggleStrength");
+			jiggleStrengthSliderUI = temp.GetComponent<Slider>();
+
 	}
 
 	void Start()
@@ -68,9 +76,10 @@ public class PolyPepManager : MonoBehaviour {
 			phiSliderUI.GetComponent<Slider>().value = 0;
 			psiSliderUI.GetComponent<Slider>().value = 0;
 			vdwSliderUI.GetComponent<Slider>().value = 10;
-			hbondSliderUI.GetComponent<Slider>().value = 200;
-			phiPsiDriveSliderUI.GetComponent<Slider>().value = 100;
+			hbondSliderUI.GetComponent<Slider>().value = 50;
+			phiPsiDriveSliderUI.GetComponent<Slider>().value = 50;
 			spawnLengthSliderUI.GetComponent<Slider>().value = 10;
+			jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
 
 			//temp = GameObject.Find("Slider_ResStart");
 
@@ -127,12 +136,13 @@ public class PolyPepManager : MonoBehaviour {
 			// offset to try to keep new pp in sensible position
 			// working solution - no scale, centre of mass / springs ...
 			spawnTransform.transform.position += offset;
-			GameObject pp = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position, Quaternion.identity);
-			PolyPepBuilder pp_cs = pp.GetComponent<PolyPepBuilder>();
-			pp_cs.numResidues = numResidues;
-			pp_cs.buildTransform = spawnTransform.transform ;
-			pp.name = "polyPep_" + allPolyPepBuilders.Count;
-			allPolyPepBuilders.Add(pp_cs);
+			GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position, Quaternion.identity);
+			PolyPepBuilder ppb_cs = ppb.GetComponent<PolyPepBuilder>();
+			ppb_cs.numResidues = numResidues;
+			ppb_cs.buildTransform = spawnTransform.transform ;
+			ppb_cs.myPolyPepManager = GetComponent<PolyPepManager>();
+			ppb.name = "polyPep_" + allPolyPepBuilders.Count;
+			allPolyPepBuilders.Add(ppb_cs);
 		}
 	}
 
@@ -169,13 +179,25 @@ public class PolyPepManager : MonoBehaviour {
 		}
 	}
 
+	public void UpdateDragFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		dragHigh = value;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			//_ppb.ActiveHbondSpringConstraints = hbondsOn;
+			_ppb.UpdateAllDrag();
+		}
+	}
+
+
 	public void UpdateHbondOnFromUI(bool value)
 	{
 		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
 		hbondsOn = value;
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
-			_ppb.ActiveHbondSpringConstraints = hbondsOn;
+			//_ppb.ActiveHbondSpringConstraints = hbondsOn;
 			_ppb.UpdateHBondSprings();
 		}
 	}
@@ -194,12 +216,7 @@ public class PolyPepManager : MonoBehaviour {
 	{
 
 		//Debug.Log("hello Hbond Strength from the manager! ---> " + hbondStrength);
-		hbondStrength = hbondStrengthFromUI;
-		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-		{
-			_ppb.hbondStrength = hbondStrength;
-			_ppb.UpdateHBondSprings();
-		}
+		hbondStrength = hbondStrengthFromUI * hbondScale;
 	}
 
 	public void UpdatePhiPsiDriveFromUI(float phiPsiDriveFromUI)
@@ -213,9 +230,6 @@ public class PolyPepManager : MonoBehaviour {
 			_ppb.drivePhiPsiPosSpring = phiPsiDrive;
 			_ppb.UpdatePhiPsiDrives();
 			_ppb.UpdateRenderModeAllBbu();
-
-
-			// drivePhiPsiPosDamper ?
 		}
 	}
 
@@ -316,6 +330,11 @@ public class PolyPepManager : MonoBehaviour {
 		{
 			_ppb.SetPhiPsiTargetValuesForSelection(phiTarget, psiTarget);
 		}
+	}
+
+	public void UpdateJiggleFromUI(float jiggleFromUI)
+	{
+		jiggleStrength = jiggleFromUI;
 	}
 
 	public void ResetLevel()
