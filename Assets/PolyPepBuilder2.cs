@@ -4,81 +4,98 @@ using UnityEngine;
 
 public class PolyPepBuilder2 : MonoBehaviour {
 
-	public int spineSize;
+	public int size;
 
-	public List<string> patterns = new List<string>();
+	public Material hydrogenMaterial;
+	public Material carbonMaterial;
 
-	// Use this for initialization
-	void Start () {
-		BuildChain();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	private List<GameObject> backbones = new List<GameObject>();
+
+	private void Start() {
+		Vector3 startPos = this.transform.position;
+		BuildMolecule(startPos);
 	}
 
-	private void BuildChain() {
+	private void BuildMolecule(Vector3 startPos) {
+		//offset
+		Vector3 offset = new Vector3(0, 0, 3.0f);
 
-		if (patterns.Count == 0) {
-			patterns.Add("Carbonyl");
-			patterns.Add("Calpha");
-			patterns.Add("Amide");
+		// first iteration (create all the backbones.)
+		for (int i = 0; i < size; i++)
+		{
+			Vector3 spawnPos = startPos + offset;
+			backbones.Add(MakeAtom(spawnPos));
 		}
 
-		foreach (var pattern in patterns) {
-				Debug.Log(pattern);
-				switch (pattern) {
-					case "Carbonyl":
-						BuildCarbonyl();
-						break;
-					case "Calpha":
-						BuildCalpha();
-						break;
-					case "Amide":
-						BuildAmide();
-						break;
+		// second iteration - join the backbones
+		GameObject prevBackbone = null;
+		foreach (var backbone in backbones)
+		{
+			if (prevBackbone == null) {
+				prevBackbone = backbone;
+				continue;
+			} else {
+				MakeJoint(prevBackbone, backbone, new Vector3(0, 0, 3.0f));
+				MakeSpring(prevBackbone, backbone);
+				prevBackbone = backbone;
+			}
+		}
+
+		// third iteration - add child molecules
+		foreach (var backbone in backbones)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				
+				if (i%2==0) {
+					Vector3 spawnPos = backbone.transform.position;					
+				} else {
+					Vector3 spawnPos = backbone.transform.position;					
 				}
-		}	
+				
+			}
+		}
 	}
 
-	private GameObject Atom(){
+	private GameObject MakeAtom(Vector3 spawnPos) {
 		GameObject atom = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-		// starts at 1.
-		atom.transform.localScale *= 0.1f;
-		Rigidbody atomRb = atom.AddComponent<Rigidbody>();
+		float scale = 0.1f;
+		atom.transform.localScale = new Vector3(scale, scale, scale);
+		atom.transform.position = spawnPos;
+		var rb = atom.AddComponent<Rigidbody>();
+		rb.useGravity = false;
+		rb.drag = 0.5f;
+		atom.GetComponent<Renderer>().sharedMaterial = carbonMaterial;
 		return atom;
 	}
 
-	private GameObject SetBondAngle(GameObject atom1, GameObject atom2){
-		GameObject residue = new GameObject();
-		atom1.transform.parent = residue.transform;
-		atom2.transform.parent = residue.transform;
-		atom1.transform.position = residue.transform.position;
-		var joint = atom1.AddComponent<ConfigurableJoint>();
-		joint.connectedBody = atom2.GetComponent<Rigidbody>();
-		joint.xMotion = ConfigurableJointMotion.Limited;
-		joint.yMotion = ConfigurableJointMotion.Limited;
-		joint.zMotion = ConfigurableJointMotion.Limited;
-		joint.angularXMotion = ConfigurableJointMotion.Limited;
-		joint.angularYMotion = ConfigurableJointMotion.Limited;
-		joint.angularZMotion = ConfigurableJointMotion.Limited;
-		return residue;
+	private ConfigurableJoint MakeJoint(GameObject go1, GameObject go2, Vector3 anchor) {
+		var cj = go1.AddComponent<ConfigurableJoint>();
+		cj.connectedBody = go2.GetComponent<Rigidbody>();
+
+		cj.autoConfigureConnectedAnchor = false;
+		cj.xMotion = ConfigurableJointMotion.Locked;
+		cj.yMotion = ConfigurableJointMotion.Locked;
+		cj.zMotion = ConfigurableJointMotion.Locked;
+
+		cj.angularXMotion = ConfigurableJointMotion.Free;
+		cj.angularYMotion = ConfigurableJointMotion.Locked;
+		cj.angularZMotion = ConfigurableJointMotion.Locked;
+
+		cj.anchor = anchor;
+		return cj;
 	}
 
-	private void BuildCarbonyl() {
-		GameObject carbon = Atom();
-		// starts at 1.
-		GameObject oxygen = Atom();
-		SetBondAngle(carbon, oxygen);
-
+	private SpringJoint MakeSpring(GameObject go1, GameObject go2) {
+		var sj = go1.AddComponent<SpringJoint>();
+		sj.connectedBody = go2.GetComponent<Rigidbody>();
+		sj.anchor = new Vector3(0, 0, 3.0f);
+		sj.spring = 10.0f;
+		return sj;
 	}
 
-	private void BuildCalpha() {
-
-	}
-
-	private void BuildAmide() {
-
+	private void FixedUpdate() {
+		if (backbones.Count == size) {
+		}
 	}
 }
