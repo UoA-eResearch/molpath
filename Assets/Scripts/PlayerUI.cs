@@ -36,10 +36,12 @@ public class PlayerUI : MonoBehaviour {
 	void Update () {
 		// poll for inputs from either hand
 		foreach (var hand in myHands) {
-			if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu)) {
-				GameObject newMenu = CycleMenu();
-				if (newMenu.transform.parent != hand.transform) {
-					SwapMenuHand(newMenu, hand);	
+			if (hand.controller != null) {
+				if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu)) {
+					GameObject newMenu = CycleMenu();
+					if (newMenu.transform.parent != hand.transform) {
+						SwapMenuHand(newMenu, hand);	
+					}
 				}
 			}
 		}

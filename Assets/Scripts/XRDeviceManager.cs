@@ -17,7 +17,6 @@ namespace ControllerSelection {
 			}
 			if (vivePlayer != null) {
 				vivePlayer = GameObject.Find("VivePlayer");
-				UpdateUIReferences();
 			}
 
 			if (UnityEngine.XR.XRDevice.model.Contains("Vive")) {
@@ -31,19 +30,6 @@ namespace ControllerSelection {
 				Debug.Log("Using unhandled XR device.");
 			}
 		}
-
-		// TEST:
-		public Canvas ui1;
-		public Canvas ui2;
-		void UpdateUIReferences() {
-			// switch from oculus righthand references as pointer to vive controller.
-			gazePointer.rayTransform = viveRayTransform;
-
-			// update canvas world cameras.
-			ui1.worldCamera = vivePlayer.GetComponentInChildren<Camera>();
-			ui2.worldCamera = vivePlayer.GetComponentInChildren<Camera>();
-		}
-		// TODO: Also add button references so clicks work
 
 		// Use this for initialization
 		void Start () {

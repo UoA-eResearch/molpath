@@ -872,6 +872,7 @@ namespace ControllerSelection
                 Hand hand1 = hands[0];
                 Hand hand2 = hands[1];
                 ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
+                // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
                 if (hand1.controller.GetPress(touchpad) || hand2.controller.GetPress(touchpad)) {
                     // Debug.Log("one of the hands it pressing");
                     pressed = true;

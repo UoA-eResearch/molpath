@@ -144,80 +144,21 @@ namespace ControllerSelection {
 
 		}
 
-		void Update() {
-            activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
-
-			
-
-			Ray pointer;
-			if (trackingSpace != null) {
-				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
-			} else {
-				// activates when ovr player inactive in hierarchy ie when using Vive setting in XRDeviceManager
-				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
-				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
+		private bool GetViveTriggerDown(Hand hand, Valve.VR.EVRButtonId button) {
+			// just so I don't have to repeatedly call null checks.
+			if (hand.controller == null) {
+				return false;
 			}
+			var controller = hand.controller;
+			if (controller.GetPressDown(button)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
-
-            RaycastHit hit; // Was anything hit?
-			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
-			{
-				myHitPos = hit.point;
-				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
-				//Debug.Log(hit.distance);
-				if (lastHit != null && lastHit != hit.transform)
-				{
-					if (onHoverExit != null)
-					{
-						onHoverExit.Invoke(lastHit);
-					}
-					lastHit = null;
-				}
-
-				if (lastHit == null)
-				{
-					if (onHoverEnter != null)
-					{
-						onHoverEnter.Invoke(hit.transform);
-					}
-				}
-
-				if (onHover != null)
-				{
-					onHover.Invoke(hit.transform);
-				}
-
-				lastHit = hit.transform;
-
-				// start of vive input handling
-				GameObject vP = GameObject.Find("VivePlayer");
-				if (vP != null) {
-					Hand h1 = vP.GetComponent<Player>().hands[0];
-					Hand h2 = vP.GetComponent<Player>().hands[1];
-					if (h1) {
-						if (h1.controller.GetHairTrigger()) {
-							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-							Debug.Log("Trigger value is: " + val);
-							if (hit.transform.gameObject.layer != 11) {
-								onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-							} else {
-								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
-							}
-						}
-					}
-					if (h2) {
-						if (h1.controller.GetHairTrigger()) {
-							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-							Debug.Log("Trigger value is: " + val);
-							if (hit.transform.gameObject.layer != 11) {
-								onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-							} else {
-								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
-							}
-						}
-					}
-				}
-
+		private void HandleOculusEvents(Ray pointer) {
+			// if using oculus controller, for invoking the residue selections methods.
                 if (activeController != OVRInput.Controller.None) {
                     if (OVRInput.GetDown(secondaryButton, activeController)) {
                         secondaryDown = lastHit;
@@ -345,7 +286,83 @@ namespace ControllerSelection {
 				{
 					tractorBeaming = false;
 				}
+		}
 
+		void Update() {
+            activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
+
+			Ray pointer;
+			if (trackingSpace != null) {
+				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+			} else {
+				// activates when ovr player inactive in hierarchy ie when using Vive setting in XRDeviceManager
+				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
+				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
+			}
+
+
+            RaycastHit hit; // Was anything hit?
+			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
+			{
+				myHitPos = hit.point;
+				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
+				//Debug.Log(hit.distance);
+				if (lastHit != null && lastHit != hit.transform)
+				{
+					if (onHoverExit != null)
+					{
+						onHoverExit.Invoke(lastHit);
+					}
+					lastHit = null;
+				}
+
+				if (lastHit == null)
+				{
+					if (onHoverEnter != null)
+					{
+						onHoverEnter.Invoke(hit.transform);
+					}
+				}
+
+				if (onHover != null)
+				{
+					onHover.Invoke(hit.transform);
+				}
+
+				lastHit = hit.transform;
+
+				// start of vive input handling
+				GameObject vP = GameObject.Find("VivePlayer");
+				if (vP != null) {
+					Hand h1 = vP.GetComponent<Player>().hands[0];
+					Hand h2 = vP.GetComponent<Player>().hands[1];
+					if (h1 && h1.controller != null) {
+						if (h1.controller.GetHairTrigger()) {
+							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+							Debug.Log("Trigger value is: " + val);
+							// layer 11 corresponds to UI layer i.e. disable teleporting when aiming at UI.
+							if (hit.transform.gameObject.layer != 11) {
+								// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+							} else {
+								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
+							}
+						}
+					}
+					if (h2 && h2.controller!= null) {
+						if (h2.controller.GetHairTrigger()) {
+							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+							Debug.Log("Trigger value is: " + val);
+							if (hit.transform.gameObject.layer != 11) {
+								// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+							} else {
+								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
+							}
+						}
+					}
+				}
+
+				HandleOculusEvents(pointer);
+				
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
             else {

@@ -43,27 +43,39 @@ public class PolyPepManager : MonoBehaviour {
 
 	void Awake()
 	{
-			GameObject temp = GameObject.Find("Slider_Phi");
-			phiSliderUI = temp.GetComponent<Slider>();
+			// GameObject temp = GameObject.Find("Slider_Phi");
+			// phiSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_Psi");
-			psiSliderUI = temp.GetComponent<Slider>();
+			// temp = GameObject.Find("Slider_Psi");
+			// psiSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_Vdw");
-			vdwSliderUI = temp.GetComponent<Slider>();
+			// temp = GameObject.Find("Slider_Vdw");
+			// vdwSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_HbondStrength");
-			hbondSliderUI = temp.GetComponent<Slider>();
+			// temp = GameObject.Find("Slider_HbondStrength");
+			// hbondSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_PhiPsiDrive");
-			phiPsiDriveSliderUI = temp.GetComponent<Slider>();
+			// temp = GameObject.Find("Slider_PhiPsiDrive");
+			// phiPsiDriveSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_SpawnLength");
-			spawnLengthSliderUI = temp.GetComponent<Slider>();
+			// temp = GameObject.Find("Slider_SpawnLength");
+			// spawnLengthSliderUI = temp.GetComponent<Slider>();
 
-			temp = GameObject.Find("Slider_JiggleStrength");
-			jiggleStrengthSliderUI = temp.GetComponent<Slider>();
+			phiSliderUI = FindSlider("Slider_Phi");
+			psiSliderUI = FindSlider("Slider_Psi");
+			vdwSliderUI = FindSlider("Slider_Vdw");
+			hbondSliderUI = FindSlider("Slider_HbondStrength");
+			phiPsiDriveSliderUI = FindSlider("Slider_PhiPsiDrive");
+			spawnLengthSliderUI = FindSlider("Slider_SpawnLength");
+			jiggleStrengthSliderUI = FindSlider("Slider_JiggleStrength");
+	}
 
+	public static Slider FindSlider(string name) {
+		GameObject go = GameObject.Find("name");
+		if (go != null) {
+			return go.GetComponent<Slider>();
+		}
+		else return null;
 	}
 
 	void Start()
