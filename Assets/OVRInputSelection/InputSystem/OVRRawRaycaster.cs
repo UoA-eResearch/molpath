@@ -157,7 +157,37 @@ namespace ControllerSelection {
 			}
 		}
 
-		private void HandleOculusEvents(Ray pointer) {
+		private void ProcessViveInputOnTarget(Ray pointer) {
+			GameObject vP = GameObject.Find("VivePlayer");
+			if (vP == null) {
+				return;
+			}
+			Hand h1 = vP.GetComponent<Player>().hands[0];
+			Hand h2 = vP.GetComponent<Player>().hands[1];
+			if (h1 && h1.controller != null) {
+				if (h1.controller.GetHairTrigger()) {
+					var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+					Debug.Log("Trigger value is: " + val);
+					// layer 11 corresponds to UI layer i.e. disable teleporting when aiming at UI.
+					// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+				}
+			}
+			if (h2 && h2.controller!= null) {
+				if (h2.controller.GetHairTrigger()) {
+					var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
+					Debug.Log("Trigger value is: " + val);
+					// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
+				}
+			}
+
+			// WIP: if the trigger is down and aimed at something & that object isnt't the same last hit as last call then reassign last hit
+			// if trigger is down and not aimed, don't clear last hit, dont reassign last hit.
+			// if trigger released then clear last hit.
+
+			// if triggerdown && lasthit != null : do remote grab on lasthit.transform.
+		}
+
+		private void ProcessOculusInputOnTarget(Ray pointer) {
 			// if using oculus controller, for invoking the residue selections methods.
                 if (activeController != OVRInput.Controller.None) {
                     if (OVRInput.GetDown(secondaryButton, activeController)) {
@@ -329,39 +359,13 @@ namespace ControllerSelection {
 					onHover.Invoke(hit.transform);
 				}
 
-				lastHit = hit.transform;
 
 				// start of vive input handling
-				GameObject vP = GameObject.Find("VivePlayer");
-				if (vP != null) {
-					Hand h1 = vP.GetComponent<Player>().hands[0];
-					Hand h2 = vP.GetComponent<Player>().hands[1];
-					if (h1 && h1.controller != null) {
-						if (h1.controller.GetHairTrigger()) {
-							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-							Debug.Log("Trigger value is: " + val);
-							// layer 11 corresponds to UI layer i.e. disable teleporting when aiming at UI.
-							if (hit.transform.gameObject.layer != 11) {
-								// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-							} else {
-								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
-							}
-						}
-					}
-					if (h2 && h2.controller!= null) {
-						if (h2.controller.GetHairTrigger()) {
-							var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-							Debug.Log("Trigger value is: " + val);
-							if (hit.transform.gameObject.layer != 11) {
-								// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-							} else {
-								Debug.Log("Physics raycaster and trigger pulled but aimed at UI.");
-							}
-						}
-					}
+				if (hit.transform.gameObject.layer != 11) {
+					ProcessViveInputOnTarget(pointer);
 				}
 
-				HandleOculusEvents(pointer);
+				ProcessOculusInputOnTarget(pointer);
 				
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
