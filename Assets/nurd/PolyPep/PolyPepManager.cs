@@ -71,7 +71,7 @@ public class PolyPepManager : MonoBehaviour {
 	}
 
 	public static Slider FindSlider(string name) {
-		GameObject go = GameObject.Find("name");
+		GameObject go = GameObject.Find(name);
 		if (go != null) {
 			return go.GetComponent<Slider>();
 		}
