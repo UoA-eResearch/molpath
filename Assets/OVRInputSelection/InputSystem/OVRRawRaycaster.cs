@@ -151,6 +151,28 @@ namespace ControllerSelection {
 			return hand.controller.GetHairTrigger();
 		}
 
+		private bool AnyViveTriggerDown() {
+			bool anyTriggerDown = false;
+			foreach (var hand in GameObject.Find("VivePlayer").GetComponent<Player>().hands)
+			{
+				if (hand.controller.GetHairTriggerDown()) {
+					anyTriggerDown = true;
+				}
+			}
+			return anyTriggerDown;
+		}
+
+		private bool AnyViveTriggerUp() {
+			bool anyTriggerUp = false;
+			foreach (var hand in GameObject.Find("VivePlayer").GetComponent<Player>().hands)
+			{
+				if (hand.controller.GetHairTriggerUp()) {
+					anyTriggerUp = true;
+				}
+			}
+			return anyTriggerUp;
+		}
+
 
 		private Vector3 lastControllerPos;
 		private Vector3 lastControllerRot;
