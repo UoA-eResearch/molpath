@@ -195,8 +195,6 @@ public class RawInteraction : MonoBehaviour {
 			float tractorBeamAttractionFactor = scale * 100.0f;
 			float tractorBeamMax = scale * 100.0f;
 			float tractorBeamDistanceRatio = 400f / scale; // larger = weaker
-
-
 			Vector3 tractorBeam = position - go.transform.position;
 			if (!attract)
 			{

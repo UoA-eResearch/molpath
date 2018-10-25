@@ -144,48 +144,81 @@ namespace ControllerSelection {
 
 		}
 
-		private bool GetViveTriggerDown(Hand hand, Valve.VR.EVRButtonId button) {
-			// just so I don't have to repeatedly call null checks.
+		private bool GetViveTriggerDown(Hand hand) {
 			if (hand.controller == null) {
 				return false;
 			}
-			var controller = hand.controller;
-			if (controller.GetPressDown(button)) {
-				return true;
-			} else {
-				return false;
-			}
+			return hand.controller.GetHairTrigger();
 		}
 
-		private void ProcessViveInputOnTarget(Ray pointer) {
-			GameObject vP = GameObject.Find("VivePlayer");
-			if (vP == null) {
-				return;
-			}
-			Hand h1 = vP.GetComponent<Player>().hands[0];
-			Hand h2 = vP.GetComponent<Player>().hands[1];
-			if (h1 && h1.controller != null) {
-				if (h1.controller.GetHairTrigger()) {
-					var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-					Debug.Log("Trigger value is: " + val);
-					// layer 11 corresponds to UI layer i.e. disable teleporting when aiming at UI.
-					// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-				}
-			}
-			if (h2 && h2.controller!= null) {
-				if (h2.controller.GetHairTrigger()) {
-					var val = h1.controller.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis1).x;
-					Debug.Log("Trigger value is: " + val);
-					// onPrimarySelectDownAxis.Invoke(hit.transform, pointer, val);
-				}
-			}
 
-			// WIP: if the trigger is down and aimed at something & that object isnt't the same last hit as last call then reassign last hit
-			// if trigger is down and not aimed, don't clear last hit, dont reassign last hit.
-			// if trigger released then clear last hit.
+		private Vector3 lastControllerPos;
+		private Vector3 lastControllerRot;
+		// private void ProcessViveInputOnTarget(RaycastHit hit) {
+		// 	GameObject vP = GameObject.Find("VivePlayer");
+		// 	if (vP == null) {
+		// 		return;
+		// 	}
+		// 	Hand hand1 = vP.GetComponent<Player>().hands[0];
+		// 	bool triggering = false;
+		// 	foreach (var hand in vP.GetComponent<Player>().hands)
+		// 	{
+		// 		if (GetViveTriggerDown(hand)) {
+		// 			triggering = true;
+		// 		}
+		// 	}
+		// 	if (triggering) {
+		// 		if (lastHit == null) {
+		// 			lastHit = hit.transform;
+		// 		}
+		// 	} else {
+		// 		lastHit = null;
+		// 	}
 
-			// if triggerdown && lasthit != null : do remote grab on lasthit.transform.
-		}
+		// 	if (lastHit) {
+		// 		remoteGrab = lastHit;
+				
+		// 		// perfunctory info david set
+		// 		remoteGrabDistance = hit.distance;
+		// 		remoteGrabStartPos = hit.point;
+		// 		approxMovingAvgPoke = 0f;
+		// 		remoteGrabTime = 0;
+
+		// 		remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
+		// 		remoteGrabControllerStartQ = hand1.transform.localRotation;
+
+		// 		BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
+		// 		if (bu != null) {
+		// 			bu.SetRemoteGrabSelect(true);
+		// 		}
+		// 	}
+
+		// 	if (remoteGrab) {
+		// 		if (lastControllerPos == null) {
+		// 			lastControllerPos = hand1.transform.position;
+		// 		}
+		// 		if (lastControllerRot == null) {
+		// 			lastControllerRot = hand1.transform.rotation.eulerAngles;
+		// 		}
+		// 		Vector3 controllerPosDelta = hand1.transform.position - lastControllerPos;
+		// 		Vector3 controllerRotDelta = hand1.transform.rotation.eulerAngles - lastControllerRot;		
+
+		// 		controllerPosDelta *= 10.0f;
+		// 		// Debug.Log(controllerPosDelta);
+		// 		// only scale the positional difference.
+		// 		hit.transform.position += controllerPosDelta;
+		// 		hit.transform.rotation = Quaternion.Euler(hit.transform.rotation.eulerAngles + controllerRotDelta);
+		// 		// Debug.Log(hit.transform.name);				
+		// 		lastControllerPos = hand1.transform.position;
+		// 		lastControllerRot = hand1.transform.rotation.eulerAngles;
+		// 	}
+
+		// 	// WIP: if the trigger is down and aimed at something & that object isnt't the same last hit as last call then reassign last hit
+		// 	// if trigger is down and not aimed, don't clear last hit, dont reassign last hit.
+		// 	// if trigger released then clear last hit.
+
+		// 	// if triggerdown && lasthit != null : do remote grab on lasthit.transform.
+		// }
 
 		private void ProcessOculusInputOnTarget(Ray pointer) {
 			// if using oculus controller, for invoking the residue selections methods.
@@ -329,8 +362,6 @@ namespace ControllerSelection {
 				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
 				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
 			}
-
-
             RaycastHit hit; // Was anything hit?
 			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
 			{
@@ -361,10 +392,7 @@ namespace ControllerSelection {
 
 
 				// start of vive input handling
-				if (hit.transform.gameObject.layer != 11) {
-					ProcessViveInputOnTarget(pointer);
-				}
-
+				// ProcessViveInputOnTarget(hit);
 				ProcessOculusInputOnTarget(pointer);
 				
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -385,7 +413,7 @@ namespace ControllerSelection {
                 }
             }
 #endif
-
+				
 				//REMOTE GRAB
 				if (!remoteGrab)
 				{
@@ -490,8 +518,6 @@ namespace ControllerSelection {
 						remoteGrabObjectTargetQ =   remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
 
 						//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
-
-
 						Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
 						Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
 						Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
@@ -521,15 +547,8 @@ namespace ControllerSelection {
 
 						//Use HMD (possibly better - maybe a bit queasy)
 						Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + centreEyeAnchor.forward;
-
 						remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
-
-
 					}
-
-
-
-
 				}
 				else
 				{

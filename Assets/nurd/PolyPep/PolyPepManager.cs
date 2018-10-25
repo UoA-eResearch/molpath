@@ -358,12 +358,6 @@ public class PolyPepManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		foreach (var polyPepBuilder in allPolyPepBuilders) {
-			Transform polyPepTransform = polyPepBuilder.transform;
-			foreach (BackboneUnit bbu in polyPepTransform.GetComponentsInChildren<BackboneUnit>()) {
-				Debug.Log(bbu.transform.name);
-				// bbu.transform.gameObject.AddComponent<Interactable>();
-			}
-		}
+		
 	}
 }
