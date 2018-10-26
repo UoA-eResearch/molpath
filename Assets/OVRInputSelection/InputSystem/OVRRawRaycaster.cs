@@ -104,10 +104,10 @@ namespace ControllerSelection {
 		private float approxMovingAvgPoke;
 
 		// Vive variables to track
-		public GameObject vivePlayerGo;
-		public Player vivePlayer;
-		public Hand viveLeftHand;
-		public Hand viveRightHand;
+		private GameObject vivePlayerGo;
+		private Player vivePlayer;
+		private Hand viveLeftHand;
+		private Hand viveRightHand;
 		private Vector3 lastControllerPos;
 		private Vector3 lastControllerRot;
 		public float remoteGrabStrength = 5.0f;
@@ -401,7 +401,7 @@ namespace ControllerSelection {
 			lastControllerRot = hand1.transform.rotation.eulerAngles;
 		}
 
-		private void SetRemoteGrabPosition(Vector3 newPosition, Transform newParent) {
+		private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent) {
 			remoteGrabDestinationGo.transform.position = newPosition;
 			remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
 		}
@@ -445,11 +445,11 @@ namespace ControllerSelection {
 				// Vive handling
 				if (viveLeftHand.controller.GetHairTriggerDown()) {
 					remoteGrab = hit.transform;
-					SetRemoteGrabPosition(hit.point, viveLeftHand.transform);
+					SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
 				}
 				if (viveRightHand.controller.GetHairTriggerDown()) {
 					remoteGrab = hit.transform;
-					SetRemoteGrabPosition(hit.point, viveRightHand.transform);
+					SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
 				}
 				ProcessOculusInputOnTarget(pointer);
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -499,11 +499,8 @@ namespace ControllerSelection {
 									//bu.remoteGrabSelectOn = true;
 									//bu.UpdateRenderMode();
 								}
-
 								//Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
 								//remoteGrabOffset = hitRigidBody.position - hit.point;
-
-
 							}
 						}
 					}
