@@ -451,7 +451,7 @@ namespace ControllerSelection {
 					remoteGrab = hit.transform;
 					SetRemoteGrabPosition(hit.point, viveRightHand.transform);
 				}
-				// ProcessOculusInputOnTarget(pointer);
+				ProcessOculusInputOnTarget(pointer);
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
             else {
