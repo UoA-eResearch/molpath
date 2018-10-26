@@ -109,6 +109,10 @@ namespace ControllerSelection
         [Tooltip("Minimum pointer movement in degrees to start dragging")]
         public float angleDragThreshold = 1;
 
+        [Header("Vive Adaptations")]
+        public XRDeviceManager xRDeviceManager;
+        public GameObject teleporting;
+
         // The following region contains code exactly the same as the implementation
         // of StandaloneInputModule. It is copied here rather than inheriting from StandaloneInputModule
         // because most of StandaloneInputModule is private so it isn't possible to easily derive from.
@@ -649,7 +653,6 @@ namespace ControllerSelection
 			OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             // We're only interested in intersections from OVRRaycasters
             bool aimingAtUI = false;
-            GameObject teleporting = GameObject.Find("Teleporting");
             Teleport tele = teleporting.GetComponent<Teleport>();
             if (ovrRaycaster) 
             {
@@ -866,18 +869,18 @@ namespace ControllerSelection
             if (activeController != OVRInput.Controller.None) {
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
-            } else if (GameObject.Find("VivePlayer") != null) {
+            } else if (xRDeviceManager.vivePlayer != null) {
                 // adaption for vive input
-                Hand[] hands = GameObject.Find("VivePlayer").GetComponentsInChildren<Hand>();
+                Hand[] hands = xRDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();
                 Hand hand1 = hands[0];
                 Hand hand2 = hands[1];
                 ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
                 // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
-                if (hand1.controller.GetPress(touchpad) || hand2.controller.GetPress(touchpad)) {
+                if (hand1.controller.GetPressDown(touchpad) || hand2.controller.GetPressDown(touchpad)) {
                     // Debug.Log("one of the hands it pressing");
                     pressed = true;
                     released = false;
-                } else {
+                } else if (hand1.controller.GetPressUp(touchpad) || hand2.controller.GetPressUp(touchpad)){
                     pressed = false;
                     released = true;
                 }

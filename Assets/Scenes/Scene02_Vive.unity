@@ -373,6 +373,12 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 275e8ad0d2198584ca9082d00527af23, type: 2}
   m_IsPrefabAsset: 0
+--- !u!114 &564620051 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+    type: 2}
+  m_PrefabInternal: {fileID: 564620050}
+  m_Script: {fileID: 11500000, guid: dbe73b32ca8104c4a9e5305a9f4520d3, type: 3}
 --- !u!1001 &635559211
 Prefab:
   m_ObjectHideFlags: 0
@@ -756,6 +762,11 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &833026348 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 153878, guid: 7a135b1a2cb9c8f488d4dd00c55ab283,
+    type: 2}
+  m_PrefabInternal: {fileID: 1964100060}
 --- !u!1001 &835274652
 Prefab:
   m_ObjectHideFlags: 0
@@ -1146,6 +1157,8 @@ MonoBehaviour:
   swipeScrollScale: 4
   activeController: 0
   angleDragThreshold: 1
+  xRDeviceManager: {fileID: 564620051}
+  teleporting: {fileID: 833026348}
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -1789,13 +1802,8 @@ MonoBehaviour:
   myHitPos: {x: 0, y: 0, z: 0}
   remoteGrab: {fileID: 0}
   remoteGrabDistance: 0
-  vivePlayerGo: {fileID: 0}
-  vivePlayer: {fileID: 0}
-  viveLeftHand: {fileID: 0}
-  viveRightHand: {fileID: 0}
   remoteGrabStrength: 5
   activeController: 0
-  testGoDestination: {fileID: 0}
 --- !u!114 &1919213148
 MonoBehaviour:
   m_ObjectHideFlags: 0
