@@ -104,9 +104,14 @@ namespace ControllerSelection {
 		private float approxMovingAvgPoke;
 
 		// Vive variables to track
+		public GameObject vivePlayerGo;
 		public Player vivePlayer;
 		public Hand viveLeftHand;
 		public Hand viveRightHand;
+		private Vector3 lastControllerPos;
+		private Vector3 lastControllerRot;
+		public float remoteGrabStrength = 5.0f;
+		private GameObject remoteGrabDestinationGo;
 
 		//[HideInInspector]
 		public OVRInput.Controller activeController = OVRInput.Controller.None;
@@ -120,9 +125,13 @@ namespace ControllerSelection {
 			centreEyeAnchor =  trackingSpace.transform.Find("CenterEyeAnchor");
 
 			if (vivePlayer == null) {
-				vivePlayer = GameObject.Find("VivePlayer").GetComponent<Player>();
+				vivePlayerGo = GameObject.Find("VivePlayer");
+				vivePlayer = vivePlayerGo.GetComponent<Player>();
 				viveLeftHand = vivePlayer.hands[0];
 				viveRightHand = vivePlayer.hands[1];
+			}
+			if (remoteGrabDestinationGo == null) {
+				remoteGrabDestinationGo = new GameObject();
 			}
         }
 
@@ -177,10 +186,6 @@ namespace ControllerSelection {
 			}
 			return anyTriggerUp;
 		}
-
-
-		private Vector3 lastControllerPos;
-		private Vector3 lastControllerRot;
 
 		private void ProcessOculusInputOnTarget(Ray pointer) {
 			// if using oculus controller, for invoking the residue selections methods.
@@ -314,61 +319,44 @@ namespace ControllerSelection {
 		}
 
 		private void OculusRemoteGrab(Ray pointer) {
-			Debug.Log("remote grabbing: " + remoteGrab.name);
 			// still remote grabbing
 			// poke (detecting sustained controller movement along pointer axis)
 			remoteGrabTime++;
-
 			Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
-
 			float poke = Vector3.Dot(deltaPointer, pointer.direction);
-
 			approxMovingAvgPoke -= approxMovingAvgPoke / 5;
 			approxMovingAvgPoke += poke / 5;
-
 			//if (Mathf.Abs(poke) > 0.001f)
 			//{
 			//	Debug.Log("poke = " + poke);
 			//}
-
-
 			if (remoteGrabTime > 5)
 			{
 				// scale remoteGrabDistance 
 				remoteGrabDistance *= (1.0f + (poke * 5.0f));
 			}
-			
 			prevPointer = pointer;
-
 			remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
-
 			// tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
 			myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
-
-
-			BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+			BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
 			if (bu != null)
 			{
 				//add ROLL - torque from wrist twist
 				Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
 				Quaternion remoteGrabControllerDeltaQ =   remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
 				remoteGrabObjectTargetQ =   remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
-
 				//remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
 				Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
 				Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
 				Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
-
 				//Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
-
 				float zRot = vDelta.z;
 				if (zRot > 180.0f)
 				{
 					zRot -= 360.0f;
 				}
-
 				//Debug.Log(zRot);
-
 				if (Mathf.Abs(zRot) > 15.0f) // threshold 
 				{
 					remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
@@ -389,12 +377,10 @@ namespace ControllerSelection {
 		}
 
 		private void ViveRemoteGrab() {
-			GameObject vP = GameObject.Find("VivePlayer");
-			if (vP == null) {
+			if (vivePlayerGo == null) {
 				return;
 			}
-			Hand hand1 = vP.GetComponent<Player>().hands[0];
-
+			Hand hand1 = vivePlayer.hands[0];
 			if (lastControllerPos == null) {
 				lastControllerPos = hand1.transform.position;
 			}
@@ -403,20 +389,25 @@ namespace ControllerSelection {
 			}
 			Vector3 controllerPosDelta = hand1.transform.position - lastControllerPos;
 			Vector3 controllerRotDelta = hand1.transform.rotation.eulerAngles - lastControllerRot;		
-
-			controllerPosDelta *= 10.0f;
-			// Debug.Log(controllerPosDelta);
 			// only scale the positional difference.
-			remoteGrab.transform.position += controllerPosDelta;
-			remoteGrab.transform.rotation = Quaternion.Euler(remoteGrab.transform.rotation.eulerAngles + controllerRotDelta);
-			// Debug.Log(hit.transform.name);				
-			lastControllerPos = hand1.transform.position;
+
+			// apply forces rather than manipulating the transform directly.
+			Rigidbody rb = remoteGrab.GetComponent<Rigidbody>();
+
+			// made a target transform instead of calculating deltas.
+			Vector3 forceDirection = remoteGrabDestinationGo.transform.position - remoteGrab.position;
+			rb.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
+			lastControllerPos = hand1.transform.localPosition;
 			lastControllerRot = hand1.transform.rotation.eulerAngles;
+		}
+
+		private void SetRemoteGrabPosition(Vector3 newPosition, Transform newParent) {
+			remoteGrabDestinationGo.transform.position = newPosition;
+			remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
 		}
 
 		void Update() {
             activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
-
 			Ray pointer;
 			if (trackingSpace != null) {
 				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
@@ -439,7 +430,6 @@ namespace ControllerSelection {
 					}
 					lastHit = null;
 				}
-
 				if (lastHit == null)
 				{
 					if (onHoverEnter != null)
@@ -447,26 +437,20 @@ namespace ControllerSelection {
 						onHoverEnter.Invoke(hit.transform);
 					}
 				}
-
 				if (onHover != null)
 				{
 					onHover.Invoke(hit.transform);
 				}
 
-				// start of vive input handling
-				// ProcessViveInputOnTarget(hit);
-
-				// Debug.Log(hit.transform.name);
-				Debug.Log(viveLeftHand);
+				// Vive handling
 				if (viveLeftHand.controller.GetHairTriggerDown()) {
-					Debug.Log("trigger is down, shoud be setting remote grab");
 					remoteGrab = hit.transform;
+					SetRemoteGrabPosition(hit.point, viveLeftHand.transform);
 				}
 				if (viveRightHand.controller.GetHairTriggerDown()) {
 					remoteGrab = hit.transform;
+					SetRemoteGrabPosition(hit.point, viveRightHand.transform);
 				}
-				// Debug.Log(remoteGrab.name);
-
 				// ProcessOculusInputOnTarget(pointer);
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
@@ -538,7 +522,6 @@ namespace ControllerSelection {
 				}
 			}
 			//REMOTE GRAB UPDATE (outside of hit test)
-			Debug.Log("remote grab " + remoteGrab.name);
 			if (remoteGrab)
 			{
 				if ( (OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController)))
@@ -550,7 +533,7 @@ namespace ControllerSelection {
 				else
 				{
 					//END remote grabbing
-					BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+					BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
 					if (bu != null)
 					{
 						bu.SetRemoteGrabSelect(false);

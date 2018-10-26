@@ -1789,7 +1789,13 @@ MonoBehaviour:
   myHitPos: {x: 0, y: 0, z: 0}
   remoteGrab: {fileID: 0}
   remoteGrabDistance: 0
+  vivePlayerGo: {fileID: 0}
+  vivePlayer: {fileID: 0}
+  viveLeftHand: {fileID: 0}
+  viveRightHand: {fileID: 0}
+  remoteGrabStrength: 5
   activeController: 0
+  testGoDestination: {fileID: 0}
 --- !u!114 &1919213148
 MonoBehaviour:
   m_ObjectHideFlags: 0
