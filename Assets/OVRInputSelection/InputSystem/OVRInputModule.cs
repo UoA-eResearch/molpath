@@ -637,7 +637,6 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true );
             leftData.Reset();
 
-
 			leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
             leftData.scrollDelta = GetExtraScrollDelta();
 
@@ -661,23 +660,21 @@ namespace ControllerSelection
                 // space position for the camera attached to this raycaster for compatability
                 leftData.position = ovrRaycaster.GetScreenPosition(raycast);
 
-                // Find the world position and normal the Graphic the ray intersected
+               // Find the world position and normal the Graphic the ray intersected
                 RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
                     
                 // TEST: Seeing is disabling teleporting prefab here will fix the teleporting through UI
                 if (raycast.gameObject.layer == 11)
-                // if (graphicRect != null || raycast.gameObject.layer == 11)
                 {
                     Debug.Log("Aiming at UI Element.");
                     // disable teleport prefab while aiming at UI.
                     if (teleporting != null && teleporting.activeInHierarchy) {
                         aimingAtUI = true;
                     }
-
                     // Set are gaze indicator with this world position and normal
                    // Vector3 worldPos = raycast.worldPosition;
                     //Vector3 normal = GetRectTransformNormal(graphicRect);
-					
+
                     if (OnSelectionRayHit != null) {
                         OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
                     }

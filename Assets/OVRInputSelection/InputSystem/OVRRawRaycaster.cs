@@ -512,7 +512,8 @@ namespace ControllerSelection {
 				myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
 				if (lastHit != null) {
-					if (onHoverExit != null) {
+					if (onHoverExit != null) {	
+						onHoverExit.Invoke(remoteGrab);
 						onHoverExit.Invoke(lastHit);
 					}
 					lastHit = null;

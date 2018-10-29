@@ -117,8 +117,7 @@ public class BackboneUnit : MonoBehaviour {
 			myResidue.residueSelected = flag;
 		}
 	}
-
-	public void SetBackboneUnitSelect (bool flag)
+public void SetBackboneUnitSelect (bool flag)
 	{
 		controllerSelectOn = flag;
 		UpdateRenderMode();
