@@ -816,7 +816,7 @@ namespace Valve.VR.InteractionSystem
 					teleportingToMarker = pointedAtTeleportMarker;
 					InitiateTeleportFade();
 
-					CancelTeleportHint();
+					// CancelTeleportHint();
 				}
 			}
 		}
@@ -985,6 +985,8 @@ namespace Valve.VR.InteractionSystem
 						if ( !isShowingHint )
 						{
 							ControllerButtonHints.ShowTextHint( hand, EVRButtonId.k_EButton_SteamVR_Touchpad, "Teleport" );
+							ControllerButtonHints.ShowTextHint( hand, EVRButtonId.k_EButton_Grip, "Grab" );
+							ControllerButtonHints.ShowTextHint( hand, EVRButtonId.k_EButton_SteamVR_Trigger, "Remote Grab" );
 							prevBreakTime = Time.time;
 							prevHapticPulseTime = Time.time;
 						}
@@ -994,12 +996,14 @@ namespace Valve.VR.InteractionSystem
 							//Haptic pulse for a few seconds
 							pulsed = true;
 
-							hand.controller.TriggerHapticPulse( 500 );
+							// hand.controller.TriggerHapticPulse( 500 );
 						}
 					}
 					else if ( !showHint && isShowingHint )
 					{
 						ControllerButtonHints.HideTextHint( hand, EVRButtonId.k_EButton_SteamVR_Touchpad );
+						ControllerButtonHints.HideTextHint( hand, EVRButtonId.k_EButton_Grip);
+						ControllerButtonHints.HideTextHint( hand,EVRButtonId.k_EButton_SteamVR_Trigger);
 					}
 				}
 
