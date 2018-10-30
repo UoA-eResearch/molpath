@@ -227,12 +227,14 @@ namespace Valve.VR.InteractionSystem
 			}
 		}
 
+		private Hand oldPointerHand;
+		private Hand newPointerHand;
 
 		//-------------------------------------------------
 		void Update()
 		{
-			Hand oldPointerHand = pointerHand;
-			Hand newPointerHand = null;
+			oldPointerHand = pointerHand;
+			newPointerHand = null;
 
 			foreach ( Hand hand in player.hands )
 			{
@@ -667,6 +669,14 @@ namespace Valve.VR.InteractionSystem
 			onDeactivateObjectTransform.gameObject.SetActive( true );
 
 			pointerHand = null;
+		}
+
+		public void ShowTeleportPointer() {
+			// WIP: To reactivate the teleportation when no longer looking at VR UI.
+			if (oldPointerHand) {
+				// pointerHand = oldPointerHand;
+				// ShowPointer(newPointerHand, oldPointerHand);
+			}
 		}
 
 
