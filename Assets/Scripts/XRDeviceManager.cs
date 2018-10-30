@@ -60,7 +60,7 @@ namespace ControllerSelection {
 
 		private void SetUIToWorldPosition() {
 			UI.transform.parent = null;
-			UI.transform.position = Vector3.zero;
+			UI.transform.position = new Vector3(0, 1, 0);
 			UI.transform.rotation = Quaternion.Euler(Vector3.zero);
 			UI.transform.localScale = Vector3.one;
 		}
