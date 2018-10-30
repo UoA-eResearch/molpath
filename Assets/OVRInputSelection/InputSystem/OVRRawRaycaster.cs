@@ -402,6 +402,7 @@ namespace ControllerSelection {
 		}
 
 		private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent) {
+			// sets an anchor at the hit position and sets hand as parent so offsets are automatically calculated without code.
 			remoteGrabDestinationGo.transform.position = newPosition;
 			remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
 		}
@@ -443,15 +444,29 @@ namespace ControllerSelection {
 				}
 
 				// Vive handling
-				if (viveLeftHand.controller.GetHairTriggerDown()) {
-					remoteGrab = hit.transform;
-					SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
+				if (vivePlayer.gameObject.activeInHierarchy) {
+					// HAND 1
+					if (viveLeftHand.controller.GetHairTriggerDown()) {
+						// TEMP: disabling for test
+						// remoteGrab = hit.transform;
+						// SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
+					}
+					if (viveLeftHand.controller.GetHairTriggerUp()) {
+						
+					}
+					if (viveLeftHand.controller.GetHairTrigger()) {
+
+					}
+
+					// HAND 2
+					if (viveRightHand.controller.GetHairTriggerDown()) {
+						remoteGrab = hit.transform;
+						SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
+					}
+				} else {
+					ProcessOculusInputOnTarget(pointer);	
 				}
-				if (viveRightHand.controller.GetHairTriggerDown()) {
-					remoteGrab = hit.transform;
-					SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
-				}
-				ProcessOculusInputOnTarget(pointer);
+				
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
             else {
