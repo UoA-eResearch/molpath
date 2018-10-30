@@ -370,6 +370,41 @@ Prefab:
       propertyPath: oculusPlayer
       value: 
       objectReference: {fileID: 1099655592}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: UI
+      value: 
+      objectReference: {fileID: 766835229}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandPosition.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandPosition.z
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandRotation.x
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandScale.x
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandScale.y
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: uiHandScale.z
+      value: 0.35
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 275e8ad0d2198584ca9082d00527af23, type: 2}
   m_IsPrefabAsset: 0
@@ -762,6 +797,11 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &766835229 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1062138818205230, guid: 3f4dc7657986a484997151337d7f7362,
+    type: 2}
+  m_PrefabInternal: {fileID: 635559211}
 --- !u!1 &833026348 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 153878, guid: 7a135b1a2cb9c8f488d4dd00c55ab283,
