@@ -27,12 +27,12 @@ public class RawInteraction : MonoBehaviour {
     protected Material oldHoverMat;
     public Material yellowMat;
     public Material backIdle;
-    public Material backACtive;
+    public Material backActive;
     public UnityEngine.UI.Text outText;
 
     public void OnHoverEnter(Transform t) {
         if (t.gameObject.name == "BackButton") {
-            t.gameObject.GetComponent<Renderer>().material = backACtive;
+            t.gameObject.GetComponent<Renderer>().material = backActive;
         }
         else {
 			//Debug.Log("---> " + t);
@@ -54,6 +54,7 @@ public class RawInteraction : MonoBehaviour {
     }
 
     public void OnHoverExit(Transform t) {
+		Debug.Log("running on hover exit on" + t.name);
         if (t.gameObject.name == "BackButton") {
             t.gameObject.GetComponent<Renderer>().material = backIdle;
         }

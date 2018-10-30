@@ -422,46 +422,60 @@ namespace ControllerSelection {
 			{
 				myHitPos = hit.point;
 				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
-				//Debug.Log(hit.distance);
-				if (lastHit != null && lastHit != hit.transform)
-				{
-					if (onHoverExit != null)
-					{
-						onHoverExit.Invoke(lastHit);
-					}
-					lastHit = null;
-				}
-				if (lastHit == null)
-				{
-					if (onHoverEnter != null)
-					{
-						onHoverEnter.Invoke(hit.transform);
-					}
-				}
-				if (onHover != null)
-				{
-					onHover.Invoke(hit.transform);
-				}
+
+				// // If aiming at something new to last frame.
+				// if (lastHit != null && lastHit != hit.transform)
+				// {
+				// 	// If theres an onHoverExit method, disable the shaders on last hit.
+				// 	if (onHoverExit != null)
+				// 	{
+				// 		onHoverExit.Invoke(lastHit);
+				// 	}
+				// 	// Clear what was in last hit once the shader has been disabled.
+				// 	lastHit = null;
+				// }
+				// if (lastHit == null)
+				// {
+				// 	if (onHoverEnter != null)
+				// 	{
+				// 		onHoverEnter.Invoke(hit.transform);
+				// 	}
+				// }
+				// if (onHover != null)
+				// {
+				// 	onHover.Invoke(hit.transform);
+				// }
 
 				// Vive handling
 				if (vivePlayer.gameObject.activeInHierarchy) {
 					// HAND 1
-					if (viveLeftHand.controller.GetHairTriggerDown()) {
-						// TEMP: disabling for test
-						// remoteGrab = hit.transform;
-						// SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
-					}
-					if (viveLeftHand.controller.GetHairTriggerUp()) {
-						
-					}
-					if (viveLeftHand.controller.GetHairTrigger()) {
+					onHoverEnter.Invoke(hit.transform);
 
+					if (lastHit != null && lastHit != hit.transform) {
+						onHoverExit.Invoke(lastHit);
 					}
+					lastHit = hit.transform;
+
+
+					// // onHoverEnter.Invoke(lastHit);
+					// if (viveLeftHand.controller.GetHairTriggerDown()) {
+					// 	// TEMP: disabling for test
+					// 	// lastHit = hit.transform;
+					// 	// remoteGrab = hit.transform;
+					// 	// SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
+					// 	// Debug.Log("firing vive trigger down on " + lastHit.name);
+					// 	// secondaryDown = lastHit;
+					// 	remoteGrab = lastHit;
+					// }
+					// if (viveLeftHand.controller.GetHairTriggerUp()) {
+					// 	remoteGrab = null;
+					// }
+					
 
 					// HAND 2
 					if (viveRightHand.controller.GetHairTriggerDown()) {
-						remoteGrab = hit.transform;
-						SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
+						// remoteGrab = hit.transform;
+						// SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
 					}
 				} else {
 					ProcessOculusInputOnTarget(pointer);	
