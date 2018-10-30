@@ -380,25 +380,9 @@ namespace ControllerSelection {
 			if (vivePlayerGo == null) {
 				return;
 			}
-			Hand hand1 = vivePlayer.hands[0];
-			if (lastControllerPos == null) {
-				lastControllerPos = hand1.transform.position;
-			}
-			if (lastControllerRot == null) {
-				lastControllerRot = hand1.transform.rotation.eulerAngles;
-			}
-			Vector3 controllerPosDelta = hand1.transform.position - lastControllerPos;
-			Vector3 controllerRotDelta = hand1.transform.rotation.eulerAngles - lastControllerRot;		
-			// only scale the positional difference.
-
-			// apply forces rather than manipulating the transform directly.
 			Rigidbody rb = remoteGrab.GetComponent<Rigidbody>();
-
-			// made a target transform instead of calculating deltas.
 			Vector3 forceDirection = remoteGrabDestinationGo.transform.position - remoteGrab.position;
 			rb.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
-			lastControllerPos = hand1.transform.localPosition;
-			lastControllerRot = hand1.transform.rotation.eulerAngles;
 		}
 
 		private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent) {
@@ -540,9 +524,10 @@ namespace ControllerSelection {
 			{
 				myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
-				if (lastHit != null) {
+				// if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
+				if (lastHit != null && !viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger()) {
 					if (onHoverExit != null) {	
-						onHoverExit.Invoke(remoteGrab);
+						// onHoverExit.Invoke(lastHit);
 						onHoverExit.Invoke(lastHit);
 					}
 					lastHit = null;

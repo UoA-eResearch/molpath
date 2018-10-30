@@ -54,20 +54,14 @@ public class RawInteraction : MonoBehaviour {
     }
 
     public void OnHoverExit(Transform t) {
-		Debug.Log("running on hover exit on" + t.name);
         if (t.gameObject.name == "BackButton") {
             t.gameObject.GetComponent<Renderer>().material = backIdle;
         }
         else {
-			//Debug.Log("---> " + t);
-			GameObject go = t.gameObject;
-			BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
-			if (bu != null)
-			{
-				//Debug.Log("      --> script");
+			BackboneUnit bu = t.GetComponent<BackboneUnit>();
+			if (bu != null) {
 				bu.SetBackboneUnitControllerHover(false);
 			}
-			//t.gameObject.GetComponent<Renderer>().material = oldHoverMat;
 		}
         if (outText != null) {
             outText.text = "<b>Last Interaction:</b>\nHover Exit:" + t.gameObject.name;
