@@ -21,7 +21,7 @@ limitations under the License.
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace ControllerSelection 
+namespace ControllerSelection
 {
     /// <summary>
     /// Simple event system using physics raycasts.
@@ -33,7 +33,7 @@ namespace ControllerSelection
         /// Const to use for clarity when no event mask is set
         /// </summary>
         protected const int kNoEventMaskSet = -1;
-        
+
 
         /// <summary>
         /// Layer mask used to filter events. Always combined with the camera's culling mask if a camera is used.
@@ -76,7 +76,7 @@ namespace ControllerSelection
             get { return m_EventMask; }
             set { m_EventMask = value; }
         }
-       
+
 
         /// <summary>
         /// Perform a raycast using the worldSpaceRay in eventData.
