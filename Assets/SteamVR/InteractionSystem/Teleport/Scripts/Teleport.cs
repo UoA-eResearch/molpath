@@ -221,6 +221,7 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public void HideTeleportPointer()
 		{
+			Debug.Log("Hiding teleport pointer.");
 			if ( pointerHand != null )
 			{
 				HidePointer();
@@ -670,15 +671,6 @@ namespace Valve.VR.InteractionSystem
 
 			pointerHand = null;
 		}
-
-		public void ShowTeleportPointer() {
-			// WIP: To reactivate the teleportation when no longer looking at VR UI.
-			if (oldPointerHand) {
-				// pointerHand = oldPointerHand;
-				// ShowPointer(newPointerHand, oldPointerHand);
-			}
-		}
-
 
 		//-------------------------------------------------
 		private void ShowPointer( Hand newPointerHand, Hand oldPointerHand )

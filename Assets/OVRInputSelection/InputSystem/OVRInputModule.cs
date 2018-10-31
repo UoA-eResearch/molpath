@@ -682,10 +682,6 @@ namespace ControllerSelection
             }
             if (aimingAtUI) {
                 tele.HideTeleportPointer();
-            //     // tele.CancelTeleportHint();
-            } else {
-            //     // tele.ShowTeleportHint();
-                tele.ShowTeleportPointer();
             }
 
             OVRPhysicsRaycaster physicsRaycaster = raycast.module as OVRPhysicsRaycaster;
