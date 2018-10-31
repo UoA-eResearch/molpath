@@ -450,31 +450,42 @@ namespace ControllerSelection {
 			remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
 		}
 
-		void Update() {
-            activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
-			Ray pointer;
-			if (trackingSpace != null) {
-				pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
-			} else {
-				// activates when ovr player inactive in hierarchy ie when using Vive setting in XRDeviceManager
-				pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
-				Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
-			}
-            RaycastHit hit; // Was anything hit?
-			if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
-			{
-				myHitPos = hit.point;
-				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
+        private bool IsHandUI(Transform target)
+        {
+            // checks if transform is on VR UI layer and if it's a child of a hand.
+            return (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform);
+        }
 
-				if (vivePlayer.gameObject.activeInHierarchy) 
-				{
-					ProcessViveInputOnTarget(hit);
-				} 
-				else 
-				{
-					ProcessOculusInputOnTarget(pointer, hit);	
-				}
-				
+        void Update()
+        {
+            activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
+            Ray pointer;
+            if (trackingSpace != null)
+            {
+                pointer = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+            }
+            else
+            {
+                // activates when ovr player inactive in hierarchy ie when using Vive setting in XRDeviceManager
+                pointer = OVRInputHelpers.GetSelectionRay(activeController, null);
+                Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
+            }
+            RaycastHit hit; // Was anything hit?
+            if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
+            {
+                myHitPos = hit.point;
+                myOVRPointerVisualizer.rayDrawDistance = hit.distance;
+
+                if (vivePlayer.gameObject.activeInHierarchy && !IsHandUI(hit.transform))
+                {
+
+                    ProcessViveInputOnTarget(hit);
+                }
+                else
+                {
+                    ProcessOculusInputOnTarget(pointer, hit);
+                }
+
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Gaze pointer fallback
             else {
@@ -493,77 +504,81 @@ namespace ControllerSelection {
                 }
             }
 #endif
-				//REMOTE GRAB
-				if (!remoteGrab)
-				{
-					// remoteGrab not set - looking for candidate
-					if (lastHit)
-					{
-						if (primaryDown && secondaryDown)
-						{
-							if (lastHit == primaryDown && lastHit == secondaryDown)
-							{
-								// START remote grabbing
-								//Debug.Log(lastHit + " is candidate for remoteGrab");
-								remoteGrab = lastHit;
-								remoteGrabDistance = hit.distance;
-								//Debug.Log("   --->" + hit.distance);
-								remoteGrabStartPos = hit.point;
-								approxMovingAvgPoke = 0f;
-								remoteGrabTime = 0;
+                //REMOTE GRAB
+                if (!remoteGrab)
+                {
+                    // remoteGrab not set - looking for candidate
+                    if (lastHit)
+                    {
+                        if (primaryDown && secondaryDown)
+                        {
+                            if (lastHit == primaryDown && lastHit == secondaryDown)
+                            {
+                                // START remote grabbing
+                                //Debug.Log(lastHit + " is candidate for remoteGrab");
+                                remoteGrab = lastHit;
+                                remoteGrabDistance = hit.distance;
+                                //Debug.Log("   --->" + hit.distance);
+                                remoteGrabStartPos = hit.point;
+                                approxMovingAvgPoke = 0f;
+                                remoteGrabTime = 0;
 
-								remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
-								remoteGrabControllerStartQ = OVRInput.GetLocalControllerRotation(activeController);
+                                remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
+                                remoteGrabControllerStartQ = OVRInput.GetLocalControllerRotation(activeController);
 
-								BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
-								if (bu != null)
-								{
-									bu.SetRemoteGrabSelect(true);
-									//bu.remoteGrabSelectOn = true;
-									//bu.UpdateRenderMode();
-								}
-								//Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
-								//remoteGrabOffset = hitRigidBody.position - hit.point;
-							}
-						}
-					}
-				}
-			}
-			// Nothing was hit, handle exit callback
-			else
-			{
-				myOVRPointerVisualizer.rayDrawDistance = 10.0f;
+                                BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+                                if (bu != null)
+                                {
+                                    bu.SetRemoteGrabSelect(true);
+                                    //bu.remoteGrabSelectOn = true;
+                                    //bu.UpdateRenderMode();
+                                }
+                                //Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
+                                //remoteGrabOffset = hitRigidBody.position - hit.point;
+                            }
+                        }
+                    }
+                }
+            }
+            // Nothing was hit, handle exit callback
+            else
+            {
+                myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
-				// if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-				if (lastHit != null && !viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger()) {
-					if (onHoverExit != null) {	
-						onHoverExit.Invoke(lastHit);
-					}
-					lastHit = null;
-				}
-			}
-			//REMOTE GRAB UPDATE (outside of hit test)
-			if (remoteGrab)
-			{
-				if ( (OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController)))
-				{
-					OculusRemoteGrab(pointer);
-				} else if (viveLeftHand.controller.GetHairTrigger() || viveRightHand.controller.GetHairTrigger()) {
-					ViveRemoteGrab();
-				}
-				else
-				{
-					//END remote grabbing
-					BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
-					if (bu != null)
-					{
-						bu.SetRemoteGrabSelect(false);
-						//bu.remoteGrabSelectOn = false;
-						//bu.UpdateRenderMode();
-					}
-					remoteGrab = null;
-				}
-			}
+                // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
+                if (lastHit != null && !viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger())
+                {
+                    if (onHoverExit != null)
+                    {
+                        onHoverExit.Invoke(lastHit);
+                    }
+                    lastHit = null;
+                }
+            }
+            //REMOTE GRAB UPDATE (outside of hit test)
+            if (remoteGrab)
+            {
+                if ((OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController)))
+                {
+                    OculusRemoteGrab(pointer);
+                }
+                else if (viveLeftHand.controller.GetHairTrigger() || viveRightHand.controller.GetHairTrigger())
+                {
+                    ViveRemoteGrab();
+                }
+                else
+                {
+                    //END remote grabbing
+                    BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
+                    if (bu != null)
+                    {
+                        bu.SetRemoteGrabSelect(false);
+                        //bu.remoteGrabSelectOn = false;
+                        //bu.UpdateRenderMode();
+                    }
+                    remoteGrab = null;
+                }
+            }
         }
     }
 }
