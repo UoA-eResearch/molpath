@@ -164,158 +164,216 @@ namespace ControllerSelection {
 
 		}
 
-		private bool AnyViveTriggerDown() {
-			bool anyTriggerDown = false;
-			foreach (var hand in GameObject.Find("VivePlayer").GetComponent<Player>().hands)
-			{
-				if (hand.controller.GetHairTriggerDown()) {
-					Debug.Log("trigger is down");
-					anyTriggerDown = true;
+		private void ProcessViveInputOnTarget(RaycastHit hit) {
+			// Vive handling
+			if (remoteGrab == null) {
+				onHoverEnter.Invoke(hit.transform);
+			}
+
+			if (lastHit != null && lastHit != hit.transform) {
+				// dont show selection highlight if remote grabbing.
+				onHoverExit.Invoke(lastHit);
+			}
+			lastHit = hit.transform;
+
+			// Test remote grab stuff
+			//left
+			if (viveLeftHand.controller.GetHairTriggerDown()) {
+				SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
+				remoteGrab = lastHit;
+				
+				// code to activate shader.
+				BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
+				if (bu != null) {
+					bu.SetRemoteGrabSelect(true);
 				}
 			}
-			return anyTriggerDown;
-		}
-
-		private bool AnyViveTriggerUp() {
-			bool anyTriggerUp = false;
-			foreach (var hand in GameObject.Find("VivePlayer").GetComponent<Player>().hands)
-			{
-				if (hand.controller.GetHairTriggerUp()) {
-					anyTriggerUp = true;
+			if (viveLeftHand.controller.GetHairTriggerUp()) {
+				// deactivate shader
+				if (remoteGrab != null) {
+					BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
+					if (bu != null) {
+						bu.SetRemoteGrabSelect(false);
+					}
+					//clear reference
+					remoteGrab = null;
 				}
 			}
-			return anyTriggerUp;
+
+			// right
+			if (viveRightHand.controller.GetHairTriggerDown()) {
+				SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
+				remoteGrab = lastHit;
+
+				// code to activate shader.
+				BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
+				if (bu != null) {
+					bu.SetRemoteGrabSelect(true);
+				}
+			}
+			if (viveRightHand.controller.GetHairTriggerUp()) {
+				if (remoteGrab != null) {
+					BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
+					if (bu != null) {
+						bu.SetRemoteGrabSelect(false);
+					}
+					remoteGrab = null;
+				}
+			}
 		}
 
-		private void ProcessOculusInputOnTarget(Ray pointer) {
+		private void ProcessOculusInputOnTarget(Ray pointer, RaycastHit hit) {
 			// if using oculus controller, for invoking the residue selections methods.
-                if (activeController != OVRInput.Controller.None) {
-                    if (OVRInput.GetDown(secondaryButton, activeController)) {
-                        secondaryDown = lastHit;
-						//Debug.Log("1");
-					}
-					else if (OVRInput.GetUp(secondaryButton, activeController))
+			// If aiming at something new to last frame.
+			if (lastHit != null && lastHit != hit.transform)
+			{
+				// If theres an onHoverExit method, disable the shaders on last hit.
+				if (onHoverExit != null)
+				{
+					onHoverExit.Invoke(lastHit);
+				}
+				// Clear what was in last hit once the shader has been disabled.
+				lastHit = null;
+			}
+			if (lastHit == null)
+			{
+				if (onHoverEnter != null)
+				{
+					onHoverEnter.Invoke(hit.transform);
+				}
+			}
+			if (onHover != null)
+			{
+				onHover.Invoke(hit.transform);
+			}
+
+			if (activeController != OVRInput.Controller.None) {
+				if (OVRInput.GetDown(secondaryButton, activeController)) {
+					secondaryDown = lastHit;
+					//Debug.Log("1");
+				}
+				else if (OVRInput.GetUp(secondaryButton, activeController))
+				{
+					if (secondaryDown != null && secondaryDown == lastHit)
 					{
-						if (secondaryDown != null && secondaryDown == lastHit)
+						if (onSecondarySelect != null)
 						{
-							if (onSecondarySelect != null)
-							{
-								onSecondarySelect.Invoke(secondaryDown, pointer);
-								//Debug.Log("2");
-							}
-						}
-					}
-					if (!OVRInput.Get(secondaryButton, activeController))
-					{
-						secondaryDown = null;
-						//Debug.Log("3");
-					}
-
-					if (OVRInput.GetDown(primaryButton, activeController))
-					{
-						primaryDown = lastHit;
-						//Debug.Log("4");
-					}
-					else if (OVRInput.GetUp(primaryButton, activeController))
-					{
-						if (primaryDown != null && primaryDown == lastHit)
-						{
-							if (onPrimarySelect != null)
-							{
-								onPrimarySelect.Invoke(primaryDown, pointer);
-								//Debug.Log("5");
-							}
-						}
-					}
-					if (!OVRInput.Get(primaryButton, activeController))
-					{
-						primaryDown = null;
-						//Debug.Log("6");
-					}
-				}
-
-				if (lastHit)
-				{
-					///
-					if (OVRInput.Get(aButton, activeController))
-					{
-						aDown = lastHit;
-					}
-					else
-					{
-						aDown = null;
-					}
-					if (OVRInput.Get(bButton, activeController))
-					{
-						bDown = lastHit;
-					}
-					else
-					{
-						bDown = null;
-					}
-				}
-
-
-
-				if (aDown)
-				{
-					//Debug.Log("A---->" + aDown);
-					onHoverADown.Invoke(aDown);
-				}
-
-				if (bDown)
-				{
-					//Debug.Log("B---->" + bDown);
-					onHoverBDown.Invoke(bDown);
-				}
-
-				if (primaryDown && !secondaryDown)
-				{
-					//Debug.Log(primaryDown);
-					//Debug.Log(axisValue);
-					if (!tractorBeaming)
-					{
-						tractorBeaming = true;
-						tractorTime = 0;
-						tractorAxisInputFiltered = 0.0f;
-					}
-					else
-					{
-						tractorTime++;
-						if (tractorTime > tractorDelay)
-						{
-							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, activeController);
-							tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
-							onPrimarySelectDownAxis.Invoke(primaryDown, pointer, tractorAxisInputFiltered);
+							onSecondarySelect.Invoke(secondaryDown, pointer);
+							//Debug.Log("2");
 						}
 					}
 				}
-				else if (secondaryDown && !primaryDown)
+				if (!OVRInput.Get(secondaryButton, activeController))
 				{
-					//Debug.Log(secondaryDown);
-					//Debug.Log(axisValue);
-					if (!tractorBeaming)
+					secondaryDown = null;
+					//Debug.Log("3");
+				}
+
+				if (OVRInput.GetDown(primaryButton, activeController))
+				{
+					primaryDown = lastHit;
+					//Debug.Log("4");
+				}
+				else if (OVRInput.GetUp(primaryButton, activeController))
+				{
+					if (primaryDown != null && primaryDown == lastHit)
 					{
-						tractorBeaming = true;
-						tractorTime = 0;
-						tractorAxisInputFiltered = 0.0f;
-					}
-					else
-					{
-						tractorTime++;
-						if (tractorTime > tractorDelay)
+						if (onPrimarySelect != null)
 						{
-							float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, activeController);
-							tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
-							onSecondarySelectDownAxis.Invoke(secondaryDown, pointer, tractorAxisInputFiltered);
+							onPrimarySelect.Invoke(primaryDown, pointer);
+							//Debug.Log("5");
 						}
 					}
+				}
+				if (!OVRInput.Get(primaryButton, activeController))
+				{
+					primaryDown = null;
+					//Debug.Log("6");
+				}
+			}
 
+			if (lastHit)
+			{
+				///
+				if (OVRInput.Get(aButton, activeController))
+				{
+					aDown = lastHit;
 				}
 				else
 				{
-					tractorBeaming = false;
+					aDown = null;
 				}
+				if (OVRInput.Get(bButton, activeController))
+				{
+					bDown = lastHit;
+				}
+				else
+				{
+					bDown = null;
+				}
+			}
+
+
+
+			if (aDown)
+			{
+				//Debug.Log("A---->" + aDown);
+				onHoverADown.Invoke(aDown);
+			}
+
+			if (bDown)
+			{
+				//Debug.Log("B---->" + bDown);
+				onHoverBDown.Invoke(bDown);
+			}
+
+			if (primaryDown && !secondaryDown)
+			{
+				//Debug.Log(primaryDown);
+				//Debug.Log(axisValue);
+				if (!tractorBeaming)
+				{
+					tractorBeaming = true;
+					tractorTime = 0;
+					tractorAxisInputFiltered = 0.0f;
+				}
+				else
+				{
+					tractorTime++;
+					if (tractorTime > tractorDelay)
+					{
+						float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, activeController);
+						tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
+						onPrimarySelectDownAxis.Invoke(primaryDown, pointer, tractorAxisInputFiltered);
+					}
+				}
+			}
+			else if (secondaryDown && !primaryDown)
+			{
+				//Debug.Log(secondaryDown);
+				//Debug.Log(axisValue);
+				if (!tractorBeaming)
+				{
+					tractorBeaming = true;
+					tractorTime = 0;
+					tractorAxisInputFiltered = 0.0f;
+				}
+				else
+				{
+					tractorTime++;
+					if (tractorTime > tractorDelay)
+					{
+						float axisValue = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, activeController);
+						tractorAxisInputFiltered = Mathf.Lerp(tractorAxisInputFiltered, axisValue, tractorLerp);
+						onSecondarySelectDownAxis.Invoke(secondaryDown, pointer, tractorAxisInputFiltered);
+					}
+				}
+
+			}
+			else
+			{
+				tractorBeaming = false;
+			}
 		}
 
 		private void OculusRemoteGrab(Ray pointer) {
@@ -377,7 +435,8 @@ namespace ControllerSelection {
 		}
 
 		private void ViveRemoteGrab() {
-			if (vivePlayerGo == null) {
+			if (vivePlayerGo == null) 
+			{
 				return;
 			}
 			Rigidbody rb = remoteGrab.GetComponent<Rigidbody>();
@@ -407,62 +466,13 @@ namespace ControllerSelection {
 				myHitPos = hit.point;
 				myOVRPointerVisualizer.rayDrawDistance = hit.distance;
 
-				// // If aiming at something new to last frame.
-				// if (lastHit != null && lastHit != hit.transform)
-				// {
-				// 	// If theres an onHoverExit method, disable the shaders on last hit.
-				// 	if (onHoverExit != null)
-				// 	{
-				// 		onHoverExit.Invoke(lastHit);
-				// 	}
-				// 	// Clear what was in last hit once the shader has been disabled.
-				// 	lastHit = null;
-				// }
-				// if (lastHit == null)
-				// {
-				// 	if (onHoverEnter != null)
-				// 	{
-				// 		onHoverEnter.Invoke(hit.transform);
-				// 	}
-				// }
-				// if (onHover != null)
-				// {
-				// 	onHover.Invoke(hit.transform);
-				// }
-
-				// Vive handling
-				if (vivePlayer.gameObject.activeInHierarchy) {
-					// HAND 1
-					onHoverEnter.Invoke(hit.transform);
-
-					if (lastHit != null && lastHit != hit.transform) {
-						onHoverExit.Invoke(lastHit);
-					}
-					lastHit = hit.transform;
-
-
-					// // onHoverEnter.Invoke(lastHit);
-					// if (viveLeftHand.controller.GetHairTriggerDown()) {
-					// 	// TEMP: disabling for test
-					// 	// lastHit = hit.transform;
-					// 	// remoteGrab = hit.transform;
-					// 	// SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
-					// 	// Debug.Log("firing vive trigger down on " + lastHit.name);
-					// 	// secondaryDown = lastHit;
-					// 	remoteGrab = lastHit;
-					// }
-					// if (viveLeftHand.controller.GetHairTriggerUp()) {
-					// 	remoteGrab = null;
-					// }
-					
-
-					// HAND 2
-					if (viveRightHand.controller.GetHairTriggerDown()) {
-						// remoteGrab = hit.transform;
-						// SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
-					}
-				} else {
-					ProcessOculusInputOnTarget(pointer);	
+				if (vivePlayer.gameObject.activeInHierarchy) 
+				{
+					ProcessViveInputOnTarget(hit);
+				} 
+				else 
+				{
+					ProcessOculusInputOnTarget(pointer, hit);	
 				}
 				
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -527,7 +537,6 @@ namespace ControllerSelection {
 				// if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
 				if (lastHit != null && !viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger()) {
 					if (onHoverExit != null) {	
-						// onHoverExit.Invoke(lastHit);
 						onHoverExit.Invoke(lastHit);
 					}
 					lastHit = null;

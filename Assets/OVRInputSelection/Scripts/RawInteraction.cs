@@ -169,7 +169,6 @@ public class RawInteraction : MonoBehaviour {
 	public void RemoteGrabInteraction(Transform t, Vector3 destination)
 	{
 		//Debug.Log("do  RemoteGrabInteraction!");
-
 		GameObject go = t.gameObject;
 		//BackboneUnit bu = (go.GetComponent("BackboneUnit") as BackboneUnit);
 		//if (bu != null)
@@ -179,14 +178,16 @@ public class RawInteraction : MonoBehaviour {
 			TractorBeam(go, destination, true, 5.0f);
 		}
 
-
+		// addition to change shader.
+		BackboneUnit bu = t.GetComponent<BackboneUnit>();
+		if (bu!=null) {
+			bu.SetRemoteGrabSelect(true);
+		}
 	}
 
 	public void TractorBeam(GameObject go, Vector3 position, bool attract, float scale)
 		{
-
 			//Debug.Log("tractor beam me!");
-
 			float tractorBeamAttractionFactor = scale * 100.0f;
 			float tractorBeamMax = scale * 100.0f;
 			float tractorBeamDistanceRatio = 400f / scale; // larger = weaker
@@ -200,8 +201,6 @@ public class RawInteraction : MonoBehaviour {
 
 			go.GetComponent<Rigidbody>().AddForce((tractorBeam * tractorBeamScale), ForceMode.Acceleration);
 			// add scaling for 'size' of target?
-
-
 	}
 }
 
