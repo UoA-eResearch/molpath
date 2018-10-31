@@ -68,7 +68,7 @@ namespace ControllerSelection {
 		private void SetUIToHandPosition() {
 			if (vivePlayer) {
 				Player player = vivePlayer.GetComponent<Player>();
-				UI.transform.parent = player.hands[0].transform;
+				UI.transform.parent = player.hands[1].transform;
 				UI.transform.localPosition = uiHandPosition;
 				UI.transform.localRotation = Quaternion.Euler(uiHandRotation);
 				UI.transform.localScale = uiHandScale;
