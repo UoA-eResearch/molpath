@@ -133,10 +133,10 @@ public void SetBackboneUnitSelect (bool flag)
 		}
 	}
 
-	public void SetRemoteGrabSelect(bool value)
+	public void SetRemoteGrabSelect(bool flag)
 	{
-		remoteGrabSelectOn = value;
-		myResidue.residueGrabbed = value;
+		remoteGrabSelectOn = flag;
+		myResidue.residueGrabbed = flag;
 		UpdateRenderMode();
 	}
 
