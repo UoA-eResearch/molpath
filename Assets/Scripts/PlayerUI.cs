@@ -8,7 +8,6 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Player))]
 public class PlayerUI : MonoBehaviour
 {
-
     public List<GameObject> menus;
 
     public Player myPlayer;
@@ -104,24 +103,11 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    private void RecursiveLogLocalPositions(Transform t)
+    public static void RecursiveLogLocalPositions(Transform t)
     {
         foreach (Transform sub in t)
         {
-            Debug.Log(sub.name);
-            if (menuItemPositions[sub.gameObject] == null)
-            {
-                menuItemPositions[sub.gameObject] = sub.position;
-            }
-            else
-            {
-                Debug.Log("entry found.");
-                if (menuItemPositions[sub.gameObject] != sub.position)
-                {
-                    Debug.Log(sub.name);
-                    Debug.Log("has been changed.");
-                }
-            }
+            // something recursive here.
             RecursiveLogLocalPositions(sub.transform);
         }
     }
