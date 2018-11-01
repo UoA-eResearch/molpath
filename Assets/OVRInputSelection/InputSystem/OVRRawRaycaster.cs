@@ -206,6 +206,20 @@ namespace ControllerSelection
             remoteGrabBackboneUnit = null;
         }
 
+
+        private void ClearLastHit()
+        {
+            if (!lastHit)
+            {
+                return;
+            }
+            if (onHoverExit != null)
+            {
+                onHoverExit.Invoke(lastHit);
+            }
+            lastHit = null;
+        }
+
         private void ProcessViveInputOnTarget(RaycastHit hit)
         {
             // Vive handling
@@ -575,13 +589,9 @@ namespace ControllerSelection
                 myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (lastHit != null && !viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger())
+                if (!viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger())
                 {
-                    if (onHoverExit != null)
-                    {
-                        onHoverExit.Invoke(lastHit);
-                    }
-                    lastHit = null;
+                    ClearLastHit();
                 }
             }
             //REMOTE GRAB UPDATE (outside of hit test)
