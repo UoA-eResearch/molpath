@@ -83,6 +83,8 @@ namespace ControllerSelection
         public Vector3 myHitPos;
 
         public Transform remoteGrab = null;
+        private Rigidbody remoteGrabRigidBody = null;
+        private BackboneUnit remoteGrabBackboneUnit = null;
         public float remoteGrabDistance;
         //public Vector3 remoteGrabOffset;
 
@@ -137,6 +139,7 @@ namespace ControllerSelection
             }
             if (remoteGrabDestinationGo == null)
             {
+                // simple object acting as a target destination transform when using remote grab
                 remoteGrabDestinationGo = new GameObject();
             }
         }
@@ -174,6 +177,35 @@ namespace ControllerSelection
 
         }
 
+        private void SetRemoteGrab(Vector3 newPosition, Transform newParent)
+        {
+            remoteGrabDestinationGo.transform.position = newPosition;
+            remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
+
+            remoteGrab = lastHit;
+            remoteGrabBackboneUnit = remoteGrab.GetComponent<BackboneUnit>();
+            remoteGrabRigidBody = remoteGrab.GetComponent<Rigidbody>();
+            if (remoteGrabBackboneUnit)
+            {
+                remoteGrabBackboneUnit.SetRemoteGrabSelect(true);
+            }
+        }
+
+        private void ClearRemoteGrab()
+        {
+            if (remoteGrab == null)
+            {
+                return;
+            }
+            if (remoteGrabBackboneUnit)
+            {
+                remoteGrabBackboneUnit.SetRemoteGrabSelect(false);
+            }
+            remoteGrab = null;
+            remoteGrabRigidBody = null;
+            remoteGrabBackboneUnit = null;
+        }
+
         private void ProcessViveInputOnTarget(RaycastHit hit)
         {
             // Vive handling
@@ -193,55 +225,21 @@ namespace ControllerSelection
             //left
             if (viveLeftHand.controller.GetHairTriggerDown())
             {
-                SetRemoteGrabDestinationAnchor(hit.point, viveLeftHand.transform);
-                remoteGrab = lastHit;
-
-                // code to activate shader.
-                BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
-                if (bu != null)
-                {
-                    bu.SetRemoteGrabSelect(true);
-                }
+                SetRemoteGrab(hit.point, viveLeftHand.transform);
             }
             if (viveLeftHand.controller.GetHairTriggerUp())
             {
-                // deactivate shader
-                if (remoteGrab != null)
-                {
-                    BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
-                    if (bu != null)
-                    {
-                        bu.SetRemoteGrabSelect(false);
-                    }
-                    //clear reference
-                    remoteGrab = null;
-                }
+                ClearRemoteGrab();
             }
 
             // right
             if (viveRightHand.controller.GetHairTriggerDown())
             {
-                SetRemoteGrabDestinationAnchor(hit.point, viveRightHand.transform);
-                remoteGrab = lastHit;
-
-                // code to activate shader.
-                BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
-                if (bu != null)
-                {
-                    bu.SetRemoteGrabSelect(true);
-                }
+                SetRemoteGrab(hit.point, viveRightHand.transform);
             }
             if (viveRightHand.controller.GetHairTriggerUp())
             {
-                if (remoteGrab != null)
-                {
-                    BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
-                    if (bu != null)
-                    {
-                        bu.SetRemoteGrabSelect(false);
-                    }
-                    remoteGrab = null;
-                }
+                ClearRemoteGrab();
             }
         }
 
@@ -435,7 +433,7 @@ namespace ControllerSelection
                 Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
                 Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
-                                                                             //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
+                //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
                 if (zRot > 180.0f)
                 {
@@ -467,9 +465,11 @@ namespace ControllerSelection
             {
                 return;
             }
-            Rigidbody rb = remoteGrab.GetComponent<Rigidbody>();
-            Vector3 forceDirection = remoteGrabDestinationGo.transform.position - remoteGrab.position;
-            rb.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
+            if (remoteGrabRigidBody)
+            {
+                Vector3 forceDirection = remoteGrabDestinationGo.transform.position - remoteGrab.position;
+                remoteGrabRigidBody.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
+            }
         }
 
         private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent)
@@ -597,15 +597,7 @@ namespace ControllerSelection
                 }
                 else
                 {
-                    //END remote grabbing
-                    BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
-                    if (bu != null)
-                    {
-                        bu.SetRemoteGrabSelect(false);
-                        //bu.remoteGrabSelectOn = false;
-                        //bu.UpdateRenderMode();
-                    }
-                    remoteGrab = null;
+                    ClearRemoteGrab();
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Player))]
 public class PlayerUI : MonoBehaviour
@@ -40,6 +41,7 @@ public class PlayerUI : MonoBehaviour
     void Update()
     {
         // poll for inputs from either hand
+        // TODO: switch from polling to event triggers.
         foreach (var hand in myHands)
         {
             if (hand.controller != null)
@@ -54,6 +56,8 @@ public class PlayerUI : MonoBehaviour
                 }
             }
         }
+
+        DetectMovement();
     }
 
     private GameObject CycleMenu()
@@ -81,5 +85,44 @@ public class PlayerUI : MonoBehaviour
         var offset = menu.transform.localPosition;
         menu.transform.parent = hand.transform;
         menu.transform.localPosition = offset;
+    }
+
+
+    private Dictionary<GameObject, Vector3> menuItemPositions = new Dictionary<GameObject, Vector3>();
+    private void DetectMovement()
+    {
+        // iterate the children
+        foreach (GameObject menu in menus)
+        {
+            // RecursiveLogLocalPositions(menu.transform);
+            // Debug.Log(menu.name);
+            // foreach (Transform sub in menu.transform)
+            // {
+            //     Debug.Log(sub.name);
+            //     Debug.Log(sub.localPosition);
+            // }
+        }
+    }
+
+    private void RecursiveLogLocalPositions(Transform t)
+    {
+        foreach (Transform sub in t)
+        {
+            Debug.Log(sub.name);
+            if (menuItemPositions[sub.gameObject] == null)
+            {
+                menuItemPositions[sub.gameObject] = sub.position;
+            }
+            else
+            {
+                Debug.Log("entry found.");
+                if (menuItemPositions[sub.gameObject] != sub.position)
+                {
+                    Debug.Log(sub.name);
+                    Debug.Log("has been changed.");
+                }
+            }
+            RecursiveLogLocalPositions(sub.transform);
+        }
     }
 }

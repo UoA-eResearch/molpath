@@ -650,6 +650,7 @@ namespace ControllerSelection
             eventSystem.RaycastAll(leftData, m_RaycastResultCache);
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             leftData.pointerCurrentRaycast = raycast;
+            // Debug.Log(raycast.gameObject.name);
             m_RaycastResultCache.Clear();
 
             OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
@@ -671,19 +672,12 @@ namespace ControllerSelection
                 {
                     Debug.Log("Aiming at UI Element.");
                     aimingAtUI = true;
-                    // disable teleport prefab while aiming at UI.
-                    // if (teleporting != null && teleporting.activeInHierarchy)
-                    // {
-                    //     aimingAtUI = true;
-                    // }
-
                     // Set are gaze indicator with this world position and normal
                     // Vector3 worldPos = raycast.worldPosition;
                     //Vector3 normal = GetRectTransformNormal(graphicRect);
 
                     if (OnSelectionRayHit != null)
                     {
-                        Debug.Log("calling on selection ray hit on a UI layer.");
                         OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
                     }
                 }
