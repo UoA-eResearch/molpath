@@ -651,15 +651,11 @@ namespace ControllerSelection
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             leftData.pointerCurrentRaycast = raycast;
             m_RaycastResultCache.Clear();
-
-            Debug.Log("Firing get gaze pointer data");
-            Debug.Log(raycast.module);
             OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             // We're only interested in intersections from OVRRaycasters
             bool aimingAtUI = false;
             if (ovrRaycaster)
             {
-                Debug.Log("firing ovr raycaster");
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability
