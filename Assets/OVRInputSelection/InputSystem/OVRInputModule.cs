@@ -671,7 +671,6 @@ namespace ControllerSelection
                 if (raycast.gameObject.layer == 11)
                 {
                     aimingAtUI = true;
-
                     if (OnSelectionRayHit != null)
                     {
                         OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);

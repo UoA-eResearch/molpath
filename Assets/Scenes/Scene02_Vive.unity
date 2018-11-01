@@ -321,6 +321,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &503769765 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 20064303451508998, guid: 3f4dc7657986a484997151337d7f7362,
+    type: 2}
+  m_PrefabInternal: {fileID: 635559211}
 --- !u!1001 &564620050
 Prefab:
   m_ObjectHideFlags: 0
@@ -405,6 +410,11 @@ Prefab:
       propertyPath: uiHandScale.z
       value: 0.35
       objectReference: {fileID: 0}
+    - target: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: vivePlayerCamera
+      value: 
+      objectReference: {fileID: 503769765}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 275e8ad0d2198584ca9082d00527af23, type: 2}
   m_IsPrefabAsset: 0
@@ -620,6 +630,26 @@ Prefab:
         type: 2}
       propertyPath: m_BlockingMask.m_Bits
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 114436301938640308, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: noSteamVRFallbackCamera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114137079085998310, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: noSteamVRFallbackCamera
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114137079085998310, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: startingHandType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114436301938640308, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: startingHandType
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
