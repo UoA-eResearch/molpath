@@ -616,6 +616,11 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114318040263785920, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: m_BlockingMask.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
   m_IsPrefabAsset: 0
@@ -802,11 +807,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1062138818205230, guid: 3f4dc7657986a484997151337d7f7362,
     type: 2}
   m_PrefabInternal: {fileID: 635559211}
---- !u!1 &833026348 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 153878, guid: 7a135b1a2cb9c8f488d4dd00c55ab283,
+--- !u!114 &833026350 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 11445746, guid: 7a135b1a2cb9c8f488d4dd00c55ab283,
     type: 2}
   m_PrefabInternal: {fileID: 1964100060}
+  m_Script: {fileID: 11500000, guid: f260935093f73f241bfaa1578e5e5506, type: 3}
 --- !u!1001 &835274652
 Prefab:
   m_ObjectHideFlags: 0
@@ -1198,7 +1204,7 @@ MonoBehaviour:
   activeController: 0
   angleDragThreshold: 1
   xRDeviceManager: {fileID: 564620051}
-  teleporting: {fileID: 833026348}
+  teleporting: {fileID: 833026350}
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -1857,7 +1863,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   yellowMat: {fileID: 2100000, guid: 5d1e07c8dcc9f0740bde7899dcf7a37d, type: 2}
   backIdle: {fileID: 0}
-  backACtive: {fileID: 0}
+  backActive: {fileID: 0}
   outText: {fileID: 0}
 --- !u!1001 &1964100060
 Prefab:

@@ -114,7 +114,7 @@ namespace ControllerSelection
 
         [Header("Vive Adaptations")]
         public XRDeviceManager xRDeviceManager;
-        public GameObject teleporting;
+        public Teleport teleporting;
 
         // The following region contains code exactly the same as the implementation
         // of StandaloneInputModule. It is copied here rather than inheriting from StandaloneInputModule
@@ -650,15 +650,16 @@ namespace ControllerSelection
             eventSystem.RaycastAll(leftData, m_RaycastResultCache);
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             leftData.pointerCurrentRaycast = raycast;
-            // Debug.Log(raycast.gameObject.name);
             m_RaycastResultCache.Clear();
 
+            Debug.Log("Firing get gaze pointer data");
+            Debug.Log(raycast.module);
             OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
             // We're only interested in intersections from OVRRaycasters
             bool aimingAtUI = false;
-            Teleport tele = teleporting.GetComponent<Teleport>();
             if (ovrRaycaster)
             {
+                Debug.Log("firing ovr raycaster");
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability
@@ -667,14 +668,9 @@ namespace ControllerSelection
                 // Find the world position and normal the Graphic the ray intersected
                 RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
 
-                // TEST: Seeing is disabling teleporting prefab here will fix the teleporting through UI
                 if (raycast.gameObject.layer == 11)
                 {
-                    Debug.Log("Aiming at UI Element.");
                     aimingAtUI = true;
-                    // Set are gaze indicator with this world position and normal
-                    // Vector3 worldPos = raycast.worldPosition;
-                    //Vector3 normal = GetRectTransformNormal(graphicRect);
 
                     if (OnSelectionRayHit != null)
                     {
@@ -685,7 +681,7 @@ namespace ControllerSelection
             if (aimingAtUI)
             {
                 // no need to show after hiding as teleporting script using button press as activation rather than a function.
-                tele.HideTeleportPointer();
+                teleporting.HideTeleportPointer();
             }
 
             OVRPhysicsRaycaster physicsRaycaster = raycast.module as OVRPhysicsRaycaster;
