@@ -6314,6 +6314,11 @@ Prefab:
       propertyPath: menus.Array.data[0]
       value: 
       objectReference: {fileID: 317740112}
+    - target: {fileID: 114334794089773844, guid: 3f4dc7657986a484997151337d7f7362,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
   m_IsPrefabAsset: 0
