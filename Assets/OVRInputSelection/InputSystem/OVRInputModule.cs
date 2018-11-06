@@ -689,7 +689,6 @@ namespace ControllerSelection
                 if (raycast.gameObject.layer == 11)
                 {
                     aimingAtUI = true;
-                    Debug.Log("aiming at layer 11.");
                     if (OnSelectionRayHit != null)
                     {
                         OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
@@ -895,14 +894,12 @@ namespace ControllerSelection
                 // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
                 if (hand1.controller.GetPressDown(touchpad) || hand2.controller.GetPressDown(touchpad))
                 {
-                    Debug.Log("touchpad pressed in input module.");
                     // Debug.Log("one of the hands it pressing");
                     pressed = true;
                     released = false;
                 }
                 else if (hand1.controller.GetPressUp(touchpad) || hand2.controller.GetPressUp(touchpad))
                 {
-                    Debug.Log("touchpad pressed in input module.");
                     pressed = false;
                     released = true;
                 }

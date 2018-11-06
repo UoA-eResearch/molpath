@@ -52,7 +52,6 @@ namespace ControllerSelection
                 Transform hand = vivePlayer.hands[0].transform;
                 if (hand != null)
                 {
-                    Debug.Log("using vive hand");
                     return new Ray(hand.position, hand.forward);
                 }
                 // use vive camera as fallback
