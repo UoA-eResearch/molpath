@@ -862,7 +862,7 @@ namespace ControllerSelection
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
             }
-            else if (xRDeviceManager.vivePlayer != null)
+            else if (xRDeviceManager.vivePlayerGo != null)
             {
                 // adaption for vive input
                 Hand[] hands = xRDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();

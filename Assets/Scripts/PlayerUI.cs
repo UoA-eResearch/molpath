@@ -41,14 +41,14 @@ public class PlayerUI : MonoBehaviour
     {
         // poll for inputs from either hand
         // TODO: switch from polling to event triggers.
-        foreach (var hand in myHands)
+        foreach (Hand hand in myHands)
         {
             if (hand.controller != null)
             {
                 if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu))
                 {
                     GameObject newMenu = CycleMenu();
-                    if (newMenu.transform.parent != hand.transform)
+                    if (newMenu.transform.parent && newMenu.transform.parent != hand.transform)
                     {
                         SwapMenuHand(newMenu, hand);
                     }
