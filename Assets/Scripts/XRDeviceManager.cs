@@ -103,12 +103,11 @@ namespace ControllerSelection
             // Setting up floor scale to match.
             if (!teleportArea)
             {
-                teleportArea = GameObject.Find("TeleportArea") {
-                    Vector3 floorScale = GameObject.Find("FloorPlane").transform.localScale;
-                    if (floorScale != teleportArea.transform.localScale)
-                    {
-                        teleportArea.transform.localScale = floorScale;
-                    }
+                teleportArea = GameObject.Find("TeleportArea");
+                Vector3 floorScale = GameObject.Find("FloorPlane").transform.localScale;
+                if (floorScale != teleportArea.transform.localScale)
+                {
+                    teleportArea.transform.localScale = floorScale;
                 }
             }
         }
