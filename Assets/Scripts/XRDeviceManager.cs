@@ -18,9 +18,6 @@ namespace ControllerSelection
         public GameObject UI;
 
         [Header("UI Transform settings in when attached to hand")]
-        public Vector3 uiHandPosition;
-        public Vector3 uiHandRotation;
-        public Vector3 uiHandScale;
 
         private int activeMenuIndex = 0;
         public List<GameObject> menus;
