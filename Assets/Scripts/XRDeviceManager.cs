@@ -14,6 +14,7 @@ namespace ControllerSelection
         public Player vivePlayer;
         public Camera vivePlayerCamera;
 
+
         public GameObject UI;
 
         [Header("UI Transform settings in when attached to hand")]
@@ -105,9 +106,9 @@ namespace ControllerSelection
             {
                 Player player = vivePlayerGo.GetComponent<Player>();
                 UI.transform.parent = player.hands[1].transform;
-                UI.transform.localPosition = uiHandPosition;
-                UI.transform.localRotation = Quaternion.Euler(uiHandRotation);
-                UI.transform.localScale = uiHandScale;
+                UI.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
+                UI.transform.localRotation = Quaternion.Euler(60, 0, 0);
+                UI.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
             }
         }
 
