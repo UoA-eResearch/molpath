@@ -37,6 +37,18 @@ namespace ControllerSelection
                 Debug.LogWarning("OVRInputModule did not have a tracking space set. Looking for one");
                 trackingSpace = OVRInputHelpers.FindTrackingSpace();
             }
+
+            if (xrDeviceManager == null)
+            {
+                try
+                {
+                    xrDeviceManager = GameObject.Find("XRDeviceManager").GetComponent<XRDeviceManager>();
+                }
+                catch (NullReferenceException e)
+                {
+                    Debug.LogError(e);
+                }
+            }
         }
 
         protected override void OnEnable()
@@ -113,7 +125,7 @@ namespace ControllerSelection
         public float angleDragThreshold = 1;
 
         [Header("Vive Adaptations")]
-        public XRDeviceManager xRDeviceManager;
+        public XRDeviceManager xrDeviceManager;
         public Teleport teleporting;
 
         // The following region contains code exactly the same as the implementation
@@ -133,7 +145,6 @@ namespace ControllerSelection
 
         private Vector2 m_LastMousePosition;
         private Vector2 m_MousePosition;
-
         protected OVRInputModule()
         { }
 
@@ -862,10 +873,10 @@ namespace ControllerSelection
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
             }
-            else if (xRDeviceManager.vivePlayerGo != null)
+            else if (xrDeviceManager.vivePlayerGo != null)
             {
                 // adaption for vive input
-                Hand[] hands = xRDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();
+                Hand[] hands = xrDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();
                 Hand hand1 = hands[0];
                 Hand hand2 = hands[1];
                 ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
