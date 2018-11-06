@@ -30,11 +30,11 @@ namespace ControllerSelection
         {
             // programmatic fallback for if object references not set in editor.
             // oculus and vive players.
-            if (oculusPlayer != null)
+            if (oculusPlayer == null)
             {
                 oculusPlayer = GameObject.Find("OVRPlayerController");
             }
-            if (vivePlayer != null)
+            if (vivePlayer == null)
             {
                 vivePlayer = GameObject.Find("VivePlayer");
             }
