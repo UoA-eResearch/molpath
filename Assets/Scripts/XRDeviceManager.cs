@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Valve.VR;
 using Valve.VR.InteractionSystem;
 
 namespace ControllerSelection
@@ -19,6 +20,9 @@ namespace ControllerSelection
         public Vector3 uiHandPosition;
         public Vector3 uiHandRotation;
         public Vector3 uiHandScale;
+
+        private int activeMenuIndex = 0;
+        public List<GameObject> menus;
 
         void Awake()
         {
@@ -62,6 +66,10 @@ namespace ControllerSelection
             {
                 Debug.Log("Using unhandled XR device.");
             }
+
+            // hacking way of adding a no-menu option for menu cycling.
+            menus.Add(UI);
+            menus.Add(null);
         }
 
         private void ViveSceneSetup()
@@ -112,6 +120,33 @@ namespace ControllerSelection
             }
         }
 
+        private GameObject CycleMenu()
+        {
+            // switch off current menu
+            activeMenuIndex = activeMenuIndex % menus.Count;
+            if (menus[activeMenuIndex] != null)
+            {
+                menus[activeMenuIndex].SetActive(false);
+            }
+
+            // update index and active new menu
+            activeMenuIndex++;
+            activeMenuIndex %= menus.Count;
+            if (menus[activeMenuIndex] != null)
+            {
+                menus[activeMenuIndex].SetActive(true);
+                return menus[activeMenuIndex];
+            }
+            return null;
+        }
+
+        private void SwapMenuHand(GameObject menu, Hand hand)
+        {
+            var offset = menu.transform.localPosition;
+            menu.transform.parent = hand.transform;
+            menu.transform.localPosition = offset;
+        }
+
         // Use this for initialization
         void Start()
         {
@@ -121,7 +156,22 @@ namespace ControllerSelection
         // Update is called once per frame
         void Update()
         {
-
+            // poll for inputs from either hand
+            // TODO: switch from polling to event triggers.
+            foreach (Hand hand in vivePlayer.hands)
+            {
+                if (hand.controller != null)
+                {
+                    if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu))
+                    {
+                        GameObject newMenu = CycleMenu();
+                        if (newMenu.transform.parent && newMenu.transform.parent != hand.transform)
+                        {
+                            SwapMenuHand(newMenu, hand);
+                        }
+                    }
+                }
+            }
         }
     }
 }
