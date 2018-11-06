@@ -15,7 +15,7 @@ namespace ControllerSelection
         public Camera vivePlayerCamera;
 
 
-        public GameObject UI;
+        public GameObject uiContainer;
 
         [Header("UI Transform settings in when attached to hand")]
 
@@ -46,9 +46,9 @@ namespace ControllerSelection
             }
 
             // Handling UI 
-            if (UI == null)
+            if (uiContainer == null)
             {
-                UI = GameObject.Find("UI");
+                uiContainer = GameObject.Find("UI_container");
                 // TODO: Add the additional canvases
             }
 
@@ -66,7 +66,7 @@ namespace ControllerSelection
             }
 
             // hacking way of adding a no-menu option for menu cycling.
-            menus.Add(UI);
+            menus.Add(uiContainer);
             menus.Add(null);
         }
 
@@ -91,10 +91,10 @@ namespace ControllerSelection
 
         private void SetUIToWorldPosition()
         {
-            UI.transform.parent = null;
-            UI.transform.position = new Vector3(0, 1, 0);
-            UI.transform.rotation = Quaternion.Euler(Vector3.zero);
-            UI.transform.localScale = Vector3.one;
+            uiContainer.transform.parent = null;
+            uiContainer.transform.position = new Vector3(0, 1, 0);
+            uiContainer.transform.rotation = Quaternion.Euler(Vector3.zero);
+            uiContainer.transform.localScale = Vector3.one;
         }
 
         private void SetUIToHandPosition()
@@ -102,16 +102,16 @@ namespace ControllerSelection
             if (vivePlayerGo)
             {
                 Player player = vivePlayerGo.GetComponent<Player>();
-                UI.transform.parent = player.hands[1].transform;
-                UI.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
-                UI.transform.localRotation = Quaternion.Euler(60, 0, 0);
-                UI.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+                uiContainer.transform.parent = player.hands[1].transform;
+                uiContainer.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
+                uiContainer.transform.localRotation = Quaternion.Euler(60, 0, 0);
+                uiContainer.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
             }
         }
 
         private void SetAllCanvasEventCameras(Camera camera)
         {
-            Canvas[] canvases = UI.GetComponentsInChildren<Canvas>();
+            Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
             foreach (var canvas in canvases)
             {
                 canvas.worldCamera = camera;
