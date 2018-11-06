@@ -9,16 +9,18 @@ namespace ControllerSelection
 {
     public class XRDeviceManager : MonoBehaviour
     {
+        [Header("Oculus References")]
         public GameObject oculusPlayer;
+
+        [Header("Vive References")]
         public GameObject vivePlayerGo;
         public Player vivePlayer;
         public Camera vivePlayerCamera;
-
-
-        public GameObject uiContainer;
+        public GameObject teleporting;
+        public GameObject teleportArea;
 
         [Header("UI Transform settings in when attached to hand")]
-
+        public GameObject uiContainer;
         private int activeMenuIndex = 0;
         public List<GameObject> menus;
 
@@ -49,7 +51,6 @@ namespace ControllerSelection
             if (uiContainer == null)
             {
                 uiContainer = GameObject.Find("UI_container");
-                // TODO: Add the additional canvases
             }
 
             if (UnityEngine.XR.XRDevice.model.Contains("Vive"))
@@ -68,6 +69,8 @@ namespace ControllerSelection
             // hacking way of adding a no-menu option for menu cycling.
             menus.Add(uiContainer);
             menus.Add(null);
+
+            SetUpTeleporting();
         }
 
         private void ViveSceneSetup()
@@ -87,6 +90,27 @@ namespace ControllerSelection
             oculusPlayer.SetActive(true);
 
             SetUIToWorldPosition();
+        }
+
+        private void SetUpTeleporting()
+        {
+            // reference to teleporting in case it's used here.
+            if (!teleporting)
+            {
+                teleporting = GameObject.Find("Teleporting");
+            }
+
+            // Setting up floor scale to match.
+            if (!teleportArea)
+            {
+                teleportArea = GameObject.Find("TeleportArea") {
+                    Vector3 floorScale = GameObject.Find("FloorPlane").transform.localScale;
+                    if (floorScale != teleportArea.transform.localScale)
+                    {
+                        teleportArea.transform.localScale = floorScale;
+                    }
+                }
+            }
         }
 
         private void SetUIToWorldPosition()
