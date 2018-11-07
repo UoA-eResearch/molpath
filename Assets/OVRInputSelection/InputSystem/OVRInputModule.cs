@@ -662,7 +662,14 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true);
             leftData.Reset();
 
-            leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+            if (xrDeviceManager.usingVive)
+            {
+                leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
+            }
+            else
+            {
+                leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+            }
             leftData.scrollDelta = GetExtraScrollDelta();
 
             //Populate some default values

@@ -24,6 +24,9 @@ namespace ControllerSelection
         private int activeMenuIndex = 0;
         public List<GameObject> menus;
 
+        public bool usingOculus;
+        public bool usingVive;
+
         void Awake()
         {
             // programmatic fallback for if object references not set in editor.
@@ -82,6 +85,9 @@ namespace ControllerSelection
 
             // currently all the canvases are set to oculus transforms/tracking space etc.
             SetAllCanvasEventCameras(vivePlayerCamera);
+
+            usingVive = true;
+            usingOculus = false;
         }
 
         private void OculusSceneSetup()
@@ -90,6 +96,11 @@ namespace ControllerSelection
             oculusPlayer.SetActive(true);
 
             SetUIToWorldPosition();
+
+            teleporting.SetActive(false);
+
+            usingVive = false;
+            usingOculus = true;
         }
 
         private void SetUpTeleporting()
@@ -98,6 +109,10 @@ namespace ControllerSelection
             if (!teleporting)
             {
                 teleporting = GameObject.Find("Teleporting");
+                if (usingOculus || !usingVive)
+                {
+                    teleporting.SetActive(false);
+                }
             }
 
             // Setting up floor scale to match.
@@ -163,9 +178,9 @@ namespace ControllerSelection
 
         private void SwapMenuHand(GameObject menu, Hand hand)
         {
-            var offset = menu.transform.localPosition;
+            var positionOffset = menu.transform.localPosition;
             menu.transform.parent = hand.transform;
-            menu.transform.localPosition = offset;
+            menu.transform.localPosition = positionOffset;
         }
 
         // Use this for initialization
