@@ -684,7 +684,7 @@ namespace ControllerSelection
                 leftData.position = ovrRaycaster.GetScreenPosition(raycast);
 
                 // Find the world position and normal the Graphic the ray intersected
-                RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
+                // RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
 
                 if (raycast.gameObject.layer == 11)
                 {

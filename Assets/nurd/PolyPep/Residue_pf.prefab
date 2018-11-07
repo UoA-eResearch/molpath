@@ -59,9 +59,9 @@ MonoBehaviour:
   psiTarget: 0
   phiCurrent: 0
   psiCurrent: 0
-  ramaPlot: {fileID: 0}
+  ramaPlotOrigin: {fileID: 0}
   ramaPlotScale: 0.0012
-  myPlotCube: {fileID: 0}
+  myPlotCube: {fileID: 1969735767317512, guid: 2ee641756d446e84bb15c590955f3646, type: 2}
   residueSelected: 0
   residueHovered: 0
   residueGrabbed: 0
