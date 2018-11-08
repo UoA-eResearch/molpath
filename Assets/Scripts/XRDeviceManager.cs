@@ -27,6 +27,8 @@ namespace ControllerSelection
         public bool usingOculus;
         public bool usingVive;
 
+        public static XRDeviceManager instance { get; private set; }
+
         void Awake()
         {
             // programmatic fallback for if object references not set in editor.

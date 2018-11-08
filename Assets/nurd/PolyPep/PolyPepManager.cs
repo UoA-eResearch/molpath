@@ -144,9 +144,7 @@ public class PolyPepManager : MonoBehaviour
     {
         //if (!collidersOn)
         {
-            Debug.Log("spawn polypeptide from ppm");
             int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
-            Debug.Log("num residues" + numResidues);
 
             //Debug.Log(spawnTransform.position);
 
