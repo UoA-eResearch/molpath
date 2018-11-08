@@ -418,12 +418,6 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 275e8ad0d2198584ca9082d00527af23, type: 2}
   m_IsPrefabAsset: 0
---- !u!114 &564620051 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114095981936964308, guid: 275e8ad0d2198584ca9082d00527af23,
-    type: 2}
-  m_PrefabInternal: {fileID: 564620050}
-  m_Script: {fileID: 11500000, guid: dbe73b32ca8104c4a9e5305a9f4520d3, type: 3}
 --- !u!1001 &635559211
 Prefab:
   m_ObjectHideFlags: 0
@@ -651,7 +645,8 @@ Prefab:
       propertyPath: startingHandType
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114334794089773844, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1001 &679333859
@@ -1011,8 +1006,8 @@ MonoBehaviour:
   gazePointer: {fileID: 1762794663}
   rayDrawDistance: 10
   gazeDrawDistance: 3
-  activeController: 0
   hand: {fileID: 1065230784}
+  activeController: 0
 --- !u!4 &1082519096
 Transform:
   m_ObjectHideFlags: 0
@@ -1115,7 +1110,7 @@ MonoBehaviour:
   swipeScrollScale: 4
   activeController: 0
   angleDragThreshold: 1
-  xRDeviceManager: {fileID: 564620051}
+  xrDeviceManager: {fileID: 0}
   teleporting: {fileID: 833026350}
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
@@ -1426,7 +1421,8 @@ MonoBehaviour:
   psiTarget: 0
   phiCurrent: 0
   psiCurrent: 0
-  ramaPlot: {fileID: 0}
+  ramaPlotOrigin: {fileID: 0}
+  myPlotCubeBaseScale: {x: 0, y: 0, z: 0}
   ramaPlotScale: 0.0012
   myPlotCube: {fileID: 0}
   residueSelected: 0
