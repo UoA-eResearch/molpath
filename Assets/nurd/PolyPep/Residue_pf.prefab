@@ -51,8 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b22d70f0956c9741b45b232fe387751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amide_pf: {fileID: 1106350776754678, guid: 4936e546446ffae4385076fe2eaded75, type: 2}
-  calpha_pf: {fileID: 1106350776754678, guid: 98047eb084056d04d9c000b3606e91e9, type: 2}
+  amide_pf: {fileID: 1819053209946204, guid: 4936e546446ffae4385076fe2eaded75, type: 2}
+  calpha_pf: {fileID: 1892882056782380, guid: 98047eb084056d04d9c000b3606e91e9, type: 2}
   carbonyl_pf: {fileID: 1106350776754678, guid: be5cfe1926cf4d24bb8c219702f2b5be,
     type: 2}
   phiTarget: 0
@@ -60,6 +60,7 @@ MonoBehaviour:
   phiCurrent: 0
   psiCurrent: 0
   ramaPlotOrigin: {fileID: 0}
+  myPlotCubeBaseScale: {x: 0, y: 0, z: 0}
   ramaPlotScale: 0.0012
   myPlotCube: {fileID: 1969735767317512, guid: 2ee641756d446e84bb15c590955f3646, type: 2}
   residueSelected: 0

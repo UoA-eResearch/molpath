@@ -153,11 +153,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bae3d1c1003f0a741bd039288d7ef702, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amidePf: {fileID: 1106350776754678, guid: 4936e546446ffae4385076fe2eaded75, type: 2}
-  calphaPf: {fileID: 1106350776754678, guid: 98047eb084056d04d9c000b3606e91e9, type: 2}
+  amidePf: {fileID: 1819053209946204, guid: 4936e546446ffae4385076fe2eaded75, type: 2}
+  calphaPf: {fileID: 1892882056782380, guid: 98047eb084056d04d9c000b3606e91e9, type: 2}
   carbonylPf: {fileID: 1106350776754678, guid: be5cfe1926cf4d24bb8c219702f2b5be, type: 2}
   residuePf: {fileID: 1903836867372088, guid: 97b0f9eb19d5deb4e893480dc6a04b42, type: 2}
   hBondPsPf: {fileID: 1013763304498548, guid: e3ee753fcb9055e4d83b3dc736c5d1fe, type: 2}
+  myPolyPepManager: {fileID: 0}
   buildTransform: {fileID: 0}
   numResidues: 30
   polyArr: []
