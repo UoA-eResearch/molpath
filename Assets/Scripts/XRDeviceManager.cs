@@ -10,7 +10,7 @@ namespace ControllerSelection
     public class XRDeviceManager : MonoBehaviour
     {
         [Header("Oculus References")]
-        public GameObject oculusPlayer;
+        public OVRPlayerController ovrPlayerController;
 
         [Header("Vive References")]
         public GameObject vivePlayerGo;
@@ -33,23 +33,18 @@ namespace ControllerSelection
         {
             // programmatic fallback for if object references not set in editor.
             // oculus and vive players.
-            if (!oculusPlayer)
+            if (!ovrPlayerController)
             {
-                oculusPlayer = GameObject.Find("OVRPlayerController");
+                // oculusPlayer = GameObject.Find("OVRPlayerController");
+                ovrPlayerController = FindObjectOfType<OVRPlayerController>();
             }
 
             // setting up vive references
-            if (!vivePlayerGo)
+            if (Player.instance)
             {
-                vivePlayerGo = GameObject.Find("VivePlayer");
-            }
-            if (!vivePlayer)
-            {
-                vivePlayer = vivePlayerGo.GetComponent<Player>();
-            }
-            if (!vivePlayerCamera)
-            {
-                vivePlayerCamera = vivePlayer.hmdTransforms[0].GetComponent<Camera>();
+                vivePlayer = Player.instance;
+                vivePlayerGo = Player.instance.gameObject;
+                vivePlayerCamera = vivePlayer.hmdTransform.GetComponent<Camera>();
             }
 
             // Handling UI 
@@ -80,7 +75,7 @@ namespace ControllerSelection
 
         private void ViveSceneSetup()
         {
-            oculusPlayer.SetActive(false);
+            ovrPlayerController.gameObject.SetActive(false);
             vivePlayerGo.SetActive(true);
 
             SetUIToHandPosition();
@@ -95,7 +90,7 @@ namespace ControllerSelection
         private void OculusSceneSetup()
         {
             vivePlayerGo.SetActive(false);
-            oculusPlayer.SetActive(true);
+            ovrPlayerController.gameObject.SetActive(true);
 
             SetUIToWorldPosition();
 
@@ -185,17 +180,8 @@ namespace ControllerSelection
             menu.transform.localPosition = positionOffset;
         }
 
-        // Use this for initialization
-        void Start()
+        private void UpdateMenuPosition()
         {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            // poll for inputs from either hand
-            // TODO: switch from polling to event triggers.
             foreach (Hand hand in vivePlayer.hands)
             {
                 if (hand.controller != null)
@@ -210,6 +196,18 @@ namespace ControllerSelection
                     }
                 }
             }
+        }
+
+        private void SwapEventSystem()
+        {
+            // WIP: switch out the event system to vive or oculus depending on which.
+
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            UpdateMenuPosition();
         }
     }
 }

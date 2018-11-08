@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Valve.VR.InteractionSystem;
 
 namespace ControllerSelection
 {
@@ -58,26 +59,13 @@ namespace ControllerSelection
                         warnedAboutCamera = true;
                         Debug.LogWarning("ViveRaycaster belongs to a canvas with no world camera!");
                     }
-                    if (XRDeviceManager.instance.vivePlayer != null)
+                    if (Player.instance)
                     {
-                        Debug.Log("xr device manager has a player.");
-                        Camera cameraRig = XRDeviceManager.instance.vivePlayerCamera;
+                        Camera cameraRig = Player.instance.hmdTransform.GetComponent<Camera>();
                         if (cameraRig != null)
                         {
+                            Debug.Log("using player instance hmd transform as camera.");
                             return cameraRig;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                Debug.LogWarning("Camera not found in XRDevice manager instance; searching player.");
-                                cameraRig = XRDeviceManager.instance.vivePlayer.hmdTransforms[0].GetComponent<Camera>();
-                            }
-                            catch (NullReferenceException e)
-                            {
-                                Debug.LogError("Cannot find vive camera or vive player in XRDevice manager");
-                                return null;
-                            }
                         }
                     }
                     return Camera.main;
@@ -182,7 +170,7 @@ namespace ControllerSelection
         /// <param name="resultAppendList"></param>
         public override void Raycast(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList)
         {
-            OVRRayPointerEventData rayPointerEventData = eventData as OVRRayPointerEventData;
+            ViveRayPointerEventData rayPointerEventData = eventData as ViveRayPointerEventData;
             if (rayPointerEventData != null)
             {
                 Raycast(eventData, resultAppendList, rayPointerEventData.worldSpaceRay, true);

@@ -662,10 +662,7 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true);
             leftData.Reset();
 
-            if (xrDeviceManager && xrDeviceManager.usingVive)
-            {
-                leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
-            }
+            leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
             leftData.scrollDelta = GetExtraScrollDelta();
 
             //Populate some default values
@@ -682,6 +679,10 @@ namespace ControllerSelection
             bool aimingAtUI = false;
             if (viveRaycaster)
             {
+                Teleport.instance.HideTeleportPointer();
+            }
+            if (viveRaycaster)
+            {
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability
@@ -690,13 +691,10 @@ namespace ControllerSelection
                 // Find the world position and normal the Graphic the ray intersected
                 // RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
 
-                if (raycast.gameObject.layer == 11)
+                aimingAtUI = true;
+                if (OnSelectionRayHit != null)
                 {
-                    aimingAtUI = true;
-                    if (OnSelectionRayHit != null)
-                    {
-                        OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
-                    }
+                    OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
                 }
             }
             if (aimingAtUI)
@@ -761,13 +759,13 @@ namespace ControllerSelection
                 leftData.pointerCurrentRaycast = raycast;
                 m_RaycastResultCache.Clear();
 
-                OVRRaycaster ovrRaycaster = raycast.module as OVRRaycaster;
-                if (ovrRaycaster) // raycast may not actually contain a result
+                ViveRaycaster viveRaycaster = raycast.module as ViveRaycaster;
+                if (viveRaycaster) // raycast may not actually contain a result
                 {
                     // The Unity UI system expects event data to have a screen position
                     // so even though this raycast came from a world space ray we must get a screen
                     // space position for the camera attached to this raycaster for compatability
-                    Vector2 position = ovrRaycaster.GetScreenPosition(raycast);
+                    Vector2 position = viveRaycaster.GetScreenPosition(raycast);
 
                     leftData.delta = position - leftData.position;
                     leftData.position = position;

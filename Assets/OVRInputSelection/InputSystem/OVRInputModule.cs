@@ -367,10 +367,6 @@ namespace ControllerSelection
             return axisEventData.used;
         }
 
-
-
-
-
         private bool SendUpdateEventToSelectedObject()
         {
             if (eventSystem.currentSelectedGameObject == null)
