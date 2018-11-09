@@ -23,20 +23,41 @@ using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-
-public class ViveInputHelpers
+namespace ViveUISelection
 {
-    // Given a controller and tracking spcae, return the ray that controller uses.
-    // Will fall back to center eye or camera on Gear if no controller is present.
-    public static Ray GetSelectionRay(Transform viveCamera, Transform originHand)
+    public class ViveInputHelpers
     {
-        if (originHand)
+        // Given a controller and tracking spcae, return the ray that controller uses.
+        // Will fall back to center eye or camera on Gear if no controller is present.
+        public static Ray GetSelectionRay(Transform viveCamera, Transform originHand)
         {
-            return new Ray(viveCamera.position, viveCamera.forward);
+            if (originHand)
+            {
+                return new Ray(viveCamera.position, viveCamera.forward);
+            }
+            else
+            {
+                return new Ray(viveCamera.position, viveCamera.forward);
+            }
         }
-        else
+
+        public static Hand GetHandForButton(ulong button, Hand oldHand)
         {
-            return new Ray(viveCamera.position, viveCamera.forward);
+            if (Player.instance.leftHand.controller != null)
+            {
+                if (Player.instance.leftHand.controller.GetPress(button) || oldHand == null)
+                {
+                    return Player.instance.leftHand;
+                }
+            }
+            if (Player.instance.rightHand.controller != null)
+            {
+                if (Player.instance.rightHand.controller.GetPress(button) || oldHand == null)
+                {
+                    return Player.instance.rightHand;
+                }
+            }
+            return oldHand;
         }
     }
 }

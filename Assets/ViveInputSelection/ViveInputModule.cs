@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
-namespace ControllerSelection
+namespace ViveUISelection
 {
     public class ViveInputModule : UnityEngine.EventSystems.PointerInputModule
     {
@@ -35,30 +35,7 @@ namespace ControllerSelection
             if (trackingSpace == null)
             {
                 Debug.LogWarning("OVRInputModule did not have a tracking space set. Looking for one");
-                trackingSpace = OVRInputHelpers.FindTrackingSpace();
-            }
-
-            if (!xrDeviceManager)
-            {
-                try
-                {
-                    xrDeviceManager = GameObject.Find("XRDeviceManager").GetComponent<XRDeviceManager>();
-                }
-                catch (NullReferenceException e)
-                {
-                    Debug.LogError(e);
-                }
-            }
-            if (!teleporting)
-            {
-                try
-                {
-                    teleporting = GameObject.Find("Teleporting").GetComponent<Teleport>();
-                }
-                catch (NullReferenceException e)
-                {
-                    Debug.LogError(e);
-                }
+                // trackingSpace = ViveInputHelpers.FindTrackingSpace();
             }
         }
 
@@ -80,7 +57,7 @@ namespace ControllerSelection
             if (trackingSpace == null)
             {
                 Debug.LogWarning("OVRInputModule did not have a tracking space set. Looking for one");
-                trackingSpace = OVRInputHelpers.FindTrackingSpace();
+                // trackingSpace = ViveInputHelpers.FindTrackingSpace();
             }
         }
 
@@ -90,7 +67,7 @@ namespace ControllerSelection
 
         [Header("Selection")]
         [Tooltip("Primary selection button")]
-        public OVRInput.Button joyPadClickButton = OVRInput.Button.PrimaryIndexTrigger;
+        ulong primarySelectButton = SteamVR_Controller.ButtonMask.Touchpad;
 
         [Header("Physics")]
         [Tooltip("Perform an sphere cast to determine correct depth for gaze pointer")]
@@ -115,8 +92,8 @@ namespace ControllerSelection
         public float swipeScrollScale = 4f;
 
 
-        [HideInInspector]
-        public OVRInput.Controller activeController = OVRInput.Controller.None;
+        // [HideInInspector]
+        public Hand activeHand = null;
 
         public delegate void RayHitDelegate(Vector3 hitPosition, Vector3 hitNormal);
         public RayHitDelegate OnSelectionRayHit;
@@ -134,10 +111,6 @@ namespace ControllerSelection
         [Header("Dragging")]
         [Tooltip("Minimum pointer movement in degrees to start dragging")]
         public float angleDragThreshold = 1;
-
-        [Header("Vive Adaptations")]
-        public XRDeviceManager xrDeviceManager;
-        public Teleport teleporting;
 
         // The following region contains code exactly the same as the implementation
         // of StandaloneInputModule. It is copied here rather than inheriting from StandaloneInputModule
@@ -248,7 +221,7 @@ namespace ControllerSelection
 
         public override void UpdateModule()
         {
-            activeController = OVRInputHelpers.GetControllerForButton(OVRInput.Button.PrimaryIndexTrigger, activeController);
+            activeHand = ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand);
 
             m_LastMousePosition = m_MousePosition;
             m_MousePosition = Input.mousePosition;
@@ -560,7 +533,7 @@ namespace ControllerSelection
         /// </summary>
         /// <param name="from">Copy this value</param>
         /// <param name="to">to this object</param>
-        protected void CopyFromTo(OVRRayPointerEventData @from, OVRRayPointerEventData @to)
+        protected void CopyFromTo(ViveRayPointerEventData @from, ViveRayPointerEventData @to)
         {
             @to.position = @from.position;
             @to.delta = @from.delta;
@@ -662,7 +635,13 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true);
             leftData.Reset();
 
-            leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
+            // leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(Player.instance.leftHand.transform, Player.instance.hmdTransform);
+            leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(activeHand.transform, Player.instance.hmdTransform);
+
+            // some line rendering for debugging.
+            var lr = GetComponent<LineRenderer>();
+            lr.SetPosition(0, leftData.worldSpaceRay.origin);
+            lr.SetPosition(1, leftData.worldSpaceRay.origin + leftData.worldSpaceRay.direction);
             leftData.scrollDelta = GetExtraScrollDelta();
 
             //Populate some default values
@@ -674,12 +653,9 @@ namespace ControllerSelection
             leftData.pointerCurrentRaycast = raycast;
             m_RaycastResultCache.Clear();
             ViveRaycaster viveRaycaster = raycast.module as ViveRaycaster;
-            // We're only interested in intersections from OVRRaycasters
-            // warrick: like heck we are! Thetrue reason is we want the getscreenposition function that graphic raycaster doesn't have.
-            bool aimingAtUI = false;
             if (viveRaycaster)
             {
-                Teleport.instance.HideTeleportPointer();
+                Debug.Log("hitting vive raycaster.");
             }
             if (viveRaycaster)
             {
@@ -691,19 +667,12 @@ namespace ControllerSelection
                 // Find the world position and normal the Graphic the ray intersected
                 // RectTransform graphicRect = raycast.gameObject.GetComponent<RectTransform>();
 
-                aimingAtUI = true;
                 if (OnSelectionRayHit != null)
                 {
                     OnSelectionRayHit(raycast.worldPosition, raycast.worldNormal);
                 }
             }
-            if (aimingAtUI)
-            {
-                // no need to show after hiding as teleporting script using button press as activation rather than a function.
-                teleporting.HideTeleportPointer();
-            }
-
-            OVRPhysicsRaycaster physicsRaycaster = raycast.module as OVRPhysicsRaycaster;
+            VivePhysicsRaycaster physicsRaycaster = raycast.module as VivePhysicsRaycaster;
             if (physicsRaycaster)
             {
                 leftData.position = physicsRaycaster.GetScreenPos(raycast.worldPosition);
@@ -801,7 +770,7 @@ namespace ControllerSelection
             if (!pointerEvent.useDragThreshold)
                 return true;
 
-            if (pointerEvent as OVRRayPointerEventData == null)
+            if (pointerEvent as ViveRayPointerEventData == null)
             {
                 // Same as original behaviour for canvas based pointers
                 return (pointerEvent.pressPosition - pointerEvent.position).sqrMagnitude >= eventSystem.pixelDragThreshold * eventSystem.pixelDragThreshold;
@@ -830,7 +799,7 @@ namespace ControllerSelection
         /// <returns></returns>
         static bool IsPointerMoving(UnityEngine.EventSystems.PointerEventData pointerEvent)
         {
-            OVRRayPointerEventData rayPointerEventData = pointerEvent as OVRRayPointerEventData;
+            ViveRayPointerEventData rayPointerEventData = pointerEvent as ViveRayPointerEventData;
             if (rayPointerEventData != null)
                 return true;
             else
@@ -881,35 +850,21 @@ namespace ControllerSelection
             var pressed = false;
             var released = false;
 
-            if (activeController != OVRInput.Controller.None)
+            if (activeHand != null)
             {
-                pressed = OVRInput.GetDown(joyPadClickButton, activeController);
-                released = OVRInput.GetUp(joyPadClickButton, activeController);
-            }
-            else if (xrDeviceManager.vivePlayerGo != null)
-            {
-                // adaption for vive input
-                Hand[] hands = xrDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();
-                Hand hand1 = hands[0];
-                Hand hand2 = hands[1];
-                ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
-                // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
-                if (hand1.controller.GetPressDown(touchpad) || hand2.controller.GetPressDown(touchpad))
+                Debug.Log("active hand not null");
+                pressed = activeHand.controller.GetPressDown(primarySelectButton);
+
+                if (pressed)
                 {
-                    // Debug.Log("one of the hands it pressing");
-                    pressed = true;
-                    released = false;
+                    Debug.Log("pressed");
                 }
-                else if (hand1.controller.GetPressUp(touchpad) || hand2.controller.GetPressUp(touchpad))
+                released = activeHand.controller.GetPressUp(primarySelectButton);
+
+                if (released)
                 {
-                    pressed = false;
-                    released = true;
+                    Debug.Log("released.");
                 }
-            }
-            else
-            {
-                pressed = OVRInput.GetDown(joyPadClickButton);
-                released = OVRInput.GetUp(joyPadClickButton);
             }
 
 #if UNITY_ANDROID && !UNITY_EDITOR

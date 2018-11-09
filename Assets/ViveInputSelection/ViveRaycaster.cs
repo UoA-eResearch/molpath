@@ -25,7 +25,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR.InteractionSystem;
 
-namespace ControllerSelection
+namespace ViveUISelection
 {
     [RequireComponent(typeof(Canvas))]
     public class ViveRaycaster : GraphicRaycaster, UnityEngine.EventSystems.IPointerEnterHandler

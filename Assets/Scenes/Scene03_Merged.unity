@@ -964,7 +964,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbe73b32ca8104c4a9e5305a9f4520d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  oculusPlayer: {fileID: 615564634}
+  ovrPlayerController: {fileID: 0}
   vivePlayerGo: {fileID: 0}
   vivePlayer: {fileID: 0}
   vivePlayerCamera: {fileID: 1393925508}
@@ -9258,6 +9258,16 @@ Prefab:
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 382481194}
+    - target: {fileID: 114733064782710752, guid: 83bd4576652cccb438b914aec9ee3c1f,
+        type: 2}
+      propertyPath: m_IgnoreReversedGraphics
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114906910131285188, guid: 83bd4576652cccb438b914aec9ee3c1f,
+        type: 2}
+      propertyPath: m_IgnoreReversedGraphics
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
   m_IsPrefabAsset: 0
