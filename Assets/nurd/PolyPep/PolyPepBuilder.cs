@@ -8,6 +8,9 @@ using UnityEngine.Assertions;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/// <Summary>
+/// Class that receives parameters from PolyPepManager and generates polypeptides using prefabs.
+/// </Summary>
 public class PolyPepBuilder : MonoBehaviour
 {
 
@@ -68,7 +71,6 @@ public class PolyPepBuilder : MonoBehaviour
     Shader shaderStandard;
     Shader shaderToonOutline;
 
-    // Use this for initialization
     void Start()
     {
         //Debug.Log("LOAD FILE = " + LoadPhiPsiData("Assets/Data/253l_phi_psi.txt"));
@@ -91,9 +93,11 @@ public class PolyPepBuilder : MonoBehaviour
         //Debug.Log("LOAD FILE = " + LoadPhiPsiData("Assets/Data/1xda_phi_psi.txt")); 
 
         secondaryStructure = 0;
-
     }
 
+    /// <Summary>
+    /// Creates multiple joint arrays based on residue length in UI, configures joints settings in a cyclic manner using switch statement, adds the prefabs to them.
+    /// </Summary>
     void buildPolypeptideChain()
     {
         polyLength = numResidues * 3;

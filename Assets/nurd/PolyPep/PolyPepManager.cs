@@ -4,11 +4,11 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
-
+/// <Summary>
+/// PolyPepManager mainly updates from the UI then passes these value updates to the selected polypepbuilder instances to update their polypep values (bond strengths/angles etc.)
+/// </Summary>
 public class PolyPepManager : MonoBehaviour
 {
-
-
     public GameObject polyPepBuilder_pf;
     public List<PolyPepBuilder> allPolyPepBuilders = new List<PolyPepBuilder>();
 
@@ -62,6 +62,8 @@ public class PolyPepManager : MonoBehaviour
         // temp = GameObject.Find("Slider_SpawnLength");
         // spawnLengthSliderUI = temp.GetComponent<Slider>();
 
+
+        // setting up references to slider components.
         phiSliderUI = FindSlider("Slider_Phi");
         psiSliderUI = FindSlider("Slider_Psi");
         vdwSliderUI = FindSlider("Slider_Vdw");
@@ -87,7 +89,6 @@ public class PolyPepManager : MonoBehaviour
         {
             //UI
             // initialise phi psi slider values (hacky?)
-
             phiSliderUI.GetComponent<Slider>().value = 0;
             psiSliderUI.GetComponent<Slider>().value = 0;
             vdwSliderUI.GetComponent<Slider>().value = 10;
