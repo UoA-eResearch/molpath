@@ -360,10 +360,4 @@ public class PolyPepManager : MonoBehaviour
         Debug.Log("Loading... " + m_Scene.name);
         SceneManager.LoadScene(m_Scene.name);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

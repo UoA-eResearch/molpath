@@ -28,6 +28,8 @@ namespace ControllerSelection
     {
         // Given a controller and tracking spcae, return the ray that controller uses.
         // Will fall back to center eye or camera on Gear if no controller is present.
+
+        public static GameObject vivePlayerGo;
         public static Ray GetSelectionRay(OVRInput.Controller activeController, Transform trackingSpace)
         {
             if (trackingSpace != null && trackingSpace.parent.gameObject.activeInHierarchy && activeController != OVRInput.Controller.None)
@@ -43,9 +45,14 @@ namespace ControllerSelection
             }
 
             // check if vive player exists, returns ray from vive if present.
-            Transform vivePlayerTransform = GameObject.Find("VivePlayer").transform;
-            if (vivePlayerTransform != null)
+            if (!OVRInputHelpers.vivePlayerGo)
             {
+                OVRInputHelpers.vivePlayerGo = GameObject.Find("VivePlayer");
+            }
+
+            if (OVRInputHelpers.vivePlayerGo)
+            {
+                Transform vivePlayerTransform = OVRInputHelpers.vivePlayerGo.transform;
                 Player vivePlayer = vivePlayerTransform.GetComponent<Player>();
 
                 // try for hand first

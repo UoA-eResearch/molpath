@@ -56,6 +56,7 @@ namespace ControllerSelection
             if (UnityEngine.XR.XRDevice.model.Contains("Vive"))
             {
                 ViveSceneSetup();
+                usingVive = true;
             }
             else if (UnityEngine.XR.XRDevice.model.Contains("Oculus"))
             {
@@ -63,7 +64,7 @@ namespace ControllerSelection
             }
             else
             {
-                Debug.Log("Using unhandled XR device.");
+                DesktopSceneSetup();
             }
 
             // hacking way of adding a no-menu option for menu cycling.
@@ -100,27 +101,34 @@ namespace ControllerSelection
             usingOculus = true;
         }
 
+        private void DesktopSceneSetup()
+        {
+
+            // vivePlayerGo.SetActive(false);
+            // ovrPlayerController.gameObject.SetActive(false);
+            // teleportArea.SetActive(false);
+            // teleporting.SetActive(false);
+            // usingVive = false;
+            // usingOculus = false;
+
+            // just using vive scene for now as it has a debugging mode.
+            Debug.Log("Using unassigned device, defaulting to Vive scene to use the Vive 2d debugger.");
+            ViveSceneSetup();
+        }
+
         private void SetUpTeleporting()
         {
             // reference to teleporting in case it's used here.
-            if (!teleporting)
+            if (usingVive)
             {
-                teleporting = GameObject.Find("Teleporting");
-                if (usingOculus || !usingVive)
-                {
-                    teleporting.SetActive(false);
-                }
+                teleporting.SetActive(true);
+                teleportArea.SetActive(true);
             }
 
-            // Setting up floor scale to match.
-            if (!teleportArea)
+            if (usingOculus)
             {
-                teleportArea = GameObject.Find("TeleportArea");
-                Vector3 floorScale = GameObject.Find("FloorPlane").transform.localScale;
-                if (floorScale != teleportArea.transform.localScale)
-                {
-                    teleportArea.transform.localScale = floorScale;
-                }
+                teleportArea.SetActive(false);
+                teleporting.SetActive(false);
             }
         }
 
@@ -201,7 +209,6 @@ namespace ControllerSelection
         private void SwapEventSystem()
         {
             // WIP: switch out the event system to vive or oculus depending on which.
-
         }
 
         // Update is called once per frame

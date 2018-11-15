@@ -133,9 +133,16 @@ namespace ControllerSelection
             if (vivePlayer == null)
             {
                 vivePlayerGo = GameObject.Find("VivePlayer");
-                vivePlayer = vivePlayerGo.GetComponent<Player>();
-                viveLeftHand = vivePlayer.hands[0];
-                viveRightHand = vivePlayer.hands[1];
+
+                if (vivePlayerGo)
+                {
+                    vivePlayer = vivePlayerGo.GetComponent<Player>();
+                    if (vivePlayer)
+                    {
+                        viveLeftHand = vivePlayer.hands[0];
+                        viveRightHand = vivePlayer.hands[1];
+                    }
+                }
             }
             if (remoteGrabDestinationGo == null)
             {
@@ -237,21 +244,21 @@ namespace ControllerSelection
 
             // Test remote grab stuff
             //left
-            if (viveLeftHand.controller.GetHairTriggerDown())
+            if (vivePlayer.GetHairTrigger(viveLeftHand))
             {
                 SetRemoteGrab(hit.point, viveLeftHand.transform);
             }
-            if (viveLeftHand.controller.GetHairTriggerUp())
+            if (vivePlayer.GetHairTriggerUp(viveLeftHand))
             {
                 ClearRemoteGrab();
             }
 
             // right
-            if (viveRightHand.controller.GetHairTriggerDown())
+            if (vivePlayer.GetHairTrigger(viveRightHand))
             {
                 SetRemoteGrab(hit.point, viveRightHand.transform);
             }
-            if (viveRightHand.controller.GetHairTriggerUp())
+            if (vivePlayer.GetHairTriggerUp(viveRightHand))
             {
                 ClearRemoteGrab();
             }
@@ -589,7 +596,7 @@ namespace ControllerSelection
                 myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (!viveLeftHand.controller.GetHairTrigger() && !viveRightHand.controller.GetHairTrigger())
+                if (!GetViveHairTrigger(viveLeftHand) && !GetViveHairTrigger(viveRightHand))
                 {
                     ClearLastHit();
                 }
@@ -610,6 +617,21 @@ namespace ControllerSelection
                     ClearRemoteGrab();
                 }
             }
+        }
+
+        public bool GetViveHairTrigger(Hand hand)
+        {
+            if (hand)
+            {
+                if (hand.controller != null)
+                {
+                    if (hand.controller.GetHairTrigger())
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

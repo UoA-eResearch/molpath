@@ -658,13 +658,20 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true);
             leftData.Reset();
 
-            if (xrDeviceManager.usingVive)
+            if (xrDeviceManager != null)
             {
-                leftData.worldSpaceRay = ViveUISelection.ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
+                if (xrDeviceManager.usingVive)
+                {
+                    leftData.worldSpaceRay = ViveUISelection.ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
+                }
+            }
+            else if (trackingSpace.gameObject.activeInHierarchy)
+            {
+                leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
             }
             else
             {
-                leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
+                leftData.worldSpaceRay = new Ray(Camera.current.transform.position, Camera.current.transform.forward);
             }
             leftData.scrollDelta = GetExtraScrollDelta();
 
@@ -890,18 +897,15 @@ namespace ControllerSelection
             else if (xrDeviceManager.vivePlayerGo != null)
             {
                 // adaption for vive input
-                Hand[] hands = xrDeviceManager.vivePlayer.GetComponentsInChildren<Hand>();
-                Hand hand1 = hands[0];
-                Hand hand2 = hands[1];
                 ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
                 // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
-                if (hand1.controller.GetPressDown(touchpad) || hand2.controller.GetPressDown(touchpad))
+                if (xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad) || xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad))
                 {
                     // Debug.Log("one of the hands it pressing");
                     pressed = true;
                     released = false;
                 }
-                else if (hand1.controller.GetPressUp(touchpad) || hand2.controller.GetPressUp(touchpad))
+                if (xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad) || xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad))
                 {
                     pressed = false;
                     released = true;

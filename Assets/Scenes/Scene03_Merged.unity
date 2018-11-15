@@ -968,8 +968,8 @@ MonoBehaviour:
   vivePlayerGo: {fileID: 0}
   vivePlayer: {fileID: 0}
   vivePlayerCamera: {fileID: 1393925508}
-  teleporting: {fileID: 0}
-  teleportArea: {fileID: 0}
+  teleporting: {fileID: 1775365204}
+  teleportArea: {fileID: 1158582400}
   uiContainer: {fileID: 0}
   menus: []
   usingOculus: 0

@@ -78,7 +78,7 @@ public class PolyPepBuilder : MonoBehaviour
         shaderStandard = Shader.Find("Standard");
         shaderToonOutline = Shader.Find("Toon/Basic Outline");
 
-        buildPolypeptideChain();
+        BuildPolypeptideChain();
 
         // test: add arbitrary distance constraints
         //AddDistanceConstraint(polyArr[2], polyArr[12], 0.6f, 20);
@@ -98,7 +98,7 @@ public class PolyPepBuilder : MonoBehaviour
     /// <Summary>
     /// Creates multiple joint arrays based on residue length in UI, configures joints settings in a cyclic manner using switch statement, adds the prefabs to them.
     /// </Summary>
-    void buildPolypeptideChain()
+    public void BuildPolypeptideChain()
     {
         polyLength = numResidues * 3;
         polyArr = new GameObject[polyLength];
@@ -731,17 +731,17 @@ public class PolyPepBuilder : MonoBehaviour
         hbondBackboneSj_NO[resid].damper = springDamper;
     }
 
-    void SetAcceptorForBackboneHbondConstraint(int donorResid, GameObject acceptorGO)
+    void SetAcceptorForBackboneHbondConstraint(int donorResidue, GameObject acceptorGo)
     {
 
-        GameObject donorGO = GetAmideForResidue(donorResid);
+        GameObject donorGo = GetAmideForResidue(donorResidue);
         //GameObject acceptorGO = GetCarbonylForResidue(acceptorResid);
 
         // HO spring
-        SpringJoint sjHbond = hbondBackboneSj_HO[donorResid];
-        if (sjHbond.connectedBody != acceptorGO.GetComponent<Rigidbody>())
+        SpringJoint sjHbond = hbondBackboneSj_HO[donorResidue];
+        if (sjHbond.connectedBody != acceptorGo.GetComponent<Rigidbody>())
         {
-            sjHbond.connectedBody = acceptorGO.GetComponent<Rigidbody>();
+            sjHbond.connectedBody = acceptorGo.GetComponent<Rigidbody>();
 
 
             // calculate connected anchor position from molecular geometry
@@ -764,10 +764,10 @@ public class PolyPepBuilder : MonoBehaviour
         }
 
         //HC spring
-        sjHbond = hbondBackboneSj_HC[donorResid];
-        if (sjHbond.connectedBody != acceptorGO.GetComponent<Rigidbody>())
+        sjHbond = hbondBackboneSj_HC[donorResidue];
+        if (sjHbond.connectedBody != acceptorGo.GetComponent<Rigidbody>())
         {
-            sjHbond.connectedBody = acceptorGO.GetComponent<Rigidbody>();
+            sjHbond.connectedBody = acceptorGo.GetComponent<Rigidbody>();
             // calculate connected anchor position from molecular geometry
             sjHbond.connectedAnchor = new Vector3(0f, 0f, 0f); // No offset as the connected anchor is C atom
         }
@@ -777,10 +777,10 @@ public class PolyPepBuilder : MonoBehaviour
         //new Vector3(Mathf.Sin(thetaCarbonyl) * COBondLength, 0f, Mathf.Cos(thetaCarbonyl) * COBondLength);
 
         //NO spring
-        sjHbond = hbondBackboneSj_NO[donorResid];
-        if (sjHbond.connectedBody != acceptorGO.GetComponent<Rigidbody>())
+        sjHbond = hbondBackboneSj_NO[donorResidue];
+        if (sjHbond.connectedBody != acceptorGo.GetComponent<Rigidbody>())
         {
-            sjHbond.connectedBody = acceptorGO.GetComponent<Rigidbody>();
+            sjHbond.connectedBody = acceptorGo.GetComponent<Rigidbody>();
             // calculate connected anchor position from molecular geometry
             //
             //
@@ -831,7 +831,7 @@ public class PolyPepBuilder : MonoBehaviour
         SetChainPeriodicHBonds(-5);
     }
 
-    void SetChainPeriodicHBonds(int offset)
+    private void SetChainPeriodicHBonds(int offset)
     {
         if (offset < 0)
         {
