@@ -525,11 +525,13 @@ namespace ControllerSelection
             {
                 myHitPos = hit.point;
                 myOVRPointerVisualizer.rayDrawDistance = hit.distance;
-
-                if (vivePlayer.gameObject.activeInHierarchy && !IsHandUI(hit.transform))
+                // assumes vivePlayer script always attached to a gameObject.
+                if (vivePlayer.gameObject != null)
                 {
-
-                    ProcessViveInputOnTarget(hit);
+                    if (vivePlayer.gameObject.activeInHierarchy && !IsHandUI(hit.transform))
+                    {
+                        ProcessViveInputOnTarget(hit);
+                    }
                 }
                 else
                 {
@@ -596,7 +598,7 @@ namespace ControllerSelection
                 myOVRPointerVisualizer.rayDrawDistance = 10.0f;
 
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (!GetViveHairTrigger(viveLeftHand) && !GetViveHairTrigger(viveRightHand))
+                if (!vivePlayer.GetHairTrigger(viveLeftHand) && !vivePlayer.GetHairTrigger(viveRightHand))
                 {
                     ClearLastHit();
                 }
@@ -608,7 +610,8 @@ namespace ControllerSelection
                 {
                     OculusRemoteGrab(pointer);
                 }
-                else if (viveLeftHand.controller.GetHairTrigger() || viveRightHand.controller.GetHairTrigger())
+                // else if (viveLeftHand.controller.GetHairTrigger() || viveRightHand.controller.GetHairTrigger())
+                else if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
                 {
                     ViveRemoteGrab();
                 }
@@ -617,21 +620,6 @@ namespace ControllerSelection
                     ClearRemoteGrab();
                 }
             }
-        }
-
-        public bool GetViveHairTrigger(Hand hand)
-        {
-            if (hand)
-            {
-                if (hand.controller != null)
-                {
-                    if (hand.controller.GetHairTrigger())
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     }
 }
