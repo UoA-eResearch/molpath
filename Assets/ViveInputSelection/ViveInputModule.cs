@@ -815,8 +815,11 @@ namespace ViveInputs
 
             if (activeHand != null)
             {
-                pressed = activeHand.controller.GetPressDown(viveTouchpad);
-                released = activeHand.controller.GetPressUp(viveTouchpad);
+                if (activeHand.controller != null)
+                {
+                    pressed = activeHand.controller.GetPressDown(viveTouchpad);
+                    released = activeHand.controller.GetPressUp(viveTouchpad);
+                }
             }
 
 

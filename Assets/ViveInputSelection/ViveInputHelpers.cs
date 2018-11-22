@@ -23,18 +23,24 @@ namespace ViveInputs
 
         public static Hand GetHandForButton(ulong button, Hand oldHand)
         {
-            if (Player.instance.leftHand.controller != null)
+            if (Player.instance.leftHand)
             {
-                if (Player.instance.leftHand.controller.GetPress(button) || oldHand == null)
+                if (Player.instance.leftHand.controller != null)
                 {
-                    return Player.instance.leftHand;
+                    if (Player.instance.leftHand.controller.GetPress(button) || oldHand == null)
+                    {
+                        return Player.instance.leftHand;
+                    }
                 }
             }
-            if (Player.instance.rightHand.controller != null)
+            if (Player.instance.leftHand)
             {
-                if (Player.instance.rightHand.controller.GetPress(button) || oldHand == null)
+                if (Player.instance.rightHand.controller != null)
                 {
-                    return Player.instance.rightHand;
+                    if (Player.instance.rightHand.controller.GetPress(button) || oldHand == null)
+                    {
+                        return Player.instance.rightHand;
+                    }
                 }
             }
             return oldHand;
