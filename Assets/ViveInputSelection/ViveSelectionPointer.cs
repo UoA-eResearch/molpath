@@ -34,9 +34,12 @@ namespace ViveInputs
 
         private void SetPointerPosition()
         {
-            Ray ray = ViveInputHelpers.GetSelectionRay(activeHand.transform);
-            myLineRenderer.SetPosition(0, ray.origin);
-            myLineRenderer.SetPosition(1, ray.origin + ray.direction * distance);
+            if (activeHand)
+            {
+                Ray ray = ViveInputHelpers.GetSelectionRay(activeHand.transform);
+                myLineRenderer.SetPosition(0, ray.origin);
+                myLineRenderer.SetPosition(1, ray.origin + ray.direction * distance);
+            }
         }
 
         // Update is called once per frame

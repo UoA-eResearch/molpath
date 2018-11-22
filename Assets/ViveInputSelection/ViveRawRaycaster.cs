@@ -327,6 +327,8 @@ namespace ViveInputs
             Ray pointer;
             pointer = ViveInputHelpers.GetSelectionRay(activeController.transform);
             RaycastHit hit; // Was anything hit?
+
+
             if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
             {
                 myHitPos = hit.point;
