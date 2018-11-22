@@ -622,7 +622,6 @@ namespace ViveInputs
 
             if (viveRaycaster)
             {
-                Debug.Log("vive raycaster");
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability

@@ -185,6 +185,14 @@ namespace ControllerSelection
 
         private void SwapMenuHand(GameObject menu, Hand hand)
         {
+            if (!menu)
+            {
+                return;
+            }
+            if (menu.transform.parent && menu.transform.parent != hand.transform)
+            {
+                return;
+            }
             var positionOffset = menu.transform.localPosition;
             menu.transform.parent = hand.transform;
             menu.transform.localPosition = positionOffset;
@@ -199,26 +207,16 @@ namespace ControllerSelection
                     if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu))
                     {
                         GameObject newMenu = CycleMenu();
-                        if (newMenu.transform.parent && newMenu.transform.parent != hand.transform)
-                        {
-                            SwapMenuHand(newMenu, hand);
-                        }
+                        SwapMenuHand(newMenu, hand);
                     }
                 }
             }
-        }
-
-        private void SwapEventSystem()
-        {
-            // WIP: switch out the event system to vive or oculus depending on which.
         }
 
         // Update is called once per frame
         void Update()
         {
             UpdateMenuPosition();
-
-            Debug.Log(EventSystem.current.gameObject.name);
         }
     }
 }
