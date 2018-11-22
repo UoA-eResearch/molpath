@@ -21,7 +21,7 @@ limitations under the License.
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace ViveUISelection
+namespace ViveInputs
 {
     /// <summary>
     /// Simple event system using physics raycasts.

@@ -24,6 +24,10 @@ namespace ControllerSelection
         private int activeMenuIndex = 0;
         public List<GameObject> menus;
 
+        [Header("Event Systems")]
+        public GameObject OvrEventSystem;
+        public GameObject ViveEventSystem;
+
         public bool usingOculus;
         public bool usingVive;
 
@@ -76,6 +80,9 @@ namespace ControllerSelection
 
         private void ViveSceneSetup()
         {
+            OvrEventSystem.SetActive(false);
+            ViveEventSystem.SetActive(true);
+
             ovrPlayerController.gameObject.SetActive(false);
             vivePlayerGo.SetActive(true);
 
@@ -90,6 +97,9 @@ namespace ControllerSelection
 
         private void OculusSceneSetup()
         {
+            OvrEventSystem.SetActive(true);
+            ViveEventSystem.SetActive(false);
+
             vivePlayerGo.SetActive(false);
             ovrPlayerController.gameObject.SetActive(true);
 

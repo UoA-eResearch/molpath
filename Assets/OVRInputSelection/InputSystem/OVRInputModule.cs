@@ -662,7 +662,7 @@ namespace ControllerSelection
             {
                 if (xrDeviceManager.usingVive)
                 {
-                    leftData.worldSpaceRay = ViveUISelection.ViveInputHelpers.GetSelectionRay(xrDeviceManager.vivePlayer.leftHand.transform, xrDeviceManager.vivePlayerCamera.transform);
+                    leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, xrDeviceManager.vivePlayerCamera.transform);
                 }
             }
             else if (trackingSpace.gameObject.activeInHierarchy)

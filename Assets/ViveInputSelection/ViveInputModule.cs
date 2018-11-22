@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Valve.VR.InteractionSystem;
 
-namespace ViveUISelection
+namespace ViveInputs
 {
     public class ViveInputModule : UnityEngine.EventSystems.PointerInputModule
     {
@@ -67,7 +67,7 @@ namespace ViveUISelection
 
         [Header("Selection")]
         [Tooltip("Primary selection button")]
-        ulong primarySelectButton = SteamVR_Controller.ButtonMask.Touchpad;
+        ulong viveTouchpad = SteamVR_Controller.ButtonMask.Touchpad;
 
         [Header("Physics")]
         [Tooltip("Perform an sphere cast to determine correct depth for gaze pointer")]
@@ -219,9 +219,16 @@ namespace ViveUISelection
             set { m_CancelButton = value; }
         }
 
+        public ViveSelectionPointer viveSelectionPointer;
+
         public override void UpdateModule()
         {
-            activeHand = ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand);
+            if (activeHand != ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand))
+            {
+                activeHand = ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand);
+
+                viveSelectionPointer.activeHand = activeHand;
+            }
 
             m_LastMousePosition = m_MousePosition;
             m_MousePosition = Input.mousePosition;
@@ -636,12 +643,11 @@ namespace ViveUISelection
             leftData.Reset();
 
             // leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(Player.instance.leftHand.transform, Player.instance.hmdTransform);
-            leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(activeHand.transform, Player.instance.hmdTransform);
+            if (activeHand && Player.instance.hmdTransform)
+            {
+                leftData.worldSpaceRay = ViveInputHelpers.GetSelectionRay(activeHand.transform);
+            }
 
-            // some line rendering for debugging.
-            var lr = GetComponent<LineRenderer>();
-            lr.SetPosition(0, leftData.worldSpaceRay.origin);
-            lr.SetPosition(1, leftData.worldSpaceRay.origin + leftData.worldSpaceRay.direction);
             leftData.scrollDelta = GetExtraScrollDelta();
 
             //Populate some default values
@@ -653,12 +659,10 @@ namespace ViveUISelection
             leftData.pointerCurrentRaycast = raycast;
             m_RaycastResultCache.Clear();
             ViveRaycaster viveRaycaster = raycast.module as ViveRaycaster;
+
             if (viveRaycaster)
             {
                 Debug.Log("hitting vive raycaster.");
-            }
-            if (viveRaycaster)
-            {
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability
@@ -853,19 +857,20 @@ namespace ViveUISelection
             if (activeHand != null)
             {
                 Debug.Log("active hand not null");
-                pressed = activeHand.controller.GetPressDown(primarySelectButton);
+                pressed = activeHand.controller.GetPressDown(viveTouchpad);
 
                 if (pressed)
                 {
                     Debug.Log("pressed");
                 }
-                released = activeHand.controller.GetPressUp(primarySelectButton);
+                released = activeHand.controller.GetPressUp(viveTouchpad);
 
                 if (released)
                 {
                     Debug.Log("released.");
                 }
             }
+
 
 #if UNITY_ANDROID && !UNITY_EDITOR
             pressed |= Input.GetMouseButtonDown(0);

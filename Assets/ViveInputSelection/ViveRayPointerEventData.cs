@@ -2,7 +2,7 @@
 using System.Text;
 using UnityEngine;
 
-namespace ViveUISelection
+namespace ViveInputs
 {
 
     public class ViveRayPointerEventData : UnityEngine.EventSystems.PointerEventData
