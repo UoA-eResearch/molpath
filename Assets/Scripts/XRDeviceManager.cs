@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using UnityEngine.EventSystems;
 
 namespace ControllerSelection
 {
@@ -216,6 +217,8 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
+
+            Debug.Log(EventSystem.current.gameObject.name);
         }
     }
 }
