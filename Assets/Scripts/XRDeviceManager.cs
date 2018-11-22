@@ -113,15 +113,6 @@ namespace ControllerSelection
 
         private void DesktopSceneSetup()
         {
-
-            // vivePlayerGo.SetActive(false);
-            // ovrPlayerController.gameObject.SetActive(false);
-            // teleportArea.SetActive(false);
-            // teleporting.SetActive(false);
-            // usingVive = false;
-            // usingOculus = false;
-
-            // just using vive scene for now as it has a debugging mode.
             Debug.Log("Using unassigned device, defaulting to Vive scene to use the Vive 2d debugger.");
             ViveSceneSetup();
         }

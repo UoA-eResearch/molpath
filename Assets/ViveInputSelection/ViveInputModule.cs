@@ -29,40 +29,6 @@ namespace ViveInputs
 {
     public class ViveInputModule : UnityEngine.EventSystems.PointerInputModule
     {
-        protected override void Awake()
-        {
-            base.Awake();
-            if (trackingSpace == null)
-            {
-                Debug.LogWarning("OVRInputModule did not have a tracking space set. Looking for one");
-                // trackingSpace = ViveInputHelpers.FindTrackingSpace();
-            }
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
-
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (trackingSpace == null)
-            {
-                Debug.LogWarning("OVRInputModule did not have a tracking space set. Looking for one");
-                // trackingSpace = ViveInputHelpers.FindTrackingSpace();
-            }
-        }
-
-        [Header("(Optional) Tracking space")]
-        [Tooltip("Tracking space of the OVRCameraRig.\nIf tracking space is not set, the scene will be searched.\nThis search is expensive.")]
         public Transform trackingSpace = null;
 
         [Header("Selection")]
@@ -97,12 +63,6 @@ namespace ViveInputs
 
         public delegate void RayHitDelegate(Vector3 hitPosition, Vector3 hitNormal);
         public RayHitDelegate OnSelectionRayHit;
-
-
-        #region GearVR swipe scroll
-        private Vector2 swipeStartPos;
-        private Vector2 unusedSwipe;
-        #endregion
 
         // The raycaster that gets to do pointer interaction (e.g. with a mouse), gaze interaction always works
         // private OVRRaycaster _activeGraphicRaycaster;
@@ -662,7 +622,6 @@ namespace ViveInputs
 
             if (viveRaycaster)
             {
-                Debug.Log("hitting vive raycaster.");
                 // The Unity UI system expects event data to have a screen position
                 // so even though this raycast came from a world space ray we must get a screen
                 // space position for the camera attached to this raycaster for compatability
@@ -856,19 +815,8 @@ namespace ViveInputs
 
             if (activeHand != null)
             {
-                Debug.Log("active hand not null");
                 pressed = activeHand.controller.GetPressDown(viveTouchpad);
-
-                if (pressed)
-                {
-                    Debug.Log("pressed");
-                }
                 released = activeHand.controller.GetPressUp(viveTouchpad);
-
-                if (released)
-                {
-                    Debug.Log("released.");
-                }
             }
 
 
