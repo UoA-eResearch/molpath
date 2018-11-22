@@ -1227,6 +1227,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1549933896}
   - component: {fileID: 1549933897}
+  - component: {fileID: 1549933898}
   m_Layer: 0
   m_Name: ViveRawInteration
   m_TagString: Untagged
@@ -1266,6 +1267,7 @@ MonoBehaviour:
     m_Bits: 0
   raycastDistance: 500
   myRawInteraction: {fileID: 0}
+  viveSelectionPointer: {fileID: 1558500105}
   onHoverEnter:
     m_PersistentCalls:
       m_Calls: []
@@ -1321,6 +1323,21 @@ MonoBehaviour:
   remoteGrabDistance: 0
   remoteGrabStrength: 5
   activeController: {fileID: 0}
+--- !u!114 &1549933898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1549933895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43034b73b1ab62b409e7c11bfffd57ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yellowMat: {fileID: 2100000, guid: 5d1e07c8dcc9f0740bde7899dcf7a37d, type: 2}
+  backIdle: {fileID: 0}
+  backActive: {fileID: 0}
+  outText: {fileID: 0}
 --- !u!1001 &1550697881
 Prefab:
   m_ObjectHideFlags: 0
@@ -1423,7 +1440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myLineRenderer: {fileID: 1558500106}
-  pointerDistance: 100
+  distance: 0
   activeHand: {fileID: 0}
 --- !u!120 &1558500106
 LineRenderer:

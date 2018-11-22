@@ -418,6 +418,21 @@ namespace Valve.VR.InteractionSystem
             return false;
         }
 
+        public bool GetHairTriggerDown(Hand hand)
+        {
+            if (hand)
+            {
+                if (hand.controller != null)
+                {
+                    if (hand.controller.GetHairTriggerDown())
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public bool GetHairTriggerUp(Hand hand)
         {
             if (hand)

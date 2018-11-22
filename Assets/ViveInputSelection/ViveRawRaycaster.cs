@@ -31,6 +31,9 @@ namespace ViveInputs
         public RawInteraction myRawInteraction;
 
 
+        public ViveSelectionPointer viveSelectionPointer;
+
+
         [Header("Hover Callbacks")]
         public ViveRawRaycaster.HoverCallback onHoverEnter;
         public ViveRawRaycaster.HoverCallback onHoverExit;
@@ -113,11 +116,12 @@ namespace ViveInputs
             {
                 // simple object acting as a target destination transform when using remote grab
                 remoteGrabDestinationGo = new GameObject();
+                remoteGrabDestinationGo.name = "remoteGrabDestination";
             }
 
             if (!activeController)
             {
-                activeController = viveLeftHand;
+                activeController = Player.instance.leftHand;
             }
         }
 
@@ -153,7 +157,7 @@ namespace ViveInputs
         private void SetRemoteGrab(Vector3 newPosition, Transform newParent)
         {
             remoteGrabDestinationGo.transform.position = newPosition;
-            remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
+            remoteGrabDestinationGo.transform.parent = newParent.transform;
 
             remoteGrab = lastHit;
             remoteGrabBackboneUnit = remoteGrab.GetComponent<BackboneUnit>();
@@ -210,7 +214,7 @@ namespace ViveInputs
 
             // Test remote grab stuff
             //left
-            if (vivePlayer.GetHairTrigger(viveLeftHand))
+            if (vivePlayer.GetHairTriggerDown(viveLeftHand))
             {
                 SetRemoteGrab(hit.point, viveLeftHand.transform);
             }
@@ -220,7 +224,7 @@ namespace ViveInputs
             }
 
             // right
-            if (vivePlayer.GetHairTrigger(viveRightHand))
+            if (Player.instance.GetHairTriggerDown(viveRightHand))
             {
                 SetRemoteGrab(hit.point, viveRightHand.transform);
             }
@@ -322,11 +326,11 @@ namespace ViveInputs
 
             Ray pointer;
             pointer = ViveInputHelpers.GetSelectionRay(activeController.transform);
-            Debug.Log("Vive raw raycaster pointer origin: " + pointer.origin);
             RaycastHit hit; // Was anything hit?
             if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
             {
                 myHitPos = hit.point;
+                viveSelectionPointer.distance = hit.distance;
 
                 // assumes vivePlayer script always attached to a gameObject.
                 if (vivePlayer.gameObject != null)
@@ -367,9 +371,7 @@ namespace ViveInputs
             // Nothing was hit, handle exit callback
             else
             {
-                // ViveSelectionPointer.distance = 10.0f;
-                // viveSelectionVisualizer.rayDrawDistance = hit.distance;
-
+                viveSelectionPointer.distance = 10.0f;
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
                 if (!vivePlayer.GetHairTrigger(viveLeftHand) && !vivePlayer.GetHairTrigger(viveRightHand))
                 {

@@ -10,7 +10,7 @@ namespace ViveInputs
 
         public LineRenderer myLineRenderer;
 
-        public float pointerDistance;
+        public float distance;
 
         public Hand activeHand;
 
@@ -20,12 +20,31 @@ namespace ViveInputs
 
         }
 
+        private void SetPointerVisibility()
+        {
+            if (activeHand)
+            {
+                myLineRenderer.enabled = true;
+            }
+            else
+            {
+                myLineRenderer.enabled = false;
+            }
+        }
+
+        private void SetPointerPosition()
+        {
+            Ray ray = ViveInputHelpers.GetSelectionRay(activeHand.transform);
+            myLineRenderer.SetPosition(0, ray.origin);
+            myLineRenderer.SetPosition(1, ray.origin + ray.direction * distance);
+        }
+
         // Update is called once per frame
         void Update()
         {
-            Ray r = ViveInputHelpers.GetSelectionRay(activeHand.transform);
-            myLineRenderer.SetPosition(0, activeHand.transform.position);
-            myLineRenderer.SetPosition(1, activeHand.transform.forward * pointerDistance);
+            activeHand = ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand);
+            SetPointerPosition();
+            SetPointerVisibility();
         }
     }
 }
