@@ -383,7 +383,6 @@ namespace ViveInputs
             //REMOTE GRAB UPDATE (outside of hit test)
             if (remoteGrab)
             {
-                // else if (viveLeftHand.controller.GetHairTrigger() || viveRightHand.controller.GetHairTrigger())
                 if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
                 {
                     ViveRemoteGrab();

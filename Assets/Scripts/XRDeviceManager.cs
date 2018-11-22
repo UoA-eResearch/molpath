@@ -12,6 +12,8 @@ namespace ControllerSelection
     {
         [Header("Oculus References")]
         public OVRPlayerController ovrPlayerController;
+        public GameObject OvrPlayerGo;
+        public Camera OvrPlayerCamera;
 
         [Header("Vive References")]
         public GameObject vivePlayerGo;
@@ -31,6 +33,8 @@ namespace ControllerSelection
 
         public bool usingOculus;
         public bool usingVive;
+
+        public bool DebugOculusAsVive = false;
 
         public static XRDeviceManager instance { get; private set; }
 
@@ -58,12 +62,12 @@ namespace ControllerSelection
                 uiContainer = GameObject.Find("UI_container");
             }
 
-            if (UnityEngine.XR.XRDevice.model.Contains("Vive"))
+            if (UnityEngine.XR.XRDevice.model.Contains("Vive") && !DebugOculusAsVive)
             {
                 ViveSceneSetup();
                 usingVive = true;
             }
-            else if (UnityEngine.XR.XRDevice.model.Contains("Oculus"))
+            else if (UnityEngine.XR.XRDevice.model.Contains("Oculus") || DebugOculusAsVive)
             {
                 OculusSceneSetup();
             }
@@ -105,6 +109,8 @@ namespace ControllerSelection
             ovrPlayerController.gameObject.SetActive(true);
 
             SetUIToWorldPosition();
+            // accessing ovr camera rig left/right eye camera gets centre eye camera by default.
+            SetAllCanvasEventCameras(OvrPlayerCamera);
 
             teleporting.SetActive(false);
 
@@ -217,6 +223,35 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
+            Debug.Log(EventSystem.current.gameObject.name);
+            if (DebugOculusAsVive)
+            {
+                DebugWithVive();
+            }
+        }
+
+
+        public GameObject OvrRightHandAnchor;
+        public GameObject OvrLeftHandAnchor;
+
+        private void DebugWithVive()
+        {
+            if (vivePlayerGo.activeInHierarchy == false)
+            {
+                vivePlayerGo.SetActive(true);
+                vivePlayerCamera.enabled = false;
+                var audioListeners = vivePlayerGo.GetComponentsInChildren<AudioListener>();
+                foreach (var audioListener in audioListeners)
+                {
+                    audioListener.enabled = false;
+                }
+            }
+            if (ovrPlayerController.gameObject.activeInHierarchy == false)
+            {
+                ovrPlayerController.gameObject.SetActive(true);
+                OvrRightHandAnchor.transform.position = Player.instance.rightHand.transform.position;
+                OvrLeftHandAnchor.transform.position = Player.instance.leftHand.transform.position;
+            }
         }
     }
 }

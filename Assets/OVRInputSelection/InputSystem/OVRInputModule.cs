@@ -658,14 +658,7 @@ namespace ControllerSelection
             GetPointerData(kMouseLeftId, out leftData, true);
             leftData.Reset();
 
-            if (xrDeviceManager != null)
-            {
-                if (xrDeviceManager.usingVive)
-                {
-                    leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, xrDeviceManager.vivePlayerCamera.transform);
-                }
-            }
-            else if (trackingSpace.gameObject.activeInHierarchy)
+            if (trackingSpace.gameObject.activeInHierarchy)
             {
                 leftData.worldSpaceRay = OVRInputHelpers.GetSelectionRay(activeController, trackingSpace);
             }

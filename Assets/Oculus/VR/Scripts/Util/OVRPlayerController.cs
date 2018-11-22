@@ -135,7 +135,12 @@ public class OVRPlayerController : MonoBehaviour
     public bool EnableRotation = true;
 
     protected CharacterController Controller = null;
-    protected OVRCameraRig CameraRig = null;
+    // protected OVRCameraRig CameraRig = null;
+    public OVRCameraRig CameraRig
+    {
+        get;
+        protected set;
+    }
 
     private float MoveScale = 1.0f;
     private Vector3 MoveThrottle = Vector3.zero;

@@ -426,6 +426,11 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f4dc7657986a484997151337d7f7362, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &586096535 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1371494667381226, guid: 2296cc2756c75574da733e4057b6b1ed,
+    type: 2}
+  m_PrefabInternal: {fileID: 247530846}
 --- !u!1001 &606224157
 Prefab:
   m_ObjectHideFlags: 0
@@ -606,6 +611,51 @@ Prefab:
       propertyPath: OvrEventSystem
       value: 
       objectReference: {fileID: 1974771667}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: OvrRightHandAnchor
+      value: 
+      objectReference: {fileID: 1177280942}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: OvrLeftHandAnchor
+      value: 
+      objectReference: {fileID: 586096535}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: XrDebug
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: DebugOculusAsVive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: ovrPlayerController
+      value: 
+      objectReference: {fileID: 1083493713}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: OvrPlayerGo
+      value: 
+      objectReference: {fileID: 1083493709}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: OvrPlayerCamera
+      value: 
+      objectReference: {fileID: 475981969}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: vivePlayerGo
+      value: 
+      objectReference: {fileID: 1950483462}
+    - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
+        type: 2}
+      propertyPath: vivePlayer
+      value: 
+      objectReference: {fileID: 1950483464}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 275e8ad0d2198584ca9082d00527af23, type: 2}
   m_IsPrefabAsset: 0
@@ -635,6 +685,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1336777057435420, guid: 087e03402a6149848b6b14b59ab8434d,
     type: 2}
   m_PrefabInternal: {fileID: 1454458424}
+--- !u!1 &1083493709 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1497751455017384, guid: 2296cc2756c75574da733e4057b6b1ed,
+    type: 2}
+  m_PrefabInternal: {fileID: 247530846}
+--- !u!114 &1083493713 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114381027601387340, guid: 2296cc2756c75574da733e4057b6b1ed,
+    type: 2}
+  m_PrefabInternal: {fileID: 247530846}
+  m_Script: {fileID: 11500000, guid: 0950df82e7936c84983497630bde5b54, type: 3}
 --- !u!1001 &1101200536
 Prefab:
   m_ObjectHideFlags: 0
@@ -728,6 +789,11 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be5cfe1926cf4d24bb8c219702f2b5be, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1177280942 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1297673707776644, guid: 2296cc2756c75574da733e4057b6b1ed,
+    type: 2}
+  m_PrefabInternal: {fileID: 247530846}
 --- !u!1001 &1222999860
 Prefab:
   m_ObjectHideFlags: 0
@@ -767,26 +833,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 16
       objectReference: {fileID: 0}
-    - target: {fileID: 114386999356401026, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: rayTransform
-      value: 
-      objectReference: {fileID: 1997753270}
-    - target: {fileID: 114560449322822034, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: trackingSpace
-      value: 
-      objectReference: {fileID: 251161642}
-    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: trackingSpace
-      value: 
-      objectReference: {fileID: 251161642}
-    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: teleporting
-      value: 
-      objectReference: {fileID: 1775365206}
     - target: {fileID: 114966566594739202, guid: a55612613076bf64faff52860a72cc2a,
         type: 2}
       propertyPath: trackingSpace
@@ -797,6 +843,26 @@ Prefab:
       propertyPath: hand
       value: 
       objectReference: {fileID: 1890142902}
+    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: trackingSpace
+      value: 
+      objectReference: {fileID: 251161642}
+    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: teleporting
+      value: 
+      objectReference: {fileID: 1775365206}
+    - target: {fileID: 114560449322822034, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: trackingSpace
+      value: 
+      objectReference: {fileID: 251161642}
+    - target: {fileID: 114386999356401026, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: rayTransform
+      value: 
+      objectReference: {fileID: 1997753270}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a55612613076bf64faff52860a72cc2a, type: 2}
   m_IsPrefabAsset: 0
@@ -1027,7 +1093,7 @@ Prefab:
     - target: {fileID: 114769077228939246, guid: 83bd4576652cccb438b914aec9ee3c1f,
         type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
@@ -1233,6 +1299,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1205319062080680, guid: 3f4dc7657986a484997151337d7f7362,
     type: 2}
   m_PrefabInternal: {fileID: 477198070}
+--- !u!1 &1950483462 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1309354785117386, guid: 3f4dc7657986a484997151337d7f7362,
+    type: 2}
+  m_PrefabInternal: {fileID: 477198070}
+--- !u!114 &1950483464 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114525917033173160, guid: 3f4dc7657986a484997151337d7f7362,
+    type: 2}
+  m_PrefabInternal: {fileID: 477198070}
+  m_Script: {fileID: 11500000, guid: 202a6e24b48d1684398409c47161adcb, type: 3}
 --- !u!1 &1974771667 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1188813989253702, guid: a55612613076bf64faff52860a72cc2a,
