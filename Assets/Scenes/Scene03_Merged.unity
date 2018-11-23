@@ -629,7 +629,7 @@ Prefab:
     - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
         type: 2}
       propertyPath: DebugOculusAsVive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
         type: 2}
