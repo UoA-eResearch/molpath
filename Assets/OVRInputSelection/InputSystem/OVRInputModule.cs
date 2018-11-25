@@ -887,22 +887,11 @@ namespace ControllerSelection
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
             }
-            else if (xrDeviceManager.vivePlayerGo != null)
+            else if (xrDeviceManager.DebugOculusAsVive)
             {
-                // adaption for vive input
-                ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
-                // Will trigger a UI press (aimed by the right controller but triggerable by either the left or the right controller currently.)
-                if (xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad) || xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad))
-                {
-                    // Debug.Log("one of the hands it pressing");
-                    pressed = true;
-                    released = false;
-                }
-                if (xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad) || xrDeviceManager.vivePlayer.GetPressDown(xrDeviceManager.vivePlayer.leftHand, touchpad))
-                {
-                    pressed = false;
-                    released = true;
-                }
+                Debug.Log("debugging oculus as vive input");
+                pressed = Input.GetKeyDown(KeyCode.Alpha1);
+                released = Input.GetKeyUp(KeyCode.Alpha1);
             }
             else
             {
