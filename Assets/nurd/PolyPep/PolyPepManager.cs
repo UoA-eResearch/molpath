@@ -44,43 +44,27 @@ public class PolyPepManager : MonoBehaviour
 
     void Awake()
     {
-        // GameObject temp = GameObject.Find("Slider_Phi");
-        // phiSliderUI = temp.GetComponent<Slider>();
+        GameObject temp = GameObject.Find("Slider_Phi");
+        phiSliderUI = temp.GetComponent<Slider>();
 
-        // temp = GameObject.Find("Slider_Psi");
-        // psiSliderUI = temp.GetComponent<Slider>();
+        temp = GameObject.Find("Slider_Psi");
+        psiSliderUI = temp.GetComponent<Slider>();
 
-        // temp = GameObject.Find("Slider_Vdw");
-        // vdwSliderUI = temp.GetComponent<Slider>();
+        temp = GameObject.Find("Slider_Vdw");
+        vdwSliderUI = temp.GetComponent<Slider>();
 
-        // temp = GameObject.Find("Slider_HbondStrength");
-        // hbondSliderUI = temp.GetComponent<Slider>();
+        temp = GameObject.Find("Slider_HbondStrength");
+        hbondSliderUI = temp.GetComponent<Slider>();
 
-        // temp = GameObject.Find("Slider_PhiPsiDrive");
-        // phiPsiDriveSliderUI = temp.GetComponent<Slider>();
+        temp = GameObject.Find("Slider_PhiPsiDrive");
+        phiPsiDriveSliderUI = temp.GetComponent<Slider>();
 
-        // temp = GameObject.Find("Slider_SpawnLength");
-        // spawnLengthSliderUI = temp.GetComponent<Slider>();
+        temp = GameObject.Find("Slider_SpawnLength");
+        spawnLengthSliderUI = temp.GetComponent<Slider>();
 
+        temp = GameObject.Find("Slider_JiggleStrength");
+        jiggleStrengthSliderUI = temp.GetComponent<Slider>();
 
-        // setting up references to slider components.
-        phiSliderUI = FindSlider("Slider_Phi");
-        psiSliderUI = FindSlider("Slider_Psi");
-        vdwSliderUI = FindSlider("Slider_Vdw");
-        hbondSliderUI = FindSlider("Slider_HbondStrength");
-        phiPsiDriveSliderUI = FindSlider("Slider_PhiPsiDrive");
-        spawnLengthSliderUI = FindSlider("Slider_SpawnLength");
-        jiggleStrengthSliderUI = FindSlider("Slider_JiggleStrength");
-    }
-
-    public static Slider FindSlider(string name)
-    {
-        GameObject go = GameObject.Find(name);
-        if (go != null)
-        {
-            return go.GetComponent<Slider>();
-        }
-        else return null;
     }
 
     void Start()
@@ -89,6 +73,7 @@ public class PolyPepManager : MonoBehaviour
         {
             //UI
             // initialise phi psi slider values (hacky?)
+
             phiSliderUI.GetComponent<Slider>().value = 0;
             psiSliderUI.GetComponent<Slider>().value = 0;
             vdwSliderUI.GetComponent<Slider>().value = 10;
@@ -137,7 +122,7 @@ public class PolyPepManager : MonoBehaviour
 
         //}
 
-
+        SpawnPolypeptide(transform);
 
     }
 
@@ -146,17 +131,15 @@ public class PolyPepManager : MonoBehaviour
         //if (!collidersOn)
         {
             int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
-
             //Debug.Log(spawnTransform.position);
 
-            Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.1f;
+            Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
             // offset to try to keep new pp in sensible position
             // working solution - no scale, centre of mass / springs ...
-            spawnTransform.transform.position += offset;
-            GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position, Quaternion.identity);
+            //spawnTransform.transform.position += offset; // NO! this is a reference not a copy!
+            GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position + offset, Quaternion.identity);
             PolyPepBuilder ppb_cs = ppb.GetComponent<PolyPepBuilder>();
             ppb_cs.numResidues = numResidues;
-            ppb_cs.buildTransform = spawnTransform.transform;
             ppb_cs.myPolyPepManager = GetComponent<PolyPepManager>();
             ppb.name = "polyPep_" + allPolyPepBuilders.Count;
             allPolyPepBuilders.Add(ppb_cs);
@@ -359,5 +342,11 @@ public class PolyPepManager : MonoBehaviour
         Scene m_Scene = SceneManager.GetActiveScene();
         Debug.Log("Loading... " + m_Scene.name);
         SceneManager.LoadScene(m_Scene.name);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 }

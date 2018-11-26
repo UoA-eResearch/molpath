@@ -71,6 +71,13 @@ public class PolyPepBuilder : MonoBehaviour
     Shader shaderStandard;
     Shader shaderToonOutline;
 
+
+    private void Awake()
+    {
+        buildTransform = transform;
+    }
+
+    // Use this for initialization
     void Start()
     {
         //Debug.Log("LOAD FILE = " + LoadPhiPsiData("Assets/Data/253l_phi_psi.txt"));
