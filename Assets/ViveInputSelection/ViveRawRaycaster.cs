@@ -155,22 +155,8 @@ namespace ViveInputs
 
         }
 
-        // private void SetRemoteGrab(Vector3 newPosition, Transform newParent)
-        private void SetRemoteGrab(RaycastHit hit, Transform controller)
+        private void InitializeRemoteGrab(RaycastHit hit, Transform controller)
         {
-            // remoteGrabDestinationGo.transform.position = newPosition;
-            // remoteGrabDestinationGo.transform.parent = newParent.transform;
-
-            // remoteGrab = lastHit;
-            // remoteGrabTime = 0;
-            // remoteGrabDistance = myHitPos.distance;
-            // remoteGrabBackboneUnit = remoteGrab.GetComponent<BackboneUnit>();
-            // remoteGrabRigidBody = remoteGrab.GetComponent<Rigidbody>();
-            // if (remoteGrabBackboneUnit)
-            // {
-            //     remoteGrabBackboneUnit.SetRemoteGrabSelect(true);
-            // }
-
             remoteGrabController = controller;
             remoteGrab = lastHit;
             remoteGrabDistance = hit.distance;
@@ -240,7 +226,7 @@ namespace ViveInputs
             //left
             if (vivePlayer.GetHairTriggerDown(viveLeftHand))
             {
-                SetRemoteGrab(hit, viveLeftHand.transform);
+                InitializeRemoteGrab(hit, viveLeftHand.transform);
                 // SetRemoteGrab(hit.point, viveLeftHand.transform);
             }
             if (vivePlayer.GetHairTriggerUp(viveLeftHand))
@@ -251,7 +237,7 @@ namespace ViveInputs
             // right
             if (Player.instance.GetHairTriggerDown(viveRightHand))
             {
-                SetRemoteGrab(hit, viveRightHand.transform);
+                InitializeRemoteGrab(hit, viveRightHand.transform);
                 // SetRemoteGrab(hit.point, viveRightHand.transform);
             }
             if (vivePlayer.GetHairTriggerUp(viveRightHand))
@@ -279,8 +265,6 @@ namespace ViveInputs
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            // myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
-            // TESST:
             myRawInteraction.RemoteGrabInteraction(remoteGrab, remoteGrabTargetPos);
             BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
             if (bu != null)
