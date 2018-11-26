@@ -399,9 +399,7 @@ namespace ControllerSelection
                     {
                         if (primaryDown && secondaryDown)
                         {
-                            Debug.Log("primary down and secondary down");
                             if (lastHit == primaryDown && lastHit == secondaryDown)
-                                Debug.Log("last hit == primary and secondary down");
                             {
                                 // START remote grabbing
                                 //Debug.Log(lastHit + " is candidate for remoteGrab");

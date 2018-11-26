@@ -294,17 +294,43 @@ namespace ViveInputs
             // }
         }
 
+        float prevHandZ;
+        public float jerkThresh = 0.1f;
+
         private void ViveRemoteGrab()
         {
+            Vector3 targetPos = remoteGrabDestinationGo.transform.position;
             if (vivePlayerGo == null)
             {
                 return;
             }
+            // positional manipulation
             if (remoteGrabRigidBody)
             {
-                Vector3 forceDirection = remoteGrabDestinationGo.transform.position - remoteGrab.position;
+                Vector3 forceDirection = targetPos - remoteGrab.position;
                 remoteGrabRigidBody.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
+
+                // get the backbone unit.
+                BackboneUnit bbu = remoteGrabRigidBody.GetComponent<BackboneUnit>();
+                if (bbu)
+                {
+                    Debug.Log("Grabbing bbu");
+                    // if controller moves a lot forward on backward in a frame tick. add an impulse force relative to the delta value.
+                    float handZ = remoteGrabDestinationGo.transform.parent.position.z;
+
+                    // Debug.Log(handZ - prevHandZ);
+                    if (Mathf.Abs(handZ - prevHandZ) > jerkThresh)
+                    {
+                        Debug.Log("jerk motion.");
+                        // remoteGrabRigidBody.AddForce(forceDirection * 1000, ForceMode.Impulse);
+                        targetPos += forceDirection * 1000 * jerkThresh;
+                    }
+                    // Debug.Log(handZ - prevHandZ);
+                    prevHandZ = handZ;
+                }
             }
+
+
         }
 
         private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent)

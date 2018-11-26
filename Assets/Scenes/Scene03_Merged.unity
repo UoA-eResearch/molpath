@@ -629,7 +629,7 @@ Prefab:
     - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
         type: 2}
       propertyPath: DebugOculusAsVive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114177654287841834, guid: 275e8ad0d2198584ca9082d00527af23,
         type: 2}
@@ -1233,6 +1233,16 @@ Prefab:
     - target: {fileID: 4069034293289840, guid: 087e03402a6149848b6b14b59ab8434d, type: 2}
       propertyPath: m_RootOrder
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114024175105876032, guid: 087e03402a6149848b6b14b59ab8434d,
+        type: 2}
+      propertyPath: RemoteGrabDestinationGo
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114024175105876032, guid: 087e03402a6149848b6b14b59ab8434d,
+        type: 2}
+      propertyPath: jerkThresh
+      value: 0.03
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 087e03402a6149848b6b14b59ab8434d, type: 2}

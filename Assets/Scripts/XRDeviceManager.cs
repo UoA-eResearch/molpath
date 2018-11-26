@@ -234,7 +234,7 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
-            Debug.Log(EventSystem.current.gameObject.name);
+            // Debug.Log(EventSystem.current.gameObject.name);
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
