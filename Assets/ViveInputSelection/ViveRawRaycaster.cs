@@ -95,6 +95,7 @@ namespace ViveInputs
 
         //[HideInInspector]
         public Hand activeController;
+        public Transform remoteGrabController;
 
         void Awake()
         {
@@ -154,17 +155,40 @@ namespace ViveInputs
 
         }
 
-        private void SetRemoteGrab(Vector3 newPosition, Transform newParent)
+        // private void SetRemoteGrab(Vector3 newPosition, Transform newParent)
+        private void SetRemoteGrab(RaycastHit hit, Transform controller)
         {
-            remoteGrabDestinationGo.transform.position = newPosition;
-            remoteGrabDestinationGo.transform.parent = newParent.transform;
+            // remoteGrabDestinationGo.transform.position = newPosition;
+            // remoteGrabDestinationGo.transform.parent = newParent.transform;
 
+            // remoteGrab = lastHit;
+            // remoteGrabTime = 0;
+            // remoteGrabDistance = myHitPos.distance;
+            // remoteGrabBackboneUnit = remoteGrab.GetComponent<BackboneUnit>();
+            // remoteGrabRigidBody = remoteGrab.GetComponent<Rigidbody>();
+            // if (remoteGrabBackboneUnit)
+            // {
+            //     remoteGrabBackboneUnit.SetRemoteGrabSelect(true);
+            // }
+
+            remoteGrabController = controller;
             remoteGrab = lastHit;
-            remoteGrabBackboneUnit = remoteGrab.GetComponent<BackboneUnit>();
-            remoteGrabRigidBody = remoteGrab.GetComponent<Rigidbody>();
-            if (remoteGrabBackboneUnit)
+            remoteGrabDistance = hit.distance;
+            //Debug.Log("   --->" + hit.distance);
+            remoteGrabStartPos = hit.point;
+            approxMovingAvgPoke = 0f;
+            remoteGrabTime = 0;
+
+            remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
+            remoteGrabControllerStartQ = controller.localRotation;
+
+            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            if (bu != null)
             {
-                remoteGrabBackboneUnit.SetRemoteGrabSelect(true);
+                bu.SetRemoteGrabSelect(true);
+                remoteGrabBackboneUnit = bu;
+                //bu.remoteGrabSelectOn = true;
+                //bu.UpdateRenderMode();
             }
         }
 
@@ -216,7 +240,8 @@ namespace ViveInputs
             //left
             if (vivePlayer.GetHairTriggerDown(viveLeftHand))
             {
-                SetRemoteGrab(hit.point, viveLeftHand.transform);
+                SetRemoteGrab(hit, viveLeftHand.transform);
+                // SetRemoteGrab(hit.point, viveLeftHand.transform);
             }
             if (vivePlayer.GetHairTriggerUp(viveLeftHand))
             {
@@ -226,7 +251,8 @@ namespace ViveInputs
             // right
             if (Player.instance.GetHairTriggerDown(viveRightHand))
             {
-                SetRemoteGrab(hit.point, viveRightHand.transform);
+                SetRemoteGrab(hit, viveRightHand.transform);
+                // SetRemoteGrab(hit.point, viveRightHand.transform);
             }
             if (vivePlayer.GetHairTriggerUp(viveRightHand))
             {
@@ -234,111 +260,64 @@ namespace ViveInputs
             }
         }
 
-
-        private void OculusRemoteGrab(Ray pointer)
+        private void ViveRemoteGrab(Ray pointer)
         {
-            // // still remote grabbing
-            // // poke (detecting sustained controller movement along pointer axis)
-            // remoteGrabTime++;
-            // Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
-            // float poke = Vector3.Dot(deltaPointer, pointer.direction);
-            // approxMovingAvgPoke -= approxMovingAvgPoke / 5;
-            // approxMovingAvgPoke += poke / 5;
-            // //if (Mathf.Abs(poke) > 0.001f)
-            // //{
-            // //	Debug.Log("poke = " + poke);
-            // //}
-            // if (remoteGrabTime > 5)
-            // {
-            //     // scale remoteGrabDistance 
-            //     remoteGrabDistance *= (1.0f + (poke * 5.0f));
-            // }
-            // prevPointer = pointer;
-            // remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
-            // // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            // myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
-            // BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
-            // if (bu != null)
-            // {
-            //     //add ROLL - torque from wrist twist
-            //     Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
-            //     Quaternion remoteGrabControllerDeltaQ = remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
-            //     remoteGrabObjectTargetQ = remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
-            //     //remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
-            //     Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
-            //     Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
-            //     Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
-            //     //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
-            //     float zRot = vDelta.z;
-            //     if (zRot > 180.0f)
-            //     {
-            //         zRot -= 360.0f;
-            //     }
-            //     //Debug.Log(zRot);
-            //     if (Mathf.Abs(zRot) > 15.0f) // threshold 
-            //     {
-            //         remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
-            //     }
-            // }
-            // else
-            // {
-            //     // not bu - UI - make the 'front' face the pointer
-            //     // flipped because go was initially set up with z facing away
-
-            //     //Use pointer position
-            //     //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
-
-            //     //Use HMD (possibly better - maybe a bit queasy)
-            //     Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + centreEyeAnchor.forward;
-            //     remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
-            // }
-        }
-
-        float prevHandZ;
-        public float jerkThresh = 0.1f;
-
-        private void ViveRemoteGrab()
-        {
-            Vector3 targetPos = remoteGrabDestinationGo.transform.position;
-            if (vivePlayerGo == null)
+            remoteGrabTime++;
+            Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
+            float poke = Vector3.Dot(deltaPointer, pointer.direction);
+            approxMovingAvgPoke -= approxMovingAvgPoke / 5;
+            approxMovingAvgPoke += poke / 5;
+            //if (Mathf.Abs(poke) > 0.001f)
+            //{
+            //	Debug.Log("poke = " + poke);
+            //}
+            if (remoteGrabTime > 5)
             {
-                return;
+                // scale remoteGrabDistance 
+                remoteGrabDistance *= (1.0f + (poke * 5.0f));
             }
-            // positional manipulation
-            if (remoteGrabRigidBody)
+            prevPointer = pointer;
+            remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
+            // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
+            // myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
+            // TESST:
+            myRawInteraction.RemoteGrabInteraction(remoteGrab, remoteGrabTargetPos);
+            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            if (bu != null)
             {
-                Vector3 forceDirection = targetPos - remoteGrab.position;
-                remoteGrabRigidBody.AddForce(forceDirection * remoteGrabStrength, ForceMode.VelocityChange);
-
-                // get the backbone unit.
-                BackboneUnit bbu = remoteGrabRigidBody.GetComponent<BackboneUnit>();
-                if (bbu)
+                //add ROLL - torque from wrist twist
+                Quaternion remoteGrabControllerCurrentQ = remoteGrabController.localRotation;
+                Quaternion remoteGrabControllerDeltaQ = remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
+                remoteGrabObjectTargetQ = remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
+                //remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
+                Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
+                Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
+                Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
+                //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
+                float zRot = vDelta.z;
+                if (zRot > 180.0f)
                 {
-                    Debug.Log("Grabbing bbu");
-                    // if controller moves a lot forward on backward in a frame tick. add an impulse force relative to the delta value.
-                    float handZ = remoteGrabDestinationGo.transform.parent.position.z;
-
-                    // Debug.Log(handZ - prevHandZ);
-                    if (Mathf.Abs(handZ - prevHandZ) > jerkThresh)
-                    {
-                        Debug.Log("jerk motion.");
-                        // remoteGrabRigidBody.AddForce(forceDirection * 1000, ForceMode.Impulse);
-                        targetPos += forceDirection * 1000 * jerkThresh;
-                    }
-                    // Debug.Log(handZ - prevHandZ);
-                    prevHandZ = handZ;
+                    zRot -= 360.0f;
+                }
+                //Debug.Log(zRot);
+                if (Mathf.Abs(zRot) > 15.0f) // threshold 
+                {
+                    remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
                 }
             }
-
-
+            else
+            {
+                // not bu - UI - make the 'front' face the pointer
+                // flipped because go was initially set up with z facing away
+                //Use pointer position
+                //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
+                //Use HMD (possibly better - maybe a bit queasy)
+                Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
+                remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+            }
         }
 
-        private void SetRemoteGrabDestinationAnchor(Vector3 newPosition, Transform newParent)
-        {
-            // sets an anchor at the hit position and sets hand as parent so offsets are automatically calculated without code.
-            remoteGrabDestinationGo.transform.position = newPosition;
-            remoteGrabDestinationGo.transform.parent = viveLeftHand.transform;
-        }
+
 
         private bool IsHandUI(Transform target)
         {
@@ -411,7 +390,7 @@ namespace ViveInputs
             {
                 if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
                 {
-                    ViveRemoteGrab();
+                    ViveRemoteGrab(pointer);
                 }
                 else
                 {
