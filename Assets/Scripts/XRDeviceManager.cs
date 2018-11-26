@@ -36,7 +36,18 @@ namespace ControllerSelection
 
         public bool DebugOculusAsVive = false;
 
-        public static XRDeviceManager instance { get; private set; }
+        public static XRDeviceManager instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<XRDeviceManager>();
+                }
+                return _instance;
+            }
+        }
+        private static XRDeviceManager _instance;
 
         void Awake()
         {
@@ -223,7 +234,7 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
-            // Debug.Log(EventSystem.current.gameObject.name);
+            Debug.Log(EventSystem.current.gameObject.name);
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
@@ -248,6 +259,9 @@ namespace ControllerSelection
             if (ovrPlayerController.gameObject.activeInHierarchy == false)
             {
                 ovrPlayerController.gameObject.SetActive(true);
+                Debug.Log(Player.instance.gameObject.name);
+                Debug.Log(Player.instance.rightHand.gameObject.name);
+                Debug.Log(Player.instance.leftHand.gameObject.name);
                 OvrRightHandAnchor.transform.position = Player.instance.rightHand.transform.position;
                 OvrLeftHandAnchor.transform.position = Player.instance.leftHand.transform.position;
             }

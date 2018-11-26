@@ -36,8 +36,12 @@ namespace ControllerSelection
         [Header("Selection")]
         [Tooltip("Primary selection button")]
         public OVRInput.Button primaryButton = OVRInput.Button.PrimaryIndexTrigger;
+        [Tooltip("Debug primary selection button")]
+        public KeyCode DebugPrimaryButton = KeyCode.Alpha1;
         [Tooltip("Secondary selection button")]
         public OVRInput.Button secondaryButton = OVRInput.Button.PrimaryTouchpad;
+        [Tooltip("Debug primary selection button")]
+        public KeyCode DebugSecondaryButton = KeyCode.Alpha2;
         [Tooltip("A selection button")]
         public OVRInput.Button aButton = OVRInput.Button.One;
         [Tooltip("B selection button")]
@@ -233,6 +237,58 @@ namespace ControllerSelection
                     }
                 }
 
+                // Debug inputs
+                if (activeController == OVRInput.Controller.None && XRDeviceManager.instance.DebugOculusAsVive)
+                {
+                    // primary
+                    Debug.Log("using debug raw raycast inputs");
+                    if (Input.GetKeyDown(DebugPrimaryButton))
+                    {
+                        Debug.Log("primary debug pressed,");
+                        primaryDown = lastHit;
+                        Debug.Log(primaryDown.name);
+                    }
+                    else if ((Input.GetKeyUp(DebugPrimaryButton)))
+                    {
+                        if (primaryDown != null && primaryDown == lastHit)
+                        {
+                            if (onPrimarySelect != null)
+                            {
+                                onPrimarySelect.Invoke(primaryDown, pointer);
+                                //Debug.Log("5");
+                            }
+                        }
+                    }
+                    if (!Input.GetKey(DebugPrimaryButton))
+                    {
+                        primaryDown = null;
+                    }
+
+                    //secondary
+                    Debug.Log("using debug raw raycast inputs");
+                    if (Input.GetKeyDown(DebugSecondaryButton))
+                    {
+                        Debug.Log("secondary debug pressed,");
+                        secondaryDown = lastHit;
+                        Debug.Log(secondaryDown.name);
+                    }
+                    else if ((Input.GetKeyUp(DebugSecondaryButton)))
+                    {
+                        if (secondaryDown != null && secondaryDown == lastHit)
+                        {
+                            if (onSecondarySelect != null)
+                            {
+                                onSecondarySelect.Invoke(secondaryDown, pointer);
+                                //Debug.Log("5");
+                            }
+                        }
+                    }
+                    if (!Input.GetKey(DebugSecondaryButton))
+                    {
+                        secondaryDown = null;
+                    }
+                }
+
                 if (lastHit)
                 {
                     ///
@@ -343,7 +399,9 @@ namespace ControllerSelection
                     {
                         if (primaryDown && secondaryDown)
                         {
+                            Debug.Log("primary down and secondary down");
                             if (lastHit == primaryDown && lastHit == secondaryDown)
+                                Debug.Log("last hit == primary and secondary down");
                             {
                                 // START remote grabbing
                                 //Debug.Log(lastHit + " is candidate for remoteGrab");
@@ -397,83 +455,11 @@ namespace ControllerSelection
             //REMOTE GRAB UPDATE (outside of hit test)
             if (remoteGrab)
             {
-                if ((OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController)))
+                if ((OVRInput.Get(primaryButton, activeController)) && (OVRInput.Get(secondaryButton, activeController))
+            || Input.GetKey(DebugPrimaryButton) && Input.GetKey(DebugSecondaryButton))
                 {
                     // still remote grabbing
-
-
-                    // poke (detecting sustained controller movement along pointer axis)
-                    remoteGrabTime++;
-
-                    Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
-
-                    float poke = Vector3.Dot(deltaPointer, pointer.direction);
-
-                    approxMovingAvgPoke -= approxMovingAvgPoke / 5;
-                    approxMovingAvgPoke += poke / 5;
-
-                    //if (Mathf.Abs(poke) > 0.001f)
-                    //{
-                    //	Debug.Log("poke = " + poke);
-                    //}
-
-
-                    if (remoteGrabTime > 5)
-                    {
-                        // scale remoteGrabDistance 
-                        remoteGrabDistance *= (1.0f + (poke * 5.0f));
-                    }
-
-                    prevPointer = pointer;
-
-                    remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
-
-                    // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-                    myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
-
-
-                    BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
-                    if (bu != null)
-                    {
-                        //add ROLL - torque from wrist twist
-                        Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
-                        Quaternion remoteGrabControllerDeltaQ = remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
-                        remoteGrabObjectTargetQ = remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
-
-                        //remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
-
-
-                        Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
-                        Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
-                        Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
-
-                        //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
-
-                        float zRot = vDelta.z;
-                        if (zRot > 180.0f)
-                        {
-                            zRot -= 360.0f;
-                        }
-
-                        //Debug.Log(zRot);
-
-                        if (Mathf.Abs(zRot) > 15.0f) // threshold 
-                        {
-                            remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
-                        }
-                    }
-                    else
-                    {
-                        // not bu - UI - make the 'front' face the pointer
-                        // flipped because go was initially set up with z facing away
-
-                        //Use pointer position
-                        //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
-
-                        //Use HMD (possibly better - maybe a bit queasy)
-                        Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + centreEyeAnchor.forward;
-                        remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
-                    }
+                    RemoteGrab(pointer);
                 }
                 else
                 {
@@ -487,6 +473,62 @@ namespace ControllerSelection
                     }
                     remoteGrab = null;
                 }
+            }
+        }
+
+        private void RemoteGrab(Ray pointer)
+        {
+            // poke (detecting sustained controller movement along pointer axis)
+            remoteGrabTime++;
+            Vector3 deltaPointer = Vector3.Project((pointer.origin - prevPointer.origin), pointer.direction);
+            float poke = Vector3.Dot(deltaPointer, pointer.direction);
+            approxMovingAvgPoke -= approxMovingAvgPoke / 5;
+            approxMovingAvgPoke += poke / 5;
+            //if (Mathf.Abs(poke) > 0.001f)
+            //{
+            //	Debug.Log("poke = " + poke);
+            //}
+            if (remoteGrabTime > 5)
+            {
+                // scale remoteGrabDistance 
+                remoteGrabDistance *= (1.0f + (poke * 5.0f));
+            }
+            prevPointer = pointer;
+            remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
+            // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
+            myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
+            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            if (bu != null)
+            {
+                //add ROLL - torque from wrist twist
+                Quaternion remoteGrabControllerCurrentQ = OVRInput.GetLocalControllerRotation(activeController);
+                Quaternion remoteGrabControllerDeltaQ = remoteGrabControllerCurrentQ * Quaternion.Inverse(remoteGrabControllerStartQ);
+                remoteGrabObjectTargetQ = remoteGrabControllerDeltaQ * remoteGrabObjectStartQ;
+                //remoteGrab.gameObject.transform.rotation = Quaternion.Slerp(remoteGrab.gameObject.transform.rotation, remoteGrabObjectTargetQ, 0.1f);
+                Vector3 vInit = remoteGrabControllerStartQ.eulerAngles;
+                Vector3 vDelta = remoteGrabControllerDeltaQ.eulerAngles;
+                Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
+                //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
+                float zRot = vDelta.z;
+                if (zRot > 180.0f)
+                {
+                    zRot -= 360.0f;
+                }
+                //Debug.Log(zRot);
+                if (Mathf.Abs(zRot) > 15.0f) // threshold 
+                {
+                    remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
+                }
+            }
+            else
+            {
+                // not bu - UI - make the 'front' face the pointer
+                // flipped because go was initially set up with z facing away
+                //Use pointer position
+                //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
+                //Use HMD (possibly better - maybe a bit queasy)
+                Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + centreEyeAnchor.forward;
+                remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
             }
         }
     }
