@@ -168,7 +168,7 @@ namespace ViveInputs
             remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
             remoteGrabControllerStartQ = controller.localRotation;
 
-            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
                 bu.SetRemoteGrabSelect(true);
@@ -265,8 +265,8 @@ namespace ViveInputs
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            myRawInteraction.RemoteGrabInteraction(remoteGrab, remoteGrabTargetPos);
-            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            myRawInteraction.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
+            BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
                 //add ROLL - torque from wrist twist
@@ -279,15 +279,7 @@ namespace ViveInputs
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
                 //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
-                if (zRot > 180.0f)
-                {
-                    zRot -= 360.0f;
-                }
-                //Debug.Log(zRot);
-                if (Mathf.Abs(zRot) > 15.0f) // threshold 
-                {
-                    remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
-                }
+                myRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
             }
             else
             {
@@ -296,8 +288,17 @@ namespace ViveInputs
                 //Use pointer position
                 //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
                 //Use HMD (possibly better - maybe a bit queasy)
-                Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
-                remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+                Vector3 lookAwayPos = Vector3.zero;
+                if (IsHandUI(remoteGrab.transform))
+                {
+                    lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
+                    remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+                }
+                else
+                {
+                    lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
+                    remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+                }
             }
         }
 
@@ -305,8 +306,23 @@ namespace ViveInputs
 
         private bool IsHandUI(Transform target)
         {
+            bool isHandUi = false;
             // checks if transform is on VR UI layer and if it's a child of a hand.
-            return (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform);
+            if (viveLeftHand || viveRightHand)
+            {
+                if (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform)
+                {
+                    isHandUi = true;
+                }
+            }
+            // if (target.transform.parent)
+            // {
+            //     if (target.transform.parent.parent.GetComponent<OVRGrabber>() != null)
+            //     {
+            //         isHandUi = true;
+            //     }
+            // }
+            return isHandUi;
         }
 
         void Update()

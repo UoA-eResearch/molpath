@@ -182,7 +182,7 @@ public class RawInteraction : MonoBehaviour
 
     }
 
-    public void RemoteGrabInteraction(Transform t, Vector3 destination)
+    public void RemoteGrabPositionalInteration(Transform t, Vector3 destination)
     {
         GameObject go = t.gameObject;
         {
@@ -193,6 +193,19 @@ public class RawInteraction : MonoBehaviour
         if (bu != null)
         {
             bu.SetRemoteGrabSelect(true);
+        }
+    }
+
+    public void RemoteGrabRotationalInteration(float zRot, Transform remoteGrab, Ray pointer)
+    {
+        if (zRot > 180.0f)
+        {
+            zRot -= 360.0f;
+        }
+        //Debug.Log(zRot);
+        if (Mathf.Abs(zRot) > 15.0f) // threshold 
+        {
+            remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
         }
     }
 

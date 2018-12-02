@@ -413,12 +413,10 @@ namespace ControllerSelection
                                 remoteGrabObjectStartQ = remoteGrab.gameObject.transform.rotation;
                                 remoteGrabControllerStartQ = OVRInput.GetLocalControllerRotation(activeController);
 
-                                BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+                                BackboneUnit bu = remoteGrab.GetComponent<BackboneUnit>();
                                 if (bu != null)
                                 {
                                     bu.SetRemoteGrabSelect(true);
-                                    //bu.remoteGrabSelectOn = true;
-                                    //bu.UpdateRenderMode();
                                 }
 
                                 //Rigidbody hitRigidBody = lastHit.gameObject.GetComponent<Rigidbody>();
@@ -494,8 +492,8 @@ namespace ControllerSelection
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            myRawInteraction.RemoteGrabInteraction(primaryDown, remoteGrabTargetPos);
-            BackboneUnit bu = (remoteGrab.gameObject.GetComponent("BackboneUnit") as BackboneUnit);
+            myRawInteraction.RemoteGrabPositionalInteration(primaryDown, remoteGrabTargetPos);
+            BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
                 //add ROLL - torque from wrist twist
@@ -508,15 +506,7 @@ namespace ControllerSelection
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
                 //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
-                if (zRot > 180.0f)
-                {
-                    zRot -= 360.0f;
-                }
-                //Debug.Log(zRot);
-                if (Mathf.Abs(zRot) > 15.0f) // threshold 
-                {
-                    remoteGrab.gameObject.GetComponent<Rigidbody>().AddTorque(pointer.direction * zRot * 2.5f);
-                }
+                myRawInteraction.RemoteGrabRotationalInteration(zRot, primaryDown, pointer);
             }
             else
             {
