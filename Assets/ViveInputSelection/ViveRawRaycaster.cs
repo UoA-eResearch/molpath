@@ -291,6 +291,7 @@ namespace ViveInputs
                 Vector3 lookAwayPos = Vector3.zero;
                 if (IsHandUI(remoteGrab.transform))
                 {
+                    // TODO: Add consideration in calculation that it's attached to hand transform.
                     lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
                     remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
                 }

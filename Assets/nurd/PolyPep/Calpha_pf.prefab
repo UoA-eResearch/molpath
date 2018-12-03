@@ -309,6 +309,7 @@ GameObject:
   - component: {fileID: 114814397798405406}
   - component: {fileID: 114510433943881598}
   - component: {fileID: 114000989424234382}
+  - component: {fileID: 114715464933040330}
   m_Layer: 0
   m_Name: Calpha_pf
   m_TagString: calpha
@@ -932,7 +933,7 @@ MonoBehaviour:
   attachmentFlags: 12
   attachmentPoint: 
   catchSpeedThreshold: 0
-  restoreOriginalParent: 0
+  restoreOriginalParent: 1
   attachEaseIn: 0
   snapAttachEaseInCurve:
     serializedVersion: 2
@@ -985,6 +986,17 @@ MonoBehaviour:
   velocityAverageFrames: 5
   angularVelocityAverageFrames: 11
   estimateOnAwake: 0
+--- !u!114 &114715464933040330
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1892882056782380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114782153117780838
 MonoBehaviour:
   m_ObjectHideFlags: 1

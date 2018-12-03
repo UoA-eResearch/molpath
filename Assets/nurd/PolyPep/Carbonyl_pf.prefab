@@ -61,6 +61,7 @@ GameObject:
   - component: {fileID: 114303316270145294}
   - component: {fileID: 114320585961771310}
   - component: {fileID: 114427102674665858}
+  - component: {fileID: 114417745452408328}
   m_Layer: 0
   m_Name: Carbonyl_pf
   m_TagString: carbonyl
@@ -542,6 +543,17 @@ MonoBehaviour:
   velocityAverageFrames: 5
   angularVelocityAverageFrames: 11
   estimateOnAwake: 0
+--- !u!114 &114417745452408328
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1106350776754678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114427102674665858
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -556,7 +568,7 @@ MonoBehaviour:
   attachmentFlags: 12
   attachmentPoint: 
   catchSpeedThreshold: 0
-  restoreOriginalParent: 0
+  restoreOriginalParent: 1
   attachEaseIn: 0
   snapAttachEaseInCurve:
     serializedVersion: 2

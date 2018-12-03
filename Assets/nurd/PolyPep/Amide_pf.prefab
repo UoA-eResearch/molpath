@@ -140,6 +140,7 @@ GameObject:
   - component: {fileID: 114530103719570442}
   - component: {fileID: 114055145608262400}
   - component: {fileID: 114952568759280024}
+  - component: {fileID: 114400420877538294}
   m_Layer: 0
   m_Name: Amide_pf
   m_TagString: amide
@@ -536,6 +537,17 @@ MonoBehaviour:
   m_grabPoints:
   - {fileID: 135794482563104096}
   - {fileID: 135358427584503814}
+--- !u!114 &114400420877538294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1819053209946204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b93b6a877adcbf94c89a9d6e0c0e844d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114530103719570442
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -569,7 +581,7 @@ MonoBehaviour:
   attachmentFlags: 12
   attachmentPoint: 
   catchSpeedThreshold: 0
-  restoreOriginalParent: 0
+  restoreOriginalParent: 1
   attachEaseIn: 0
   snapAttachEaseInCurve:
     serializedVersion: 2
