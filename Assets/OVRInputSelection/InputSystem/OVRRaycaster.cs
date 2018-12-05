@@ -24,16 +24,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ControllerSelection {
+namespace ControllerSelection
+{
     [RequireComponent(typeof(Canvas))]
-    public class OVRRaycaster : GraphicRaycaster, UnityEngine.EventSystems.IPointerEnterHandler {
+    public class OVRRaycaster : GraphicRaycaster, UnityEngine.EventSystems.IPointerEnterHandler
+    {
         protected OVRRaycaster() { }
 
         [NonSerialized]
         private Canvas m_Canvas;
 
-        private Canvas canvas {
-            get {
+        private Canvas canvas
+        {
+            get
+            {
                 if (m_Canvas != null)
                     return m_Canvas;
 
@@ -43,17 +47,24 @@ namespace ControllerSelection {
         }
 
         protected bool warnedAboutCamera = false;
-        public override Camera eventCamera {
-            get {
-                if (canvas == null || canvas.worldCamera == null) {
-                    if (!warnedAboutCamera) {
+        public override Camera eventCamera
+        {
+            get
+            {
+                if (canvas == null || canvas.worldCamera == null)
+                {
+                    if (!warnedAboutCamera)
+                    {
                         warnedAboutCamera = true;
                         Debug.LogWarning("OVRRaycaster belongs to a canvas with no world camera!");
                     }
-                    if (OVRManager.instance != null) {
+                    if (OVRManager.instance != null)
+                    {
                         OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
-                        if (cameraRig != null) {
-                            if (cameraRig.leftEyeCamera != null) {
+                        if (cameraRig != null)
+                        {
+                            if (cameraRig.leftEyeCamera != null)
+                            {
                                 return cameraRig.leftEyeCamera;
                             }
                         }
@@ -71,7 +82,8 @@ namespace ControllerSelection {
         /// </summary>
         [NonSerialized]
         private List<RaycastHit> m_RaycastResults = new List<RaycastHit>();
-        private void Raycast(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList, Ray ray, bool checkForBlocking) {
+        private void Raycast(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList, Ray ray, bool checkForBlocking)
+        {
             //This function is closely based on 
             //void GraphicRaycaster.Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
 
@@ -80,21 +92,26 @@ namespace ControllerSelection {
 
             float hitDistance = float.MaxValue;
 
-            if (checkForBlocking && blockingObjects != BlockingObjects.None) {
+            if (checkForBlocking && blockingObjects != BlockingObjects.None)
+            {
                 float dist = eventCamera.farClipPlane;
 
-                if (blockingObjects == BlockingObjects.ThreeD || blockingObjects == BlockingObjects.All) {
+                if (blockingObjects == BlockingObjects.ThreeD || blockingObjects == BlockingObjects.All)
+                {
                     var hits = Physics.RaycastAll(ray, dist, m_BlockingMask);
 
-                    if (hits.Length > 0 && hits[0].distance < hitDistance) {
+                    if (hits.Length > 0 && hits[0].distance < hitDistance)
+                    {
                         hitDistance = hits[0].distance;
                     }
                 }
 
-                if (blockingObjects == BlockingObjects.TwoD || blockingObjects == BlockingObjects.All) {
+                if (blockingObjects == BlockingObjects.TwoD || blockingObjects == BlockingObjects.All)
+                {
                     var hits = Physics2D.GetRayIntersectionAll(ray, dist, m_BlockingMask);
 
-                    if (hits.Length > 0 && hits[0].fraction * dist < hitDistance) {
+                    if (hits.Length > 0 && hits[0].fraction * dist < hitDistance)
+                    {
                         hitDistance = hits[0].fraction * dist;
                     }
                 }
@@ -104,11 +121,13 @@ namespace ControllerSelection {
 
             GraphicRaycast(canvas, ray, m_RaycastResults);
 
-            for (var index = 0; index < m_RaycastResults.Count; index++) {
+            for (var index = 0; index < m_RaycastResults.Count; index++)
+            {
                 var go = m_RaycastResults[index].graphic.gameObject;
                 bool appendGraphic = true;
 
-                if (ignoreReversedGraphics) {
+                if (ignoreReversedGraphics)
+                {
                     // If we have a camera compare the direction against the cameras forward.
                     var cameraFoward = ray.direction;
                     var dir = go.transform.rotation * Vector3.forward;
@@ -116,18 +135,22 @@ namespace ControllerSelection {
                 }
 
                 // Ignore points behind us (can happen with a canvas pointer)
-                if (eventCamera.transform.InverseTransformPoint(m_RaycastResults[index].worldPos).z <= 0) {
+                if (eventCamera.transform.InverseTransformPoint(m_RaycastResults[index].worldPos).z <= 0)
+                {
                     appendGraphic = false;
                 }
 
-                if (appendGraphic) {
+                if (appendGraphic)
+                {
                     float distance = Vector3.Distance(ray.origin, m_RaycastResults[index].worldPos);
 
-                    if (distance >= hitDistance) {
+                    if (distance >= hitDistance)
+                    {
                         continue;
                     }
 
-                    var castResult = new UnityEngine.EventSystems.RaycastResult {
+                    var castResult = new UnityEngine.EventSystems.RaycastResult
+                    {
                         gameObject = go,
                         module = this,
                         distance = distance,
@@ -146,9 +169,11 @@ namespace ControllerSelection {
         /// </summary>
         /// <param name="eventData"></param>
         /// <param name="resultAppendList"></param>
-        public override void Raycast(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList) {
+        public override void Raycast(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList)
+        {
             OVRRayPointerEventData rayPointerEventData = eventData as OVRRayPointerEventData;
-            if (rayPointerEventData != null) {
+            if (rayPointerEventData != null)
+            {
                 Raycast(eventData, resultAppendList, rayPointerEventData.worldSpaceRay, true);
             }
         }
@@ -157,7 +182,8 @@ namespace ControllerSelection {
         /// </summary>
         /// <param name="eventData"></param>
         /// <param name="resultAppendList"></param>
-        public void RaycastPointer(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList) {
+        public void RaycastPointer(UnityEngine.EventSystems.PointerEventData eventData, List<UnityEngine.EventSystems.RaycastResult> resultAppendList)
+        {
 
         }
 
@@ -167,7 +193,8 @@ namespace ControllerSelection {
         /// </summary>
         [NonSerialized]
         static readonly List<RaycastHit> s_SortedGraphics = new List<RaycastHit>();
-        private void GraphicRaycast(Canvas canvas, Ray ray, List<RaycastHit> results) {
+        private void GraphicRaycast(Canvas canvas, Ray ray, List<RaycastHit> results)
+        {
             //This function is based closely on :
             // void GraphicRaycaster.Raycast(Canvas canvas, Camera eventCamera, Vector2 pointerPosition, List<Graphic> results)
             // But modified to take a Ray instead of a canvas pointer, and also to explicitly ignore
@@ -176,18 +203,21 @@ namespace ControllerSelection {
             // Necessary for the event system
             var foundGraphics = GraphicRegistry.GetGraphicsForCanvas(canvas);
             s_SortedGraphics.Clear();
-            for (int i = 0; i < foundGraphics.Count; ++i) {
+            for (int i = 0; i < foundGraphics.Count; ++i)
+            {
                 Graphic graphic = foundGraphics[i];
 
                 // -1 means it hasn't been processed by the canvas, which means it isn't actually drawn
                 if (graphic.depth == -1)
                     continue;
                 Vector3 worldPos;
-                if (RayIntersectsRectTransform(graphic.rectTransform, ray, out worldPos) && eventCamera != null) {
+                if (RayIntersectsRectTransform(graphic.rectTransform, ray, out worldPos) && eventCamera != null)
+                {
                     //Work out where this is on the screen for compatibility with existing Unity UI code
                     Vector2 screenPos = eventCamera.WorldToScreenPoint(worldPos);
                     // mask/image intersection - See Unity docs on eventAlphaThreshold for when this does anything
-                    if (graphic.Raycast(screenPos, eventCamera)) {
+                    if (graphic.Raycast(screenPos, eventCamera))
+                    {
                         RaycastHit hit;
                         hit.graphic = graphic;
                         hit.worldPos = worldPos;
@@ -199,7 +229,8 @@ namespace ControllerSelection {
 
             s_SortedGraphics.Sort((g1, g2) => g2.graphic.depth.CompareTo(g1.graphic.depth));
 
-            for (int i = 0; i < s_SortedGraphics.Count; ++i) {
+            for (int i = 0; i < s_SortedGraphics.Count; ++i)
+            {
                 results.Add(s_SortedGraphics[i]);
             }
         }
@@ -208,7 +239,8 @@ namespace ControllerSelection {
         /// </summary>
         /// <param name="worldPosition"></param>
         /// <returns></returns>
-        public Vector2 GetScreenPosition(UnityEngine.EventSystems.RaycastResult raycastResult) {
+        public Vector2 GetScreenPosition(UnityEngine.EventSystems.RaycastResult raycastResult)
+        {
             // In future versions of Uinty RaycastResult will contain screenPosition so this will not be necessary
             return eventCamera.WorldToScreenPoint(raycastResult.worldPosition);
         }
@@ -222,13 +254,15 @@ namespace ControllerSelection {
         /// <param name="ray"></param>
         /// <param name="worldPos"></param>
         /// <returns></returns>
-        static bool RayIntersectsRectTransform(RectTransform rectTransform, Ray ray, out Vector3 worldPos) {
+        static bool RayIntersectsRectTransform(RectTransform rectTransform, Ray ray, out Vector3 worldPos)
+        {
             Vector3[] corners = new Vector3[4];
             rectTransform.GetWorldCorners(corners);
             Plane plane = new Plane(corners[0], corners[1], corners[2]);
 
             float enter;
-            if (!plane.Raycast(ray, out enter)) {
+            if (!plane.Raycast(ray, out enter))
+            {
                 worldPos = Vector3.zero;
                 return false;
             }
@@ -242,18 +276,21 @@ namespace ControllerSelection {
             if (BottomDot < BottomEdge.sqrMagnitude && // Can use sqrMag because BottomEdge is not normalized
                 LeftDot < LeftEdge.sqrMagnitude &&
                     BottomDot >= 0 &&
-                    LeftDot >= 0) {
+                    LeftDot >= 0)
+            {
                 worldPos = corners[0] + LeftDot * LeftEdge / LeftEdge.sqrMagnitude + BottomDot * BottomEdge / BottomEdge.sqrMagnitude;
                 return true;
             }
-            else {
+            else
+            {
                 worldPos = Vector3.zero;
                 return false;
             }
         }
 
 
-        struct RaycastHit {
+        struct RaycastHit
+        {
             public Graphic graphic;
             public Vector3 worldPos;
             public bool fromMouse;
@@ -264,14 +301,17 @@ namespace ControllerSelection {
         /// Is this the currently focussed Raycaster according to the InputModule
         /// </summary>
         /// <returns></returns>
-        public bool IsFocussed() {
+        public bool IsFocussed()
+        {
             OVRInputModule inputModule = UnityEngine.EventSystems.EventSystem.current.currentInputModule as OVRInputModule;
             return inputModule && inputModule.activeGraphicRaycaster == this;
         }
 
-        public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData e) {
+        public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData e)
+        {
             UnityEngine.EventSystems.PointerEventData ped = e as OVRRayPointerEventData;
-            if (ped != null) {
+            if (ped != null)
+            {
                 // Gaze has entered this canvas. We'll make it the active one so that canvas-mouse pointer can be used.
                 OVRInputModule inputModule = UnityEngine.EventSystems.EventSystem.current.currentInputModule as OVRInputModule;
                 inputModule.activeGraphicRaycaster = this;

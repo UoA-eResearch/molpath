@@ -5,7 +5,6 @@
 /[Bb]uilds/
 /Assets/AssetStoreTools*
 /Assets/OVRInputSelection/Meshes/
-/Assets/SteamVR*
 
 # Visual Studio 2015 cache directory
 /.vs/
