@@ -20,13 +20,20 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
-namespace ControllerSelection {
-    public class OVRInputHelpers {
+namespace ControllerSelection
+{
+    public class OVRInputHelpers
+    {
         // Given a controller and tracking spcae, return the ray that controller uses.
         // Will fall back to center eye or camera on Gear if no controller is present.
-        public static Ray GetSelectionRay(OVRInput.Controller activeController, Transform trackingSpace) {
-            if (trackingSpace != null && activeController != OVRInput.Controller.None) {
+
+        public static GameObject vivePlayerGo;
+        public static Ray GetSelectionRay(OVRInput.Controller activeController, Transform trackingSpace)
+        {
+            if (trackingSpace != null && trackingSpace.parent.gameObject.activeInHierarchy && activeController != OVRInput.Controller.None)
+            {
                 Quaternion orientation = OVRInput.GetLocalControllerRotation(activeController);
                 Vector3 localStartPoint = OVRInput.GetLocalControllerPosition(activeController);
 
@@ -37,24 +44,66 @@ namespace ControllerSelection {
                 return new Ray(worldStartPoint, worldOrientation);
             }
 
-            Transform cameraTransform = Camera.main.transform;
-
-            if (OVRManager.instance != null) {
-                OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
-                if (cameraRig != null) {
-                    cameraTransform = cameraRig.centerEyeAnchor;
-                }
+            // check if vive player exists, returns ray from vive if present.
+            if (!OVRInputHelpers.vivePlayerGo)
+            {
+                OVRInputHelpers.vivePlayerGo = GameObject.Find("VivePlayer");
             }
 
-            return new Ray(cameraTransform.position, cameraTransform.forward);
+            if (OVRInputHelpers.vivePlayerGo)
+            {
+                Transform vivePlayerTransform = OVRInputHelpers.vivePlayerGo.transform;
+                Player vivePlayer = vivePlayerTransform.GetComponent<Player>();
+
+                // try for hand first
+                Transform hand = vivePlayer.hands[0].transform;
+                if (hand != null)
+                {
+                    return new Ray(hand.position, hand.forward);
+                }
+                // use vive camera as fallback
+                Transform viveCamera = vivePlayer.hmdTransforms[0];
+                if (viveCamera != null)
+                {
+                    return new Ray(viveCamera.position, viveCamera.forward);
+                }
+                else
+                {
+                    return new Ray(vivePlayerTransform.position, vivePlayerTransform.forward);
+                }
+            }
+            else
+            {
+                Transform cameraTransform = Camera.main.transform;
+                if (OVRManager.instance != null && GameObject.Find("VivePlayer") == null)
+                {
+                    OVRCameraRig cameraRig = OVRManager.instance.GetComponent<OVRCameraRig>();
+                    if (cameraRig != null)
+                    {
+                        cameraTransform = cameraRig.centerEyeAnchor;
+                    }
+                }
+                Debug.Log(cameraTransform.parent.name);
+                return new Ray(cameraTransform.position, cameraTransform.forward);
+            }
         }
 
         // Search the scene to find a tracking spce. This method can be expensive! Try to avoid it if possible.
-        public static Transform FindTrackingSpace() {
+        public static Transform FindTrackingSpace()
+        {
+            // Vive adaption:
+            if (GameObject.Find("VivePlayer"))
+            {
+                Debug.Log("Using VivePlayer root as the tracking space transform.");
+                return GameObject.Find("VivePlayer").transform;
+            }
+
             // There should be an OVRManager in the scene
-            if (OVRManager.instance != null) {
+            if (OVRManager.instance != null)
+            {
                 Transform trackingSpace = OVRManager.instance.transform.Find("TrackingSpace");
-                if (trackingSpace != null) {
+                if (trackingSpace != null)
+                {
                     return trackingSpace;
                 }
             }
@@ -63,10 +112,13 @@ namespace ControllerSelection {
 
             // Look for any CameraRig objects
             OVRCameraRig[] cameraRigs = UnityEngine.Object.FindObjectsOfType(typeof(OVRCameraRig)) as OVRCameraRig[];
-            foreach (OVRCameraRig cameraRig in cameraRigs) {
-                if (cameraRig.gameObject.activeSelf) {
+            foreach (OVRCameraRig cameraRig in cameraRigs)
+            {
+                if (cameraRig.gameObject.activeSelf)
+                {
                     Transform trackingSpace = cameraRig.transform.Find("TrackingSpace");
-                    if (trackingSpace != null) {
+                    if (trackingSpace != null)
+                    {
                         return trackingSpace;
                     }
                 }
@@ -74,7 +126,8 @@ namespace ControllerSelection {
 
             // Last resort, look for a tracking space
             GameObject trackingSpaceGO = UnityEngine.GameObject.Find("TrackingSpace");
-            if (trackingSpaceGO != null) {
+            if (trackingSpaceGO != null)
+            {
                 return trackingSpaceGO.transform;
             }
 
@@ -83,34 +136,44 @@ namespace ControllerSelection {
         }
 
         // Find the current active controller, based on last time a certain button was hit. Needs to know the previous active controller.
-        public static OVRInput.Controller GetControllerForButton(OVRInput.Button joyPadClickButton, OVRInput.Controller oldController) {
+        public static OVRInput.Controller GetControllerForButton(OVRInput.Button joyPadClickButton, OVRInput.Controller oldController)
+        {
             OVRInput.Controller controller = OVRInput.GetConnectedControllers();
 
-            if ((controller & OVRInput.Controller.RTouch) == OVRInput.Controller.RTouch) {
-                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.RTouch) || oldController == OVRInput.Controller.None) {
+            if ((controller & OVRInput.Controller.RTouch) == OVRInput.Controller.RTouch)
+            {
+                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.RTouch) || oldController == OVRInput.Controller.None)
+                {
                     return OVRInput.Controller.RTouch;
                 }
             }
 
-            if ((controller & OVRInput.Controller.LTouch) == OVRInput.Controller.LTouch) {
-                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.LTouch) || oldController == OVRInput.Controller.None) {
+            if ((controller & OVRInput.Controller.LTouch) == OVRInput.Controller.LTouch)
+            {
+                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.LTouch) || oldController == OVRInput.Controller.None)
+                {
                     return OVRInput.Controller.LTouch;
                 }
             }
 
-            if ((controller & OVRInput.Controller.RTrackedRemote) == OVRInput.Controller.RTrackedRemote) {
-                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.RTrackedRemote) || oldController == OVRInput.Controller.None) {
+            if ((controller & OVRInput.Controller.RTrackedRemote) == OVRInput.Controller.RTrackedRemote)
+            {
+                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.RTrackedRemote) || oldController == OVRInput.Controller.None)
+                {
                     return OVRInput.Controller.RTrackedRemote;
                 }
             }
 
-            if ((controller & OVRInput.Controller.LTrackedRemote) == OVRInput.Controller.LTrackedRemote) {
-                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.LTrackedRemote) || oldController == OVRInput.Controller.None) {
+            if ((controller & OVRInput.Controller.LTrackedRemote) == OVRInput.Controller.LTrackedRemote)
+            {
+                if (OVRInput.Get(joyPadClickButton, OVRInput.Controller.LTrackedRemote) || oldController == OVRInput.Controller.None)
+                {
                     return OVRInput.Controller.LTrackedRemote;
                 }
             }
 
-            if ((controller & oldController) != oldController) {
+            if ((controller & oldController) != oldController)
+            {
                 return OVRInput.Controller.None;
             }
 

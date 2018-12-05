@@ -22,17 +22,22 @@ limitations under the License.
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuInteraction : MonoBehaviour {
-    public void OnLoadUI() {
+public class MainMenuInteraction : MonoBehaviour
+{
+    public void OnLoadUI()
+    {
         SceneManager.LoadScene("selection_ui", LoadSceneMode.Single);
     }
-    public void OnLoadRaw() {
+    public void OnLoadRaw()
+    {
         SceneManager.LoadScene("selection_raw", LoadSceneMode.Single);
     }
-    public void OnLoadEvent() {
+    public void OnLoadEvent()
+    {
         SceneManager.LoadScene("selection_physics", LoadSceneMode.Single);
     }
-    public void OnLoadAllInOne() {
+    public void OnLoadAllInOne()
+    {
         SceneManager.LoadScene("selection_all", LoadSceneMode.Single);
     }
 }

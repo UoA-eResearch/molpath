@@ -117,8 +117,7 @@ public class BackboneUnit : MonoBehaviour {
 			myResidue.residueSelected = flag;
 		}
 	}
-
-	public void SetBackboneUnitSelect (bool flag)
+public void SetBackboneUnitSelect (bool flag)
 	{
 		controllerSelectOn = flag;
 		UpdateRenderMode();
@@ -134,10 +133,10 @@ public class BackboneUnit : MonoBehaviour {
 		}
 	}
 
-	public void SetRemoteGrabSelect(bool value)
+	public void SetRemoteGrabSelect(bool flag)
 	{
-		remoteGrabSelectOn = value;
-		myResidue.residueGrabbed = value;
+		remoteGrabSelectOn = flag;
+		myResidue.residueGrabbed = flag;
 		UpdateRenderMode();
 	}
 
