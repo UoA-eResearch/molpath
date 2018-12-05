@@ -46,7 +46,7 @@ namespace ControllerSelection
                 }
                 catch (NullReferenceException e)
                 {
-                    Debug.LogError(e);
+                    // Debug.LogError(e);
                 }
             }
             if (!teleporting)
@@ -57,7 +57,7 @@ namespace ControllerSelection
                 }
                 catch (NullReferenceException e)
                 {
-                    Debug.LogError(e);
+                    // Debug.LogError(e);
                 }
             }
         }
@@ -887,11 +887,14 @@ namespace ControllerSelection
                 pressed = OVRInput.GetDown(joyPadClickButton, activeController);
                 released = OVRInput.GetUp(joyPadClickButton, activeController);
             }
-            else if (xrDeviceManager.DebugOculusAsVive)
+            if (xrDeviceManager != null)
             {
-                Debug.Log("debugging oculus as vive input");
-                pressed = Input.GetKeyDown(KeyCode.Alpha1);
-                released = Input.GetKeyUp(KeyCode.Alpha1);
+                if (xrDeviceManager.DebugOculusAsVive)
+                {
+                    Debug.Log("debugging oculus as vive input");
+                    pressed = Input.GetKeyDown(KeyCode.Alpha1);
+                    released = Input.GetKeyUp(KeyCode.Alpha1);
+                }
             }
             else
             {
