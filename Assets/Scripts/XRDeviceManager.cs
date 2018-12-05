@@ -5,22 +5,79 @@ using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 using UnityEngine.EventSystems;
+using ViveInputs;
 
 namespace ControllerSelection
 {
     public class XRDeviceManager : MonoBehaviour
     {
         [Header("Oculus References")]
-        public OVRPlayerController ovrPlayerController;
-        public GameObject OvrPlayerGo;
-        public Camera OvrPlayerCamera;
+        private OVRPlayerController _ovrPlayerController;
+        public OVRPlayerController ovrPlayerController
+        {
+
+            get
+            {
+                if (_ovrPlayerController == null)
+                {
+                    _ovrPlayerController = FindObjectOfType<OVRPlayerController>();
+                }
+                return _ovrPlayerController;
+            }
+        }
+        private GameObject _ovrPlayerGo;
+        public GameObject ovrPlayerGo
+        {
+            get
+            {
+                if (!_ovrPlayerGo)
+                {
+                    _ovrPlayerGo = ovrPlayerController.gameObject;
+                }
+                return _ovrPlayerGo;
+            }
+        }
+
+        public Camera _ovrPlayerCamera;
+        public Camera ovrPlayerCamera
+        {
+            get
+            {
+                if (!_ovrPlayerCamera)
+                {
+                    _ovrPlayerCamera = FindObjectOfType<OVRCameraRig>().leftEyeCamera;
+                }
+                return _ovrPlayerCamera;
+            }
+        }
+        public GameObject OvrRightHandAnchor;
+        public GameObject OvrLeftHandAnchor;
 
         [Header("Vive References")]
-        public GameObject vivePlayerGo;
-        public Player vivePlayer;
-        public Camera vivePlayerCamera;
-        public GameObject teleporting;
-        public GameObject teleportArea;
+        private Player _vivePlayer;
+        public Player vivePlayer
+        {
+            get
+            {
+                if (!_vivePlayer)
+                {
+                    _vivePlayer = Player.instance;
+                }
+                return _vivePlayer;
+            }
+        }
+        private Camera _vivePlayerCamera;
+        public Camera vivePlayerCamera
+        {
+            get
+            {
+                if (!_vivePlayerCamera)
+                {
+                    _vivePlayerCamera = vivePlayer.hmdTransform.GetComponent<Camera>();
+                }
+                return _vivePlayerCamera;
+            }
+        }
 
         [Header("UI Transform settings in when attached to hand")]
         public GameObject uiContainer;
@@ -28,14 +85,37 @@ namespace ControllerSelection
         public List<GameObject> menus;
 
         [Header("Event Systems")]
-        public GameObject OvrEventSystem;
-        public GameObject ViveEventSystem;
+        private OVRInputModule _ovrInputModule;
+        public OVRInputModule ovrInputModule
+        {
+            get
+            {
+                if (!_ovrInputModule)
+                {
+                    _ovrInputModule = FindObjectOfType<OVRInputModule>();
+                }
+                return _ovrInputModule;
+            }
+        }
+        private ViveInputModule _viveInputModule;
+        public ViveInputModule viveInputModule
+        {
+            get
+            {
+                if (!_viveInputModule)
+                {
+                    _viveInputModule = FindObjectOfType<ViveInputModule>();
+                }
+                return _viveInputModule;
+            }
+        }
 
         public bool usingOculus;
         public bool usingVive;
 
         public bool DebugOculusAsVive = false;
 
+        private static XRDeviceManager _instance;
         public static XRDeviceManager instance
         {
             get
@@ -47,26 +127,37 @@ namespace ControllerSelection
                 return _instance;
             }
         }
-        private static XRDeviceManager _instance;
+
+        private static Teleport _teleport;
+        public static Teleport teleport
+        {
+            get
+            {
+                if (_teleport == null)
+                {
+                    _teleport = FindObjectOfType<Teleport>();
+                }
+                return _teleport;
+            }
+        }
+
+        private static TeleportArea _teleportArea;
+        public static TeleportArea teleportArea
+        {
+            get
+            {
+                if (_teleportArea == null)
+                {
+                    _teleportArea = FindObjectOfType<TeleportArea>();
+                }
+                return _teleportArea;
+            }
+        }
+
+        public GameObject teleportAreaTarget;
 
         void Awake()
         {
-            // programmatic fallback for if object references not set in editor.
-            // oculus and vive players.
-            if (!ovrPlayerController)
-            {
-                // oculusPlayer = GameObject.Find("OVRPlayerController");
-                ovrPlayerController = FindObjectOfType<OVRPlayerController>();
-            }
-
-            // setting up vive references
-            if (Player.instance)
-            {
-                vivePlayer = Player.instance;
-                vivePlayerGo = Player.instance.gameObject;
-                vivePlayerCamera = vivePlayer.hmdTransform.GetComponent<Camera>();
-            }
-
             // Handling UI 
             if (uiContainer == null)
             {
@@ -96,16 +187,19 @@ namespace ControllerSelection
 
         private void ViveSceneSetup()
         {
-            OvrEventSystem.SetActive(false);
-            ViveEventSystem.SetActive(true);
+            ovrInputModule.gameObject.SetActive(false);
+            viveInputModule.gameObject.SetActive(true);
 
             ovrPlayerController.gameObject.SetActive(false);
-            vivePlayerGo.SetActive(true);
+            vivePlayer.gameObject.SetActive(true);
 
             SetUIToHandPosition();
 
             // currently all the canvases are set to oculus transforms/tracking space etc.
             SetAllCanvasEventCameras(vivePlayerCamera);
+
+            // disable multiple audio listeners.
+            vivePlayer.audioListener.GetComponent<AudioListener>().enabled = false;
 
             usingVive = true;
             usingOculus = false;
@@ -113,17 +207,20 @@ namespace ControllerSelection
 
         private void OculusSceneSetup()
         {
-            OvrEventSystem.SetActive(true);
-            ViveEventSystem.SetActive(false);
+            ovrInputModule.gameObject.SetActive(true);
+            viveInputModule.gameObject.SetActive(false);
 
-            vivePlayerGo.SetActive(false);
+            vivePlayer.gameObject.SetActive(false);
             ovrPlayerController.gameObject.SetActive(true);
 
+            // Camera stuff
             SetUIToWorldPosition();
             // accessing ovr camera rig left/right eye camera gets centre eye camera by default.
-            SetAllCanvasEventCameras(OvrPlayerCamera);
+            SetAllCanvasEventCameras(ovrPlayerCamera);
 
-            teleporting.SetActive(false);
+            ovrPlayerController.GetComponentInChildren<AudioListener>().enabled = false;
+
+            teleport.gameObject.SetActive(false);
 
             usingVive = false;
             usingOculus = true;
@@ -140,14 +237,24 @@ namespace ControllerSelection
             // reference to teleporting in case it's used here.
             if (usingVive)
             {
-                teleporting.SetActive(true);
-                teleportArea.SetActive(true);
-            }
+                teleport.gameObject.SetActive(true);
+                teleportArea.gameObject.SetActive(true);
 
+                // attempt to position and scale teleport area to match floor size.
+                if (!teleportAreaTarget)
+                {
+                    teleportAreaTarget = GameObject.Find("Floor");
+                }
+                if (teleportAreaTarget)
+                {
+                    teleportArea.transform.position = teleportAreaTarget.transform.position + new Vector3(0, 0.002f, 0);
+                    teleportArea.transform.localScale = teleportAreaTarget.transform.localScale;
+                }
+            }
             if (usingOculus)
             {
-                teleportArea.SetActive(false);
-                teleporting.SetActive(false);
+                teleportArea.gameObject.SetActive(false);
+                teleport.gameObject.SetActive(false);
             }
         }
 
@@ -161,10 +268,10 @@ namespace ControllerSelection
 
         private void SetUIToHandPosition()
         {
-            if (vivePlayerGo)
+            if (vivePlayer.gameObject)
             {
-                Player player = vivePlayerGo.GetComponent<Player>();
-                uiContainer.transform.parent = player.hands[1].transform;
+                Player player = vivePlayer;
+                uiContainer.transform.parent = vivePlayer.hands[1].transform;
                 uiContainer.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
                 uiContainer.transform.localRotation = Quaternion.Euler(60, 0, 0);
                 uiContainer.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
@@ -173,6 +280,7 @@ namespace ControllerSelection
 
         private void SetAllCanvasEventCameras(Camera camera)
         {
+            Debug.Log(uiContainer);
             Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
             foreach (var canvas in canvases)
             {
@@ -234,23 +342,21 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
-            // Debug.Log(EventSystem.current.gameObject.name);
+            Debug.Log(EventSystem.current.gameObject.name);
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
             }
         }
 
-        public GameObject OvrRightHandAnchor;
-        public GameObject OvrLeftHandAnchor;
 
         private void DebugWithVive()
         {
-            if (vivePlayerGo.activeInHierarchy == false)
+            if (vivePlayer.gameObject.activeInHierarchy == false)
             {
-                vivePlayerGo.SetActive(true);
+                vivePlayer.gameObject.SetActive(true);
                 vivePlayerCamera.enabled = false;
-                var audioListeners = vivePlayerGo.GetComponentsInChildren<AudioListener>();
+                var audioListeners = vivePlayer.gameObject.GetComponentsInChildren<AudioListener>();
                 foreach (var audioListener in audioListeners)
                 {
                     audioListener.enabled = false;
@@ -259,9 +365,9 @@ namespace ControllerSelection
             if (ovrPlayerController.gameObject.activeInHierarchy == false)
             {
                 ovrPlayerController.gameObject.SetActive(true);
-                Debug.Log(Player.instance.gameObject.name);
-                Debug.Log(Player.instance.rightHand.gameObject.name);
-                Debug.Log(Player.instance.leftHand.gameObject.name);
+                // Debug.Log(Player.instance.gameObject.name);
+                // Debug.Log(Player.instance.rightHand.gameObject.name);
+                // Debug.Log(Player.instance.leftHand.gameObject.name);
                 OvrRightHandAnchor.transform.position = Player.instance.rightHand.transform.position;
                 OvrLeftHandAnchor.transform.position = Player.instance.leftHand.transform.position;
             }

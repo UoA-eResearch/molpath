@@ -223,7 +223,10 @@ public class RawInteraction : MonoBehaviour
         }
         float tractorBeamScale = Mathf.Max(tractorBeamMax, tractorBeamAttractionFactor * (Vector3.Magnitude(tractorBeam) / tractorBeamDistanceRatio));
 
-        go.GetComponent<Rigidbody>().AddForce((tractorBeam * tractorBeamScale), ForceMode.Acceleration);
+        if (go.GetComponent<Rigidbody>())
+        {
+            go.GetComponent<Rigidbody>().AddForce((tractorBeam * tractorBeamScale), ForceMode.Acceleration);
+        }
         // add scaling for 'size' of target?
     }
 }

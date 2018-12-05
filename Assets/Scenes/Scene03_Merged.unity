@@ -347,6 +347,7 @@ MonoBehaviour:
   hbondsOn: 0
   hbondStrength: 100
   hbondScale: 500
+  sideChainBuilder: {fileID: 0}
   phiTarget: 0
   psiTarget: 0
   phiPsiDrive: 100
@@ -833,26 +834,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 16
       objectReference: {fileID: 0}
-    - target: {fileID: 114966566594739202, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: trackingSpace
-      value: 
-      objectReference: {fileID: 251161642}
-    - target: {fileID: 114966566594739202, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: hand
-      value: 
-      objectReference: {fileID: 1890142902}
-    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: trackingSpace
-      value: 
-      objectReference: {fileID: 251161642}
-    - target: {fileID: 114523978695381142, guid: a55612613076bf64faff52860a72cc2a,
-        type: 2}
-      propertyPath: teleporting
-      value: 
-      objectReference: {fileID: 1775365206}
     - target: {fileID: 114560449322822034, guid: a55612613076bf64faff52860a72cc2a,
         type: 2}
       propertyPath: trackingSpace
@@ -863,6 +844,16 @@ Prefab:
       propertyPath: rayTransform
       value: 
       objectReference: {fileID: 1997753270}
+    - target: {fileID: 114966566594739202, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: trackingSpace
+      value: 
+      objectReference: {fileID: 251161642}
+    - target: {fileID: 114966566594739202, guid: a55612613076bf64faff52860a72cc2a,
+        type: 2}
+      propertyPath: hand
+      value: 
+      objectReference: {fileID: 1890142902}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a55612613076bf64faff52860a72cc2a, type: 2}
   m_IsPrefabAsset: 0
@@ -1234,16 +1225,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 15
       objectReference: {fileID: 0}
-    - target: {fileID: 114024175105876032, guid: 087e03402a6149848b6b14b59ab8434d,
-        type: 2}
-      propertyPath: RemoteGrabDestinationGo
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 114024175105876032, guid: 087e03402a6149848b6b14b59ab8434d,
-        type: 2}
-      propertyPath: jerkThresh
-      value: 0.03
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 087e03402a6149848b6b14b59ab8434d, type: 2}
   m_IsPrefabAsset: 0
@@ -1252,12 +1233,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1533487186017730, guid: f70e90cf345ca4d41aab3e95f4e64cc1,
     type: 2}
   m_PrefabInternal: {fileID: 1101200536}
---- !u!114 &1775365206 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114653234086311478, guid: f70e90cf345ca4d41aab3e95f4e64cc1,
-    type: 2}
-  m_PrefabInternal: {fileID: 1101200536}
-  m_Script: {fileID: 11500000, guid: f260935093f73f241bfaa1578e5e5506, type: 3}
 --- !u!1001 &1841156284
 Prefab:
   m_ObjectHideFlags: 0
