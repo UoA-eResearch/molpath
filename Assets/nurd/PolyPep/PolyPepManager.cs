@@ -91,6 +91,8 @@ public class PolyPepManager : MonoBehaviour
             //UI
             // initialise phi psi slider values (hacky?)
 
+            SubscribeToUievents();
+
             phiSliderUI.GetComponent<Slider>().value = 0;
             psiSliderUI.GetComponent<Slider>().value = 0;
             vdwSliderUI.GetComponent<Slider>().value = 10;
@@ -122,8 +124,21 @@ public class PolyPepManager : MonoBehaviour
 
         // dev: test always spawn pp on startup
         SpawnPolypeptide(transform);
-
     }
+
+    private void SubscribeToUievents()
+    {
+        Button spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
+        // spawnButton.onClick += SpawnPolypeptide;
+        // spawnButton.onClick += idk;
+        // spawnButton.onClick.AddListener(idk);
+        spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
+    }
+
+    // void idk()
+    // {
+    //     SpawnPolypeptide(transform);
+    // }
 
     public void SpawnPolypeptide(Transform spawnTransform)
     {

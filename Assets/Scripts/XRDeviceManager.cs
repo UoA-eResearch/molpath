@@ -280,7 +280,6 @@ namespace ControllerSelection
 
         private void SetAllCanvasEventCameras(Camera camera)
         {
-            Debug.Log(uiContainer);
             Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
             foreach (var canvas in canvases)
             {
@@ -342,13 +341,11 @@ namespace ControllerSelection
         void Update()
         {
             UpdateMenuPosition();
-            Debug.Log(EventSystem.current.gameObject.name);
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
             }
         }
-
 
         private void DebugWithVive()
         {
