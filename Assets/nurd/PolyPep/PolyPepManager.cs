@@ -53,59 +53,38 @@ public class PolyPepManager : MonoBehaviour
 
     void Awake()
     {
-        // TODO: replace these with just direct find and get component statements.
-        GameObject temp = GameObject.Find("Slider_Phi");
-        phiSliderUI = temp.GetComponent<Slider>();
+        // Sliders
+        phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
+        psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
+        vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
+        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
+        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
+        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
+        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
+        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
+        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
+        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
+        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
 
-        temp = GameObject.Find("Slider_Psi");
-        psiSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_Vdw");
-        vdwSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_HbondStrength");
-        hbondSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_PhiPsiDrive");
-        phiPsiDriveSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_SpawnLength");
-        spawnLengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_JiggleStrength");
-        jiggleStrengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_HbondStrength");
-        hbondSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_PhiPsiDrive");
-        phiPsiDriveSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_SpawnLength");
-        spawnLengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_JiggleStrength");
-        jiggleStrengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("SideChainBuilder");
-        sideChainBuilder = temp.GetComponent<SideChainBuilder>();
-
+        // UI Buttons
         spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
         SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
         DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
 
+        // UI Toggles
         dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
         hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
         vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
+
+        // Sidechain builder
+        sideChainBuilder = GameObject.Find("SideChainBuilder").GetComponent<SideChainBuilder>();
     }
 
     void Start()
     {
-
         {
             //UI
             // initialise phi psi slider values (hacky?)
-
             SubscribeToUievents();
 
             phiSliderUI.GetComponent<Slider>().value = 0;
@@ -157,8 +136,15 @@ public class PolyPepManager : MonoBehaviour
         vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
         vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
 
-        // TODO: angle strength, psi aixs slider, phi axis slider, jiggle slider, show active toggle
+        jiggleStrengthSliderUI.onValueChanged.AddListener(delegate { UpdateJiggleFromUI(jiggleStrengthSliderUI.value); });
+
+        phiSliderUI.onValueChanged.AddListener(delegate { UpdatePhiFromUI(phiSliderUI.value); });
+
+        psiSliderUI.onValueChanged.AddListener(delegate { UpdatePsiFromUI(psiSliderUI.value); });
+
+        phiPsiDriveSliderUI.onValueChanged.AddListener(delegate { UpdatePhiPsiDriveFromUI(phiPsiDriveSliderUI.value); });
     }
+
 
 
 
