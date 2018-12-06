@@ -43,6 +43,13 @@ public class PolyPepManager : MonoBehaviour
     public Slider phiPsiDriveSliderUI;
     public Slider spawnLengthSliderUI;
     public Slider jiggleStrengthSliderUI;
+    public Button spawnButton;
+    public Toggle vdwToggle;
+    public Toggle hBondToggle;
+    public Toggle dampingToggle;
+
+    public Button SelectAllButton;
+    public Button DeselectAllButton;
 
     void Awake()
     {
@@ -81,7 +88,6 @@ public class PolyPepManager : MonoBehaviour
 
         temp = GameObject.Find("SideChainBuilder");
         sideChainBuilder = temp.GetComponent<SideChainBuilder>();
-
     }
 
     void Start()
@@ -128,17 +134,31 @@ public class PolyPepManager : MonoBehaviour
 
     private void SubscribeToUievents()
     {
-        Button spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
-        // spawnButton.onClick += SpawnPolypeptide;
-        // spawnButton.onClick += idk;
-        // spawnButton.onClick.AddListener(idk);
+        // new peptide
+        spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
         spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
+
+        dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
+        dampingToggle.onValueChanged.AddListener(delegate { UpdateDragFromUI(dampingToggle.isOn); });
+
+        SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
+        SelectAllButton.onClick.AddListener(delegate { SelectAllFromUI(true); });
+
+        DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
+        DeselectAllButton.onClick.AddListener(delegate { SelectAllFromUI(false); });
+
+        hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
+        hBondToggle.onValueChanged.AddListener(delegate { UpdateHbondOnFromUI(hBondToggle.isOn); });
+        hbondSliderUI.onValueChanged.AddListener(delegate { UpdateHbondStrengthFromUI(hbondSliderUI.value); });
+
+        vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
+        vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
+        vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
+
+        // TODO: angle strength, psi aixs slider, phi axis slider, jiggle slider, show active toggle
     }
 
-    // void idk()
-    // {
-    //     SpawnPolypeptide(transform);
-    // }
+
 
     public void SpawnPolypeptide(Transform spawnTransform)
     {
@@ -146,7 +166,6 @@ public class PolyPepManager : MonoBehaviour
         {
             int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
             //Debug.Log(spawnTransform.position);
-
             Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
             // offset to try to keep new pp in sensible position
             // working solution - no scale, centre of mass / springs ...
