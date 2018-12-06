@@ -53,6 +53,7 @@ public class PolyPepManager : MonoBehaviour
 
     void Awake()
     {
+        // TODO: replace these with just direct find and get component statements.
         GameObject temp = GameObject.Find("Slider_Phi");
         phiSliderUI = temp.GetComponent<Slider>();
 
@@ -88,6 +89,14 @@ public class PolyPepManager : MonoBehaviour
 
         temp = GameObject.Find("SideChainBuilder");
         sideChainBuilder = temp.GetComponent<SideChainBuilder>();
+
+        spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
+        SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
+        DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
+
+        dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
+        hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
+        vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
     }
 
     void Start()
@@ -134,24 +143,17 @@ public class PolyPepManager : MonoBehaviour
 
     private void SubscribeToUievents()
     {
-        // new peptide
-        spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
         spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
 
-        dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
         dampingToggle.onValueChanged.AddListener(delegate { UpdateDragFromUI(dampingToggle.isOn); });
 
-        SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
         SelectAllButton.onClick.AddListener(delegate { SelectAllFromUI(true); });
 
-        DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
         DeselectAllButton.onClick.AddListener(delegate { SelectAllFromUI(false); });
 
-        hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
         hBondToggle.onValueChanged.AddListener(delegate { UpdateHbondOnFromUI(hBondToggle.isOn); });
         hbondSliderUI.onValueChanged.AddListener(delegate { UpdateHbondStrengthFromUI(hbondSliderUI.value); });
 
-        vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
         vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
         vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
 
