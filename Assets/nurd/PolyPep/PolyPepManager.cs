@@ -33,7 +33,12 @@ public class PolyPepManager : MonoBehaviour
     public bool showDrivenBondsOn = true;
     public bool doCartoonBondRendering = true;
 
-    public float toonRenderScale = 0.002f;
+	public bool allResLabelsOn = false;
+	public bool showPeptidePlanes = false;
+
+	public int UISelectedAminoAcid { get; set; }
+
+	public float toonRenderScale = 0.002f;
 
     public Slider phiSliderUI;
     public Slider psiSliderUI;
@@ -51,20 +56,10 @@ public class PolyPepManager : MonoBehaviour
     public Button SelectAllButton;
     public Button DeselectAllButton;
 
-    void Awake()
-    {
-        // Sliders
-        phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
-        psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
-        vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
-        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
-        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
-        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
-        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
-        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
-        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
-        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
-        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
+	void Awake()
+	{
+			GameObject temp = GameObject.Find("Slider_Phi");
+			phiSliderUI = temp.GetComponent<Slider>();
 
         // UI Buttons
         spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
@@ -361,12 +356,115 @@ public class PolyPepManager : MonoBehaviour
         jiggleStrength = jiggleFromUI;
     }
 
-    public void ResetLevel()
-    {
-        Scene m_Scene = SceneManager.GetActiveScene();
-        Debug.Log("Loading... " + m_Scene.name);
-        SceneManager.LoadScene(m_Scene.name);
-    }
+	public void UpdateAllResidueLabelsOnFromUI(bool value)
+	{
+		allResLabelsOn = value;
+	}
+
+	public void UpdateShowPeptidePlanesOnFromUI(bool value)
+	{
+		 showPeptidePlanes= value;
+	}
+
+	public void UpdateTestToggleFromUI(bool value)
+	{
+		Debug.Log("Click from UI: " + value);
+
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			foreach (GameObject _residueGo in _ppb.chainArr)
+			{
+				if (_residueGo.GetComponent<Residue>().residueSelected == true)
+				{
+
+					if (value == true)
+						
+					{
+						_ppb.sideChainBuilder.DeleteSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid);
+						if (UISelectedAminoAcid > 0)
+						{
+							string selectedAminoAcid = "XXX";
+							switch (UISelectedAminoAcid)
+							{
+								case 0:
+									// not defined
+
+									break;
+
+								case 1:
+									// GLY
+									selectedAminoAcid = "GLY";
+									break;
+
+								case 2:
+									// ALA
+									selectedAminoAcid = "ALA";
+									break;
+
+								case 3:
+									// VAL
+									selectedAminoAcid = "VAL";
+									break;
+
+								case 4:
+									//
+									selectedAminoAcid = "LEU";
+									break;
+
+								case 5:
+									//
+									selectedAminoAcid = "ILE";
+									break;
+
+								case 6:
+									//
+									selectedAminoAcid = "MET";
+									break;
+
+								case 7:
+									//
+									selectedAminoAcid = "PHE";
+									break;
+
+							}
+							if (selectedAminoAcid == "XXX")
+							{
+
+							}
+							{ 
+								_ppb.sideChainBuilder.BuildSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid, selectedAminoAcid);
+							}
+								
+						}
+					}
+					else
+					{
+						
+					}
+
+				}
+			}
+			//push update of scale and colliders
+			_ppb.ScaleVDW(vdwScale);
+			_ppb.SetAllColliderIsTrigger(!collidersOn);
+		}
+
+	}
+
+	public void UpdateAminoAcidSelFromUI()
+	{
+
+		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
+
+
+	}
+
+	public void ResetLevel()
+	{
+		Scene m_Scene = SceneManager.GetActiveScene();
+		Debug.Log("Loading... " + m_Scene.name);
+		SceneManager.LoadScene(m_Scene.name);
+	}
 
     // Update is called once per frame
     void Update()
