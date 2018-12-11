@@ -128,6 +128,7 @@ namespace ControllerSelection
             }
         }
 
+        [Header("Teleporting")]
         private static Teleport _teleport;
         public static Teleport teleport
         {
@@ -161,7 +162,7 @@ namespace ControllerSelection
             // Handling UI 
             if (uiContainer == null)
             {
-                uiContainer = GameObject.Find("UI_container");
+                uiContainer = GameObject.Find("UiContainer");
             }
 
             if (UnityEngine.XR.XRDevice.model.Contains("Vive") && !DebugOculusAsVive)

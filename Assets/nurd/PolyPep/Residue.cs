@@ -20,8 +20,8 @@ public class Residue : MonoBehaviour
     public float phiCurrent;
     public float psiCurrent;
 
-    public GameObject ramaPlot;
-    public float ramaPlotScale = 0.0012f; //  set visually against UI
+    public Transform ramaPlot;
+    public float ramaPlotBaseScale = 0.0012f; //  set visually against UI
 
     public GameObject myPlotCube;
     private Vector3 myPlotCubeBaseScale = new Vector3(0.01f, 0.01f, 0.01f);
@@ -42,16 +42,15 @@ public class Residue : MonoBehaviour
 
     void Start()
     {
-        ramaPlot = GameObject.Find("RamaPlotOrigin");
+        ramaPlot = GameObject.Find("RamaPlotOrigin").transform;
 
-        myPlotCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        myPlotCube = GameObject.Instantiate(myPlotCube, ramaPlot);
         myPlotCube.name = "PlotCube";
         myPlotCube.GetComponent<Collider>().isTrigger = true;
-        myPlotCube.transform.parent = gameObject.transform;
+        myPlotCube.transform.parent = ramaPlot;
         myPlotCube.transform.localScale = myPlotCubeBaseScale;
-        myPlotCube.transform.rotation = ramaPlot.transform.rotation;
-        myPlotCube.transform.position = ramaPlot.transform.position;
-
+        myPlotCube.transform.rotation = ramaPlot.rotation;
+        myPlotCube.transform.position = ramaPlot.position;
     }
 
     void MeasurePhiPsi()
@@ -77,7 +76,7 @@ public class Residue : MonoBehaviour
         if (residueGrabbed)
         {
             _myPlotCubeRenderer.material.SetColor("_Color", Color.green);
-            //deltaPos += ramaPlot.transform.forward * -0.015f;
+            //deltaPos += ramaPlot.forward * -0.015f;
             targetDeltaScale = 1.6f;
         }
         else
@@ -85,7 +84,7 @@ public class Residue : MonoBehaviour
             if (residueHovered)
             {
                 _myPlotCubeRenderer.material.SetColor("_Color", Color.red);
-                //deltaPos += ramaPlot.transform.forward * -0.01f;
+                //deltaPos += ramaPlot.forward * -0.01f;
                 targetDeltaScale = 1.4f;
             }
             else
@@ -104,8 +103,9 @@ public class Residue : MonoBehaviour
         }
 
 
-        myPlotCube.transform.rotation = ramaPlot.transform.rotation;
-        myPlotCube.transform.position = ramaPlot.transform.position + (ramaPlot.transform.right * ramaPlotScale * phiCurrent) + (ramaPlot.transform.up * ramaPlotScale * psiCurrent) + deltaPos;
+        myPlotCube.transform.rotation = ramaPlot.rotation;
+        // TEST: 
+        myPlotCube.transform.position = ramaPlot.position + (ramaPlot.right * (ramaPlotBaseScale * GameObject.Find("UiContainer").transform.localScale.x) * phiCurrent) + (ramaPlot.up * ramaPlotBaseScale * psiCurrent) + deltaPos;
         deltaScale = Mathf.Lerp(deltaScale, targetDeltaScale, 0.2f);
         myPlotCube.transform.localScale = myPlotCubeBaseScale * deltaScale;
     }
