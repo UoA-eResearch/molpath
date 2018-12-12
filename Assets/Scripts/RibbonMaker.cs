@@ -59,6 +59,11 @@ public class RibbonMaker : MonoBehaviour
     {
     }
 
+	private static int SortByName(GameObject o1, GameObject o2)
+	{
+		return o1.name.CompareTo(o2.name);
+	}
+
     private void FixedUpdate()
     {
 		controlPoints.Clear();
@@ -75,7 +80,10 @@ public class RibbonMaker : MonoBehaviour
             controlPoints.Add(carbonyl.transform);
         }
 
-        interpolatedPositions = new Vector3[numberOfPoints * controlPoints.Count];
+        // TODO: Need to sort by name here for an array of the game objects rather. Not possible at the moment as theyre transforms.
+
+
+		interpolatedPositions = new Vector3[numberOfPoints * controlPoints.Count];
         tubeVertices = new TubeVertex[numberOfPoints * controlPoints.Count];
         DynamicSpline(controlPoints);
         CreateTubeVertices();
