@@ -157,13 +157,18 @@ namespace ControllerSelection
 
         public GameObject teleportAreaTarget;
 
-        void Awake()
+		private GameObject[] uis;
+
+		void Awake()
         {
             // Handling UI 
             if (uiContainer == null)
             {
                 uiContainer = GameObject.Find("UiContainer");
             }
+
+			// handling ui outside the ui container.
+			uis = GameObject.FindGameObjectsWithTag("UI");
 
             if (UnityEngine.XR.XRDevice.model.Contains("Vive") && !DebugOculusAsVive)
             {
@@ -197,7 +202,7 @@ namespace ControllerSelection
             SetUIToHandPosition();
 
             // currently all the canvases are set to oculus transforms/tracking space etc.
-            SetAllCanvasEventCameras(vivePlayerCamera);
+            ConfigureCanvasesForVive(vivePlayerCamera);
 
             // disable multiple audio listeners.
             vivePlayer.audioListener.GetComponent<AudioListener>().enabled = false;
@@ -217,7 +222,7 @@ namespace ControllerSelection
             // Camera stuff
             SetUIToWorldPosition();
             // accessing ovr camera rig left/right eye camera gets centre eye camera by default.
-            SetAllCanvasEventCameras(ovrPlayerCamera);
+            ConfigureCanvasesForVive(ovrPlayerCamera);
 
             ovrPlayerController.GetComponentInChildren<AudioListener>().enabled = false;
 
@@ -269,23 +274,33 @@ namespace ControllerSelection
 
         private void SetUIToHandPosition()
         {
-            if (vivePlayer.gameObject)
-            {
-                Player player = vivePlayer;
-                uiContainer.transform.parent = vivePlayer.hands[1].transform;
-                uiContainer.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
-                uiContainer.transform.localRotation = Quaternion.Euler(60, 0, 0);
-                uiContainer.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+			if (Player.instance)
+            {  
+                if (Player.instance.rightHand && uiContainer) {
+					uiContainer.transform.parent = Player.instance.rightHand.transform;
+					uiContainer.transform.localPosition = new Vector3(0, 0.1f, 0.2f);
+					uiContainer.transform.localRotation = Quaternion.Euler(60, 0, 0);
+					uiContainer.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+                }
             }
         }
 
-        private void SetAllCanvasEventCameras(Camera camera)
+        private void ConfigureCanvasesForVive(Camera camera)
         {
-            Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
-            foreach (var canvas in canvases)
+			foreach (var ui in uis)
             {
-                canvas.worldCamera = camera;
+                if (ui.GetComponent<Canvas>()) {
+					ui.GetComponent<Canvas>().worldCamera = camera;
+                }
+                // if (ui.GetComponent<ViveRaycaster>() == null){
+				// 	ui.AddComponent<ViveRaycaster>();
+				// }
             }
+			// Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
+            // foreach (var canvas in canvases)
+            // {
+            //     canvas.worldCamera = camera;
+            // }
         }
 
         private GameObject CycleMenu()

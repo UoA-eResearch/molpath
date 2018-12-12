@@ -71,6 +71,17 @@ public class PolyPepManager : MonoBehaviour
         hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
         vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
 
+        // sliders
+        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
+        // scaleSliderUI = GameObject.Find("Slider_ScalGetComponent<Slider>();
+        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
+        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
+        vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
+
+        phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
+        psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
+        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
+
         // Sidechain builder
         sideChainBuilder = GameObject.Find("SideChainBuilder").GetComponent<SideChainBuilder>();
     }

@@ -312,6 +312,56 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 087e03402a6149848b6b14b59ab8434d, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1001 &489629543
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 2.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.74
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0.17364816
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0.9848078
+      objectReference: {fileID: 0}
+    - target: {fileID: 4789973907727852, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_RootOrder
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1011201955110106, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_TagString
+      value: UI
+      objectReference: {fileID: 0}
+    - target: {fileID: 1592233316020628, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+      propertyPath: m_TagString
+      value: UI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 458533c9ac16a114cadd5b8bfff863ac, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1001 &768931967
 Prefab:
   m_ObjectHideFlags: 0
@@ -526,6 +576,48 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ff27eea5f584664ba1d7eba898956b4, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1480453944 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1011201955110106, guid: 458533c9ac16a114cadd5b8bfff863ac,
+    type: 2}
+  m_PrefabInternal: {fileID: 489629543}
+--- !u!114 &1480453952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1480453944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26dc7682c5a105f4aa0095887e442cb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!1 &1527791597 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1592233316020628, guid: 458533c9ac16a114cadd5b8bfff863ac,
+    type: 2}
+  m_PrefabInternal: {fileID: 489629543}
+--- !u!114 &1527791605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1527791597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26dc7682c5a105f4aa0095887e442cb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1001 &1528649025
 Prefab:
   m_ObjectHideFlags: 0
@@ -687,6 +779,14 @@ Prefab:
     - target: {fileID: 1318090332317276, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
       propertyPath: m_Name
       value: UiContainer
+      objectReference: {fileID: 0}
+    - target: {fileID: 1318090332317276, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 1396629048027554, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
+      propertyPath: m_TagString
+      value: UI
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83bd4576652cccb438b914aec9ee3c1f, type: 2}
