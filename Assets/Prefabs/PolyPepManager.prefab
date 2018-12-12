@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1493403051816312}
+  m_IsPrefabAsset: 1
+--- !u!1 &1493403051816312
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4530222074799944}
+  - component: {fileID: 114900062761777262}
+  m_Layer: 0
+  m_Name: PolyPepManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4530222074799944
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1493403051816312}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1, y: 1.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114900062761777262
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1493403051816312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afc5bd53fce43b64c9a46d644d2dc832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  polyPepBuilder_pf: {fileID: 1140521256564886, guid: 9c474393345b8134f866f1e3fa7e3db3,
+    type: 2}
+  allPolyPepBuilders: []
+  collidersOn: 0
+  vdwScale: 1
+  dragHigh: 0
+  jiggleStrength: 0
+  hbondsOn: 0
+  hbondStrength: 100
+  hbondScale: 500
+  sideChainBuilder: {fileID: 0}
+  phiTarget: 0
+  psiTarget: 0
+  phiPsiDrive: 100
+  showDrivenBondsOn: 0
+  doCartoonBondRendering: 1
+  toonRenderScale: 0.002
+  phiSliderUI: {fileID: 0}
+  psiSliderUI: {fileID: 0}
+  vdwSliderUI: {fileID: 0}
+  scaleSliderUI: {fileID: 0}
+  hbondSliderUI: {fileID: 0}
+  phiPsiDriveSliderUI: {fileID: 0}
+  spawnLengthSliderUI: {fileID: 0}
+  jiggleStrengthSliderUI: {fileID: 0}

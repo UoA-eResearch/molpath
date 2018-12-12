@@ -33,7 +33,12 @@ public class PolyPepManager : MonoBehaviour
     public bool showDrivenBondsOn = true;
     public bool doCartoonBondRendering = true;
 
-    public float toonRenderScale = 0.002f;
+	public bool allResLabelsOn = false;
+	public bool showPeptidePlanes = false;
+
+	public int UISelectedAminoAcid { get; set; }
+
+	public float toonRenderScale = 0.002f;
 
     public Slider phiSliderUI;
     public Slider psiSliderUI;
@@ -43,53 +48,50 @@ public class PolyPepManager : MonoBehaviour
     public Slider phiPsiDriveSliderUI;
     public Slider spawnLengthSliderUI;
     public Slider jiggleStrengthSliderUI;
+    public Button spawnButton;
+    public Toggle vdwToggle;
+    public Toggle hBondToggle;
+    public Toggle dampingToggle;
 
-    void Awake()
-    {
-        GameObject temp = GameObject.Find("Slider_Phi");
-        phiSliderUI = temp.GetComponent<Slider>();
+    public Button SelectAllButton;
+    public Button DeselectAllButton;
 
-        temp = GameObject.Find("Slider_Psi");
-        psiSliderUI = temp.GetComponent<Slider>();
+	void Awake()
+	{
+			GameObject temp = GameObject.Find("Slider_Phi");
+			phiSliderUI = temp.GetComponent<Slider>();
 
-        temp = GameObject.Find("Slider_Vdw");
-        vdwSliderUI = temp.GetComponent<Slider>();
+        // UI Buttons
+        spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
+        SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
+        DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
 
-        temp = GameObject.Find("Slider_HbondStrength");
-        hbondSliderUI = temp.GetComponent<Slider>();
+        // UI Toggles
+        dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
+        hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
+        vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
 
-        temp = GameObject.Find("Slider_PhiPsiDrive");
-        phiPsiDriveSliderUI = temp.GetComponent<Slider>();
+        // sliders
+        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
+        // scaleSliderUI = GameObject.Find("Slider_ScalGetComponent<Slider>();
+        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
+        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
+        vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
 
-        temp = GameObject.Find("Slider_SpawnLength");
-        spawnLengthSliderUI = temp.GetComponent<Slider>();
+        phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
+        psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
+        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
 
-        temp = GameObject.Find("Slider_JiggleStrength");
-        jiggleStrengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_HbondStrength");
-        hbondSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_PhiPsiDrive");
-        phiPsiDriveSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_SpawnLength");
-        spawnLengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("Slider_JiggleStrength");
-        jiggleStrengthSliderUI = temp.GetComponent<Slider>();
-
-        temp = GameObject.Find("SideChainBuilder");
-        sideChainBuilder = temp.GetComponent<SideChainBuilder>();
-
+        // Sidechain builder
+        sideChainBuilder = GameObject.Find("SideChainBuilder").GetComponent<SideChainBuilder>();
     }
 
     void Start()
     {
-
         {
             //UI
             // initialise phi psi slider values (hacky?)
+            SubscribeToUievents();
 
             phiSliderUI.GetComponent<Slider>().value = 0;
             psiSliderUI.GetComponent<Slider>().value = 0;
@@ -122,8 +124,35 @@ public class PolyPepManager : MonoBehaviour
 
         // dev: test always spawn pp on startup
         SpawnPolypeptide(transform);
-
     }
+
+    private void SubscribeToUievents()
+    {
+        spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
+
+        dampingToggle.onValueChanged.AddListener(delegate { UpdateDragFromUI(dampingToggle.isOn); });
+
+        SelectAllButton.onClick.AddListener(delegate { SelectAllFromUI(true); });
+
+        DeselectAllButton.onClick.AddListener(delegate { SelectAllFromUI(false); });
+
+        hBondToggle.onValueChanged.AddListener(delegate { UpdateHbondOnFromUI(hBondToggle.isOn); });
+        hbondSliderUI.onValueChanged.AddListener(delegate { UpdateHbondStrengthFromUI(hbondSliderUI.value); });
+
+        vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
+        vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
+
+        jiggleStrengthSliderUI.onValueChanged.AddListener(delegate { UpdateJiggleFromUI(jiggleStrengthSliderUI.value); });
+
+        phiSliderUI.onValueChanged.AddListener(delegate { UpdatePhiFromUI(phiSliderUI.value); });
+
+        psiSliderUI.onValueChanged.AddListener(delegate { UpdatePsiFromUI(psiSliderUI.value); });
+
+        phiPsiDriveSliderUI.onValueChanged.AddListener(delegate { UpdatePhiPsiDriveFromUI(phiPsiDriveSliderUI.value); });
+    }
+
+
+
 
     public void SpawnPolypeptide(Transform spawnTransform)
     {
@@ -131,7 +160,6 @@ public class PolyPepManager : MonoBehaviour
         {
             int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
             //Debug.Log(spawnTransform.position);
-
             Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
             // offset to try to keep new pp in sensible position
             // working solution - no scale, centre of mass / springs ...
@@ -339,12 +367,115 @@ public class PolyPepManager : MonoBehaviour
         jiggleStrength = jiggleFromUI;
     }
 
-    public void ResetLevel()
-    {
-        Scene m_Scene = SceneManager.GetActiveScene();
-        Debug.Log("Loading... " + m_Scene.name);
-        SceneManager.LoadScene(m_Scene.name);
-    }
+	public void UpdateAllResidueLabelsOnFromUI(bool value)
+	{
+		allResLabelsOn = value;
+	}
+
+	public void UpdateShowPeptidePlanesOnFromUI(bool value)
+	{
+		 showPeptidePlanes= value;
+	}
+
+	public void UpdateTestToggleFromUI(bool value)
+	{
+		Debug.Log("Click from UI: " + value);
+
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			foreach (GameObject _residueGo in _ppb.chainArr)
+			{
+				if (_residueGo.GetComponent<Residue>().residueSelected == true)
+				{
+
+					if (value == true)
+						
+					{
+						_ppb.sideChainBuilder.DeleteSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid);
+						if (UISelectedAminoAcid > 0)
+						{
+							string selectedAminoAcid = "XXX";
+							switch (UISelectedAminoAcid)
+							{
+								case 0:
+									// not defined
+
+									break;
+
+								case 1:
+									// GLY
+									selectedAminoAcid = "GLY";
+									break;
+
+								case 2:
+									// ALA
+									selectedAminoAcid = "ALA";
+									break;
+
+								case 3:
+									// VAL
+									selectedAminoAcid = "VAL";
+									break;
+
+								case 4:
+									//
+									selectedAminoAcid = "LEU";
+									break;
+
+								case 5:
+									//
+									selectedAminoAcid = "ILE";
+									break;
+
+								case 6:
+									//
+									selectedAminoAcid = "MET";
+									break;
+
+								case 7:
+									//
+									selectedAminoAcid = "PHE";
+									break;
+
+							}
+							if (selectedAminoAcid == "XXX")
+							{
+
+							}
+							{ 
+								_ppb.sideChainBuilder.BuildSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid, selectedAminoAcid);
+							}
+								
+						}
+					}
+					else
+					{
+						
+					}
+
+				}
+			}
+			//push update of scale and colliders
+			_ppb.ScaleVDW(vdwScale);
+			_ppb.SetAllColliderIsTrigger(!collidersOn);
+		}
+
+	}
+
+	public void UpdateAminoAcidSelFromUI()
+	{
+
+		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
+
+
+	}
+
+	public void ResetLevel()
+	{
+		Scene m_Scene = SceneManager.GetActiveScene();
+		Debug.Log("Loading... " + m_Scene.name);
+		SceneManager.LoadScene(m_Scene.name);
+	}
 
     // Update is called once per frame
     void Update()
