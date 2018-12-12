@@ -36,6 +36,8 @@ namespace Valve.VR.InteractionSystem
 
         public float arcDistance = 10.0f;
 
+		public GameObject UIElement;
+
         [Header("Effects")]
         public Transform onActivateObjectTransform;
         public Transform onDeactivateObjectTransform;
@@ -167,6 +169,7 @@ namespace Valve.VR.InteractionSystem
         //-------------------------------------------------
         void Start()
         {
+			UIElement = GameObject.Find("UI");
             teleportMarkers = GameObject.FindObjectsOfType<TeleportMarkerBase>();
 
             HidePointer();
@@ -448,7 +451,8 @@ namespace Valve.VR.InteractionSystem
                 if (hitSomething)
                 {
                     pointerEnd = hitInfo.point;
-                }
+					gameObject.GetComponent<Teleport>().enabled = false;
+				}
                 else
                 {
                     pointerEnd = teleportArc.GetArcPositionAtTime(teleportArc.arcDuration);
@@ -482,7 +486,9 @@ namespace Valve.VR.InteractionSystem
 
             pointerLineRenderer.SetPosition(0, pointerStart);
             pointerLineRenderer.SetPosition(1, pointerEnd);
-        }
+
+			gameObject.GetComponent<Teleport>().enabled = true;
+		}
 
 
         //-------------------------------------------------
