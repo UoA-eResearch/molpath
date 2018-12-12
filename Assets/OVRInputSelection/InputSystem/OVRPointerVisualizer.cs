@@ -101,23 +101,6 @@ namespace ControllerSelection
                 }
             }
             //Vive: Add condition to track VivePlayer hand as well.
-<<<<<<< HEAD
-            if (hand != null)
-            {
-                if (hand.activeInHierarchy)
-                {
-                    if (linePointer != null)
-                    {
-                        linePointer.enabled = true;
-                    }
-                    if (gazePointer != null)
-                    {
-                        gazePointer.gameObject.SetActive(false);
-                    }
-                }
-            }
-=======
->>>>>>> ddoak-sidechain-tracked
             else
             {
                 if (linePointer != null)
