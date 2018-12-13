@@ -58,9 +58,6 @@ public class PolyPepManager : MonoBehaviour
 
 	void Awake()
 	{
-			GameObject temp = GameObject.Find("Slider_Phi");
-			phiSliderUI = temp.GetComponent<Slider>();
-
         // UI Buttons
         spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
         SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
@@ -87,43 +84,20 @@ public class PolyPepManager : MonoBehaviour
     }
 
     void Start()
-    {
-        {
-            //UI
-            // initialise phi psi slider values (hacky?)
-            SubscribeToUievents();
+	{
+		//UI
+		// initialise phi psi slider values (hacky?)
+		SubscribeToUievents();
 
-            phiSliderUI.GetComponent<Slider>().value = 0;
-            psiSliderUI.GetComponent<Slider>().value = 0;
-            vdwSliderUI.GetComponent<Slider>().value = 10;
-            hbondSliderUI.GetComponent<Slider>().value = 50;
-            phiPsiDriveSliderUI.GetComponent<Slider>().value = 50;
-            spawnLengthSliderUI.GetComponent<Slider>().value = 10; //10
-            jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
+		phiSliderUI.GetComponent<Slider>().value = 0;
+		psiSliderUI.GetComponent<Slider>().value = 0;
+		vdwSliderUI.GetComponent<Slider>().value = 10;
+		hbondSliderUI.GetComponent<Slider>().value = 50;
+		phiPsiDriveSliderUI.GetComponent<Slider>().value = 50;
+		spawnLengthSliderUI.GetComponent<Slider>().value = 10; //10
+		jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
 
-            //temp = GameObject.Find("Slider_ResStart");
-
-            //resStartSliderUI = temp.GetComponent<Slider>();
-            //resStartSliderUI.maxValue = numResidues;
-            //resStartSliderUI.value = 1;
-
-            //temp = GameObject.Find("Slider_ResEnd");
-
-            //Assert.IsNotNull(temp);
-
-            //resEndSliderUI = temp.GetComponent<Slider>();
-            //resEndSliderUI.maxValue = numResidues;
-            //resEndSliderUI.value = 3; // numResidues; // initial value (+1)
-
-            //temp = GameObject.Find("Slider_Scale");
-
-            //scaleSliderUI = temp.GetComponent<Slider>();
-            //scaleSliderUI.value = 10;
-
-        }
-
-        // dev: test always spawn pp on startup
-        SpawnPolypeptide(transform);
+		SpawnPolypeptide(transform);
     }
 
     private void SubscribeToUievents()
@@ -377,9 +351,9 @@ public class PolyPepManager : MonoBehaviour
 		 showPeptidePlanes= value;
 	}
 
-	public void UpdateTestToggleFromUI(bool value)
+	public void MutateSelectedResiduesFromUI()
 	{
-		Debug.Log("Click from UI: " + value);
+		Debug.Log("Mutate: " + UISelectedAminoAcid);
 
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
@@ -387,70 +361,134 @@ public class PolyPepManager : MonoBehaviour
 			{
 				if (_residueGo.GetComponent<Residue>().residueSelected == true)
 				{
-
-					if (value == true)
-						
+					string selectedAminoAcidStr = "-";
+					switch (UISelectedAminoAcid)
 					{
-						_ppb.sideChainBuilder.DeleteSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid);
-						if (UISelectedAminoAcid > 0)
-						{
-							string selectedAminoAcid = "XXX";
-							switch (UISelectedAminoAcid)
-							{
-								case 0:
-									// not defined
+						// TODO use enumeration
+						case 0:
+							// not defined
+							selectedAminoAcidStr = "XXX"; 
+							break;
+									
+						case 1:
+							// GLY
+							selectedAminoAcidStr = "XXX"; //  "GLY";
+							break;
 
-									break;
+						case 2:
+							// ALA
+							selectedAminoAcidStr = "ALA";
+							break;
 
-								case 1:
-									// GLY
-									selectedAminoAcid = "GLY";
-									break;
+						case 3:
+							// VAL
+							selectedAminoAcidStr = "VAL";
+							break;
 
-								case 2:
-									// ALA
-									selectedAminoAcid = "ALA";
-									break;
+						case 4:
+							//
+							selectedAminoAcidStr = "LEU";
+							break;
 
-								case 3:
-									// VAL
-									selectedAminoAcid = "VAL";
-									break;
+						case 5:
+							//
+							selectedAminoAcidStr = "ILE";
+							break;
 
-								case 4:
-									//
-									selectedAminoAcid = "LEU";
-									break;
+						case 6:
+							//
+							selectedAminoAcidStr = "MET";
+							break;
 
-								case 5:
-									//
-									selectedAminoAcid = "ILE";
-									break;
+						case 7:
+							//
+							selectedAminoAcidStr = "PHE";
+							break;
 
-								case 6:
-									//
-									selectedAminoAcid = "MET";
-									break;
+						case 8:
+							//
+							selectedAminoAcidStr = "XXX"; // "TRP";
+							break;
 
-								case 7:
-									//
-									selectedAminoAcid = "PHE";
-									break;
+						case 9:
+							//
+							selectedAminoAcidStr = "XXX"; // "PRO";
+							break;
 
-							}
-							if (selectedAminoAcid == "XXX")
-							{
+						case 10:
+							// GLY
+							selectedAminoAcidStr = "SER";
+							break;
 
-							}
-							{ 
-								_ppb.sideChainBuilder.BuildSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid, selectedAminoAcid);
-							}
-								
-						}
+						case 11:
+							// ALA
+							selectedAminoAcidStr = "THR";
+							break;
+
+						case 12:
+							// VAL
+							selectedAminoAcidStr = "CYS";
+							break;
+
+						case 13:
+							//
+							selectedAminoAcidStr = "TYR";
+							break;
+
+						case 14:
+							//
+							selectedAminoAcidStr = "ASN";
+							break;
+
+						case 15:
+							//
+							selectedAminoAcidStr = "GLN";
+							break;
+
+						case 16:
+							//
+							selectedAminoAcidStr = "ASP";
+							break;
+
+						case 17:
+							//
+							selectedAminoAcidStr = "GLU";
+							break;
+
+						case 18:
+							//
+							selectedAminoAcidStr = "LYS";
+							break;
+
+						case 19:
+							//
+							selectedAminoAcidStr = "ARG";
+							break;
+
+						case 20:
+							//
+							selectedAminoAcidStr = "XXX"; // "HIS";
+							break;
+
+						default:
+							break;
+
+					}
+
+					if (_residueGo.GetComponent<Residue>().type != selectedAminoAcidStr)
+					{
+						// selected residue type is different => replace sidechain
+						Debug.Log ("Click from UI: " + UISelectedAminoAcid + " " + selectedAminoAcidStr);
+						_ppb.sideChainBuilder.BuildSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid, selectedAminoAcidStr);
 					}
 					else
 					{
-						
+						//don't replace sidechain as the type is unchanged
+					}
+
+					if (selectedAminoAcidStr == "-")
+					{
+						// shouldn't happen!
 					}
 
 				}
@@ -464,10 +502,12 @@ public class PolyPepManager : MonoBehaviour
 
 	public void UpdateAminoAcidSelFromUI()
 	{
-
 		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
+	}
 
-
+	public void UpdateTestToggleFromUI(bool value)
+	{
+		Debug.Log("Click from UI: " + value);
 	}
 
 	public void ResetLevel()
