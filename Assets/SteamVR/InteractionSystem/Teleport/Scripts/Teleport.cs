@@ -13,6 +13,7 @@ namespace Valve.VR.InteractionSystem
     //-------------------------------------------------------------------------
     public class Teleport : MonoBehaviour
     {
+
         public LayerMask traceLayerMask;
         public LayerMask floorFixupTraceLayerMask;
         public float floorFixupMaximumTraceDistance = 1.0f;
