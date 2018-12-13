@@ -9,6 +9,7 @@ public class RibbonMaker : MonoBehaviour
 {
     //Use the transforms of GameObjects in 3d space as your points or define array with desired points
     public List<Transform> controlPoints = new List<Transform>();
+    public List<GameObject> controlPointGos = new List<GameObject>();
 
     //Store points on the Catmull curve so we can visualize them
     List<Vector3> newPoints = new List<Vector3>();
@@ -67,29 +68,42 @@ public class RibbonMaker : MonoBehaviour
     private void FixedUpdate()
     {
 		controlPoints.Clear();
+		controlPointGos.Clear();
 		foreach (var amide in GameObject.FindGameObjectsWithTag("amide"))
         {
-            controlPoints.Add(amide.transform);
+            controlPointGos.Add(amide);
         }
-        foreach (var calpha in GameObject.FindGameObjectsWithTag("calpha"))
+        // TODO: interpolates better using just singular point per residue.
+        // TODO: Alternatively, average the residue vertices and use that as the control point.
+
+        // foreach (var calpha in GameObject.FindGameObjectsWithTag("calpha"))
+        // {
+        //     controlPointGos.Add(calpha);
+        // }
+        // foreach (var carbonyl in GameObject.FindGameObjectsWithTag("carbonyl"))
+        // {
+        //     controlPointGos.Add(carbonyl);
+        // }
+		// sort control points by otherwise it grabs them out of order
+
+
+		controlPointGos.Sort(SortByName);
+		// add sorted transforms 
+        foreach (var controlPointGo in controlPointGos)
         {
-            controlPoints.Add(calpha.transform);
-        }
-        foreach (var carbonyl in GameObject.FindGameObjectsWithTag("carbonyl"))
-        {
-            controlPoints.Add(carbonyl.transform);
-        }
+			controlPoints.Add(controlPointGo.transform);
+		}
 
-        // TODO: Need to sort by name here for an array of the game objects rather. Not possible at the moment as theyre transforms.
-
-
+        // C - C - C- C 
 		interpolatedPositions = new Vector3[numberOfPoints * controlPoints.Count];
+
         tubeVertices = new TubeVertex[numberOfPoints * controlPoints.Count];
-        DynamicSpline(controlPoints);
+        InterpolateControlPoints(controlPoints);
         CreateTubeVertices();
         Show();
     }
-    void DynamicSpline(List<Transform> controlPoints)
+
+    void InterpolateControlPoints(List<Transform> controlPoints)
     {
         Vector3 p0, p1, m0, m1;
 
