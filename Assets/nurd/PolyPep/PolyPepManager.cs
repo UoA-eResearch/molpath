@@ -9,29 +9,29 @@ using Valve.VR.InteractionSystem;
 /// </Summary>
 public class PolyPepManager : MonoBehaviour
 {
-    public GameObject polyPepBuilder_pf;
-    public List<PolyPepBuilder> allPolyPepBuilders = new List<PolyPepBuilder>();
+	public GameObject polyPepBuilder_pf;
+	public List<PolyPepBuilder> allPolyPepBuilders = new List<PolyPepBuilder>();
 
-    public bool collidersOn = false;
-    public float vdwScale = 1.0f;
+	public bool collidersOn = false;
+	public float vdwScale = 1.0f;
 
-    public bool dragHigh = false;
-    public float jiggleStrength = 0.0f;
+	public bool dragHigh = false;
+	public float jiggleStrength = 0.0f;
 
-    public bool hbondsOn = false;
-    public float hbondStrength = 100.0f;
-    public float hbondScale = 500.0f; // multiplier between UI slider strength and value used in config joint
+	public bool hbondsOn = false;
+	public float hbondStrength = 100.0f;
+	public float hbondScale = 500.0f; // multiplier between UI slider strength and value used in config joint
 
-    public SideChainBuilder sideChainBuilder;
+	public SideChainBuilder sideChainBuilder;
 
-    public int UIDefinedSecondaryStructure { get; set; }
+	public int UIDefinedSecondaryStructure { get; set; }
 
-    public float phiTarget = 0f;
-    public float psiTarget = 0f;
-    public float phiPsiDrive = 100.0f;
+	public float phiTarget = 0f;
+	public float psiTarget = 0f;
+	public float phiPsiDrive = 100.0f;
 
-    public bool showDrivenBondsOn = true;
-    public bool doCartoonBondRendering = true;
+	public bool showDrivenBondsOn = true;
+	public bool doCartoonBondRendering = true;
 
 	public bool allResLabelsOn = false;
 	public bool showPeptidePlanes = false;
@@ -40,50 +40,50 @@ public class PolyPepManager : MonoBehaviour
 
 	public float toonRenderScale = 0.002f;
 
-    public Slider phiSliderUI;
-    public Slider psiSliderUI;
-    public Slider vdwSliderUI;
-    public Slider scaleSliderUI;
-    public Slider hbondSliderUI;
-    public Slider phiPsiDriveSliderUI;
-    public Slider spawnLengthSliderUI;
-    public Slider jiggleStrengthSliderUI;
-    public Button spawnButton;
-    public Toggle vdwToggle;
-    public Toggle hBondToggle;
-    public Toggle dampingToggle;
+	public Slider phiSliderUI;
+	public Slider psiSliderUI;
+	public Slider vdwSliderUI;
+	public Slider scaleSliderUI;
+	public Slider hbondSliderUI;
+	public Slider phiPsiDriveSliderUI;
+	public Slider spawnLengthSliderUI;
+	public Slider jiggleStrengthSliderUI;
+	public Button spawnButton;
+	public Toggle vdwToggle;
+	public Toggle hBondToggle;
+	public Toggle dampingToggle;
 
-    public Button SelectAllButton;
-    public Button DeselectAllButton;
+	public Button SelectAllButton;
+	public Button DeselectAllButton;
 
 	void Awake()
 	{
-        // UI Buttons
-        spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
-        SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
-        DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
+		// UI Buttons
+		spawnButton = GameObject.Find("Spawn_Button").GetComponent<Button>();
+		SelectAllButton = GameObject.Find("Button_SelectAll").GetComponent<Button>();
+		DeselectAllButton = GameObject.Find("Button_SelectClear").GetComponent<Button>();
 
-        // UI Toggles
-        dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
-        hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
-        vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
+		// UI Toggles
+		dampingToggle = GameObject.Find("Toggle_SteadyDrag").GetComponent<Toggle>();
+		hBondToggle = GameObject.Find("Toggle_Hbonds").GetComponent<Toggle>();
+		vdwToggle = GameObject.Find("Toggle_Collisions").GetComponent<Toggle>();
 
-        // sliders
-        spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
-        // scaleSliderUI = GameObject.Find("Slider_ScalGetComponent<Slider>();
-        jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
-        hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
-        vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
+		// sliders
+		spawnLengthSliderUI = GameObject.Find("Slider_SpawnLength").GetComponent<Slider>();
+		// scaleSliderUI = GameObject.Find("Slider_ScalGetComponent<Slider>();
+		jiggleStrengthSliderUI = GameObject.Find("Slider_JiggleStrength").GetComponent<Slider>();
+		hbondSliderUI = GameObject.Find("Slider_HbondStrength").GetComponent<Slider>();
+		vdwSliderUI = GameObject.Find("Slider_Vdw").GetComponent<Slider>();
 
-        phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
-        psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
-        phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
+		phiSliderUI = GameObject.Find("Slider_Phi").GetComponent<Slider>();
+		psiSliderUI = GameObject.Find("Slider_Psi").GetComponent<Slider>();
+		phiPsiDriveSliderUI = GameObject.Find("Slider_PhiPsiDrive").GetComponent<Slider>();
 
-        // Sidechain builder
-        sideChainBuilder = GameObject.Find("SideChainBuilder").GetComponent<SideChainBuilder>();
-    }
+		// Sidechain builder
+		sideChainBuilder = GameObject.Find("SideChainBuilder").GetComponent<SideChainBuilder>();
+	}
 
-    void Start()
+	void Start()
 	{
 		//UI
 		// initialise phi psi slider values (hacky?)
@@ -98,248 +98,257 @@ public class PolyPepManager : MonoBehaviour
 		jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
 
 		SpawnPolypeptide(transform);
-    }
+		// dev: test always spawn pp on startup
+		// SpawnPolypeptide(transform);
+	}
 
-    private void SubscribeToUievents()
-    {
-        spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
+	private void SubscribeToUievents()
+	{
+		spawnButton.onClick.AddListener(delegate { SpawnPolypeptide(transform); });
 
-        dampingToggle.onValueChanged.AddListener(delegate { UpdateDragFromUI(dampingToggle.isOn); });
+		dampingToggle.onValueChanged.AddListener(delegate { UpdateDragFromUI(dampingToggle.isOn); });
 
-        SelectAllButton.onClick.AddListener(delegate { SelectAllFromUI(true); });
+		SelectAllButton.onClick.AddListener(delegate { SelectAllFromUI(true); });
 
-        DeselectAllButton.onClick.AddListener(delegate { SelectAllFromUI(false); });
+		DeselectAllButton.onClick.AddListener(delegate { SelectAllFromUI(false); });
 
-        hBondToggle.onValueChanged.AddListener(delegate { UpdateHbondOnFromUI(hBondToggle.isOn); });
-        hbondSliderUI.onValueChanged.AddListener(delegate { UpdateHbondStrengthFromUI(hbondSliderUI.value); });
+		hBondToggle.onValueChanged.AddListener(delegate { UpdateHbondOnFromUI(hBondToggle.isOn); });
+		hbondSliderUI.onValueChanged.AddListener(delegate { UpdateHbondStrengthFromUI(hbondSliderUI.value); });
 
-        vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
-        vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
+		vdwToggle.onValueChanged.AddListener(delegate { UpdateCollidersFromUI(vdwToggle.isOn); });
+		vdwSliderUI.onValueChanged.AddListener(delegate { UpdateVDWScalesFromUI(vdwSliderUI.value); });
 
-        jiggleStrengthSliderUI.onValueChanged.AddListener(delegate { UpdateJiggleFromUI(jiggleStrengthSliderUI.value); });
+		jiggleStrengthSliderUI.onValueChanged.AddListener(delegate { UpdateJiggleFromUI(jiggleStrengthSliderUI.value); });
 
-        phiSliderUI.onValueChanged.AddListener(delegate { UpdatePhiFromUI(phiSliderUI.value); });
+		phiSliderUI.onValueChanged.AddListener(delegate { UpdatePhiFromUI(phiSliderUI.value); });
 
-        psiSliderUI.onValueChanged.AddListener(delegate { UpdatePsiFromUI(psiSliderUI.value); });
+		psiSliderUI.onValueChanged.AddListener(delegate { UpdatePsiFromUI(psiSliderUI.value); });
 
-        phiPsiDriveSliderUI.onValueChanged.AddListener(delegate { UpdatePhiPsiDriveFromUI(phiPsiDriveSliderUI.value); });
-    }
-
-
-
-
-    public void SpawnPolypeptide(Transform spawnTransform)
-    {
-        //if (!collidersOn)
-        {
-            int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
-            //Debug.Log(spawnTransform.position);
-            Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
-            // offset to try to keep new pp in sensible position
-            // working solution - no scale, centre of mass / springs ...
-            //spawnTransform.transform.position += offset; // NO! this is a reference not a copy!
-            GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position + offset, Quaternion.identity);
-            PolyPepBuilder ppb_cs = ppb.GetComponent<PolyPepBuilder>();
-            ppb_cs.numResidues = numResidues;
-            ppb_cs.myPolyPepManager = GetComponent<PolyPepManager>();
-            ppb.name = "polyPep_" + allPolyPepBuilders.Count;
-            allPolyPepBuilders.Add(ppb_cs);
-
-            ppb_cs.sideChainBuilder = sideChainBuilder;
-        }
-
-    }
-
-    void OnDrawGizmos()
-    {
-        //if (spawnTransform)
-        //{
-        //	Gizmos.color = Color.cyan;
-        //	Gizmos.DrawWireSphere(spawnTransform.transform.position, 0.04f);
-        //}
-        Gizmos.color = Color.black;
-        Gizmos.DrawWireSphere(gameObject.transform.position, 0.04f);
-    }
+		phiPsiDriveSliderUI.onValueChanged.AddListener(delegate { UpdatePhiPsiDriveFromUI(phiPsiDriveSliderUI.value); });
+	}
 
 
-    public void UpdateVDWScalesFromUI(float scaleVDWx10)
-    {
-
-        //Debug.Log("hello from the manager! ---> " + scaleVDWx10);
-        vdwScale = scaleVDWx10 / 10.0f;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.ScaleVDW(vdwScale);
-        }
-    }
-
-    public void UpdateCollidersFromUI(bool value)
-    {
-        //Debug.Log("hello from the manager! ---> " + scaleVDWx10);
-        collidersOn = value;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.SetAllColliderIsTrigger(!collidersOn);
-        }
-    }
-
-    public void UpdateDragFromUI(bool value)
-    {
-        //Debug.Log("hello from the manager! ---> " + scaleVDWx10);
-        dragHigh = value;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            //_ppb.ActiveHbondSpringConstraints = hbondsOn;
-            _ppb.UpdateAllDrag();
-        }
-    }
+		
 
 
-    public void UpdateHbondOnFromUI(bool value)
-    {
-        //Debug.Log("hello from the manager! ---> " + scaleVDWx10);
-        hbondsOn = value;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            //_ppb.ActiveHbondSpringConstraints = hbondsOn;
-            _ppb.UpdateHBondSprings();
-        }
-    }
+	public void SpawnPolypeptide(Transform spawnTransform)
+	{
+		//if (!collidersOn)
+		{
+			int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
+			//Debug.Log(spawnTransform.position);
+			Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
+			// offset to try to keep new pp in sensible position
+			// working solution - no scale, centre of mass / springs ...
+			//spawnTransform.transform.position += offset; // NO! this is a reference not a copy!
+			GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position + offset, Quaternion.identity);
+			PolyPepBuilder ppb_cs = ppb.GetComponent<PolyPepBuilder>();
+			ppb_cs.numResidues = numResidues;
+			ppb_cs.myPolyPepManager = GetComponent<PolyPepManager>();
+			ppb.name = "polyPep_" + allPolyPepBuilders.Count;
+			allPolyPepBuilders.Add(ppb_cs);
 
-    public void UpdateShowDrivenBondsOnFromUI(bool value)
-    {
-        //Debug.Log("hello from the manager! ---> " + scaleVDWx10);
-        showDrivenBondsOn = value;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.UpdateRenderModeAllBbu();
-        }
-    }
+			ppb_cs.sideChainBuilder = sideChainBuilder;
+		}
 
-    public void UpdateHbondStrengthFromUI(float hbondStrengthFromUI)
-    {
+	}
 
-        //Debug.Log("hello Hbond Strength from the manager! ---> " + hbondStrength);
-        hbondStrength = hbondStrengthFromUI * hbondScale;
-    }
+	void OnDrawGizmos()
+	{
+		//if (spawnTransform)
+		//{
+		//	Gizmos.color = Color.cyan;
+		//	Gizmos.DrawWireSphere(spawnTransform.transform.position, 0.04f);
+		//}
+		Gizmos.color = Color.black;
+		Gizmos.DrawWireSphere(gameObject.transform.position, 0.04f);
+	}
 
-    public void UpdatePhiPsiDriveFromUI(float phiPsiDriveFromUI)
-    {
 
-        //Debug.Log("hello PhiPsi Drive from the manager! ---> " + phiPsiDrive);
-        phiPsiDrive = phiPsiDriveFromUI;
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.drivePhiPsiMaxForce = phiPsiDrive;
-            _ppb.drivePhiPsiPosSpring = phiPsiDrive;
-            _ppb.UpdatePhiPsiDrives();
-            _ppb.UpdateRenderModeAllBbu();
-        }
-    }
+	public void UpdateVDWScalesFromUI(float scaleVDWx10)
+	{
 
-    public void SelectAllFromUI(bool value)
-    {
-        //Debug.Log("Select All from the manager! ---> " +  value);
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.SetGlobalSelect(value);
-        }
-    }
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		vdwScale = scaleVDWx10 / 10.0f;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.ScaleVDW(vdwScale);
+		}
+	}
 
-    public void SetSelectionDriveFromUI(bool value)
-    {
-        //Debug.Log("hello from the manager! ---> SetSelectionDriveOffFromUI");
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.SetPhiPsiDriveForSelection(value);
-            _ppb.UpdateRenderModeAllBbu();
-        }
-    }
+	public void UpdateCollidersFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		collidersOn = value;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.SetAllColliderIsTrigger(!collidersOn);
+		}
+	}
 
-    public void UpdateDefinedSecondaryStructureFromUI()
-    {
-        float phi = phiTarget;
-        float psi = psiTarget;
-        switch (UIDefinedSecondaryStructure)
-        {
-            case 0:
-                // not defined
-                phi = phiTarget;
-                psi = psiTarget;
-                break;
+	public void UpdateDragFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		dragHigh = value;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			//_ppb.ActiveHbondSpringConstraints = hbondsOn;
+			_ppb.UpdateAllDrag();
+		}
+	}
 
-            case 1:
-                //alpha helix (right handed) (phi + ps ~ -105)
-                phi = -57.0f;
-                psi = -47.0f;
-                break;
 
-            case 2:
-                //310 helix (phi + psi ~ -75)
-                phi = -49.0f;// -74.0f;
-                psi = -26.0f;// -4.0f;
-                break;
+	public void UpdateHbondOnFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		hbondsOn = value;
+		PushHbondStrengthUpdate();
+	}
 
-            case 3:
-                //anti beta sheet
-                phi = -139.0f;
-                psi = 135.0f;
-                break;
+	private void PushHbondStrengthUpdate()
+	{
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			//_ppb.ActiveHbondSpringConstraints = hbondsOn;
+			_ppb.UpdateHBondSprings();
+		}
+	}
+	public void UpdateShowDrivenBondsOnFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
+		showDrivenBondsOn = value;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.UpdateRenderModeAllBbu();
+		}
+	}
 
-            case 4:
-                //parallel beta sheet
-                phi = -119.0f;
-                psi = 113.0f;
-                break;
+	public void UpdateHbondStrengthFromUI(float hbondStrengthFromUI)
+	{
 
-            case 5:
-                //pi helix (phi + ps ~ -125)
-                phi = -55.0f;
-                psi = -70.0f;
-                break;
+		//Debug.Log("hello Hbond Strength from the manager! ---> " + hbondStrength);
+		hbondStrength = hbondStrengthFromUI * hbondScale;
+		//
+		PushHbondStrengthUpdate();
+	}
 
-            case 6:
-                //alpha helix (left handed)
-                phi = 47.0f;
-                psi = 57.0f;
-                break;
-        }
+	public void UpdatePhiPsiDriveFromUI(float phiPsiDriveFromUI)
+	{
 
-        phiTarget = phi;
-        psiTarget = psi;
+		//Debug.Log("hello PhiPsi Drive from the manager! ---> " + phiPsiDrive);
+		phiPsiDrive = phiPsiDriveFromUI;
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.drivePhiPsiMaxForce = phiPsiDrive;
+			_ppb.drivePhiPsiPosSpring = phiPsiDrive;
+			_ppb.UpdatePhiPsiDrives();
+			_ppb.UpdateRenderModeAllBbu();
+		}
+	}
 
-        phiSliderUI.value = phi;
-        psiSliderUI.value = psi;
+	public void SelectAllFromUI(bool value)
+	{
+		//Debug.Log("Select All from the manager! ---> " +  value);
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.SetGlobalSelect(value);
+		}
+	}
 
-        UpdatePhiPsiForPolyPeptides();
-    }
+	public void SetSelectionDriveFromUI(bool value)
+	{
+		//Debug.Log("hello from the manager! ---> SetSelectionDriveOffFromUI");
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.SetPhiPsiDriveForSelection(value);
+			_ppb.UpdateRenderModeAllBbu();
+		}
+	}
 
-    public void UpdatePhiFromUI(float phi)
-    {
-        //Debug.Log("hello from the manager! ---> " + phi);
-        phiTarget = phi;
-        UpdatePhiPsiForPolyPeptides();
-    }
+	public void UpdateDefinedSecondaryStructureFromUI()
+	{
+		float phi = phiTarget;
+		float psi = psiTarget;
+		switch (UIDefinedSecondaryStructure)
+		{
+			case 0:
+				// not defined
+				phi = phiTarget;
+				psi = psiTarget;
+				break;
 
-    public void UpdatePsiFromUI(float psi)
-    {
-        //Debug.Log("hello from the manager! ---> " + psi);
-        psiTarget = psi;
-        UpdatePhiPsiForPolyPeptides();
-    }
+			case 1:
+				//alpha helix (right handed) (phi + ps ~ -105)
+				phi = -57.0f;
+				psi = -47.0f;
+				break;
 
-    private void UpdatePhiPsiForPolyPeptides()
-    {
-        foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
-        {
-            _ppb.SetPhiPsiTargetValuesForSelection(phiTarget, psiTarget);
-        }
-    }
+			case 2:
+				//310 helix (phi + psi ~ -75)
+				phi = -49.0f;// -74.0f;
+				psi = -26.0f;// -4.0f;
+				break;
 
-    public void UpdateJiggleFromUI(float jiggleFromUI)
-    {
-        jiggleStrength = jiggleFromUI;
-    }
+			case 3:
+				//anti beta sheet
+				phi = -139.0f;
+				psi = 135.0f;
+				break;
+
+			case 4:
+				//parallel beta sheet
+				phi = -119.0f;
+				psi = 113.0f;
+				break;
+
+			case 5:
+				//pi helix (phi + ps ~ -125)
+				phi = -55.0f;
+				psi = -70.0f;
+				break;
+
+			case 6:
+				//alpha helix (left handed)
+				phi = 47.0f;
+				psi = 57.0f;
+				break;
+		}
+
+		phiTarget = phi;
+		psiTarget = psi;
+
+		phiSliderUI.value = phi;
+		psiSliderUI.value = psi;
+
+		UpdatePhiPsiForPolyPeptides();
+	}
+
+	public void UpdatePhiFromUI(float phi)
+	{
+		//Debug.Log("hello from the manager! ---> " + phi);
+		phiTarget = phi;
+		UpdatePhiPsiForPolyPeptides();
+	}
+
+	public void UpdatePsiFromUI(float psi)
+	{
+		//Debug.Log("hello from the manager! ---> " + psi);
+		psiTarget = psi;
+		UpdatePhiPsiForPolyPeptides();
+	}
+
+	private void UpdatePhiPsiForPolyPeptides()
+	{
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.SetPhiPsiTargetValuesForSelection(phiTarget, psiTarget);
+		}
+	}
+
+	public void UpdateJiggleFromUI(float jiggleFromUI)
+	{
+		jiggleStrength = jiggleFromUI;
+	}
 
 	public void UpdateAllResidueLabelsOnFromUI(bool value)
 	{
@@ -505,6 +514,20 @@ public class PolyPepManager : MonoBehaviour
 		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
 	}
 
+	public void UpdateShowHAtomsFromUI(bool value)
+	{
+		//Debug.Log("Click from UI: " + value);
+		// TODO - store value, bond rendering
+		{
+			GameObject[] gos;
+			gos = GameObject.FindGameObjectsWithTag("H");
+			foreach (GameObject _H in gos)
+			{
+				_H.GetComponent<Renderer>().enabled = value;
+			}
+		}
+	}
+
 	public void UpdateTestToggleFromUI(bool value)
 	{
 		Debug.Log("Click from UI: " + value);
@@ -517,9 +540,9 @@ public class PolyPepManager : MonoBehaviour
 		SceneManager.LoadScene(m_Scene.name);
 	}
 
-    // Update is called once per frame
-    void Update()
-    {
+	// Update is called once per frame
+	void Update()
+	{
 
-    }
+	}
 }
