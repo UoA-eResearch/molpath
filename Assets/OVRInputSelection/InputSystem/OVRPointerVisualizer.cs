@@ -101,6 +101,23 @@ namespace ControllerSelection
                 }
             }
             //Vive: Add condition to track VivePlayer hand as well.
+<<<<<<< HEAD
+=======
+            if (hand != null)
+            {
+                if (hand.activeInHierarchy)
+                {
+                    if (linePointer != null)
+                    {
+                        linePointer.enabled = true;
+                    }
+                    if (gazePointer != null)
+                    {
+                        gazePointer.gameObject.SetActive(false);
+                    }
+                }
+            }
+>>>>>>> 6ce23d00bccc6fd4d637375913e76035958d94af
             else
             {
                 if (linePointer != null)
