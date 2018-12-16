@@ -28,6 +28,12 @@ public class PolyPepBuilder : MonoBehaviour {
 	float bondLengthAmideCalpha = 1.46f;
 	float bondLengthCalphaCarbonyl = 1.51f;
 
+	// used in dynamic hbond configurable joints
+	// highly empirical magic numbers
+	float hBondModelInnerLength = 1.2f;
+	float hBondModelOuterLength = 3.5f;
+
+
 	public int secondaryStructure { get; set; } // = 0;
 
 	public int numResidues = 0;
@@ -334,11 +340,11 @@ public class PolyPepBuilder : MonoBehaviour {
 		// CPK / VDW slider changes rendering
 		float atomDisplayScale = relativeRadiusAtomType * scaleVDW;
 		myAtom.transform.localScale = new Vector3(atomDisplayScale, atomDisplayScale, atomDisplayScale);
-		// physics collider should be independent of rendering scale
+		// physics collider should be constant radius and independent of rendering scale
 		// BUT in transform hierarchy the SphereCollider inherits the transform.localscale
-		// SO apply inverse
+		// SO apply inverse scaling to SphereCollider to compensate
 		myAtom.GetComponent<SphereCollider>().radius = 1.1f * relativeRadiusAtomType / scaleVDW; 
-		// 1.1f is magic number DGD
+		// 1.1f is magic number
 
 	}
 
@@ -527,7 +533,7 @@ public class PolyPepBuilder : MonoBehaviour {
 			// scale joint parameters to PolyPepBuilder and Amide_pf
 
 			float scale = gameObject.transform.localScale.x * donorGO.transform.localScale.x;
-			float HBondLength = 1.0f;
+			float HBondLength = hBondModelInnerLength;
 
 			sjHbond.minDistance = HBondLength * scale;
 			sjHbond.maxDistance = HBondLength * scale;
@@ -562,7 +568,7 @@ public class PolyPepBuilder : MonoBehaviour {
 			// scale joint parameters to PolyPepBuilder and Amide_pf
 
 			float scale = gameObject.transform.localScale.x * donorGO.transform.localScale.x;
-			float HBondLength = 3.5f;
+			float HBondLength = hBondModelOuterLength;
 
 			sjHbond2.minDistance = HBondLength * scale;
 			sjHbond2.maxDistance = HBondLength * scale;
@@ -597,7 +603,7 @@ public class PolyPepBuilder : MonoBehaviour {
 			// scale joint parameters to PolyPepBuilder and Amide_pf
 
 			float scale = gameObject.transform.localScale.x * donorGO.transform.localScale.x;
-			float HBondLength = 3.5f;
+			float HBondLength = hBondModelOuterLength;
 
 			sjHbond3.minDistance = HBondLength * scale;
 			sjHbond3.maxDistance = HBondLength * scale;
