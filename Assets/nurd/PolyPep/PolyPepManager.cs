@@ -126,6 +126,8 @@ public class PolyPepManager : MonoBehaviour
 	}
 
 
+		// dev: test always spawn pp on startup
+		// SpawnPolypeptide(transform);
 
 
 	public void SpawnPolypeptide(Transform spawnTransform)
@@ -199,13 +201,17 @@ public class PolyPepManager : MonoBehaviour
 	{
 		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
 		hbondsOn = value;
+		PushHbondStrengthUpdate();
+	}
+
+	private void PushHbondStrengthUpdate()
+	{
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
 			//_ppb.ActiveHbondSpringConstraints = hbondsOn;
 			_ppb.UpdateHBondSprings();
 		}
 	}
-
 	public void UpdateShowDrivenBondsOnFromUI(bool value)
 	{
 		//Debug.Log("hello from the manager! ---> " + scaleVDWx10);
@@ -221,6 +227,8 @@ public class PolyPepManager : MonoBehaviour
 
 		//Debug.Log("hello Hbond Strength from the manager! ---> " + hbondStrength);
 		hbondStrength = hbondStrengthFromUI * hbondScale;
+		//
+		PushHbondStrengthUpdate();
 	}
 
 	public void UpdatePhiPsiDriveFromUI(float phiPsiDriveFromUI)
@@ -503,6 +511,20 @@ public class PolyPepManager : MonoBehaviour
 	public void UpdateAminoAcidSelFromUI()
 	{
 		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
+	}
+
+	public void UpdateShowHAtomsFromUI(bool value)
+	{
+		//Debug.Log("Click from UI: " + value);
+		// TODO - store value, bond rendering
+		{
+			GameObject[] gos;
+			gos = GameObject.FindGameObjectsWithTag("H");
+			foreach (GameObject _H in gos)
+			{
+				_H.GetComponent<Renderer>().enabled = value;
+			}
+		}
 	}
 
 	public void UpdateTestToggleFromUI(bool value)
