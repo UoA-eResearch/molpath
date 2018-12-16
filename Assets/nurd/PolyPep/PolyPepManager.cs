@@ -98,6 +98,8 @@ public class PolyPepManager : MonoBehaviour
 		jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
 
 		SpawnPolypeptide(transform);
+		// dev: test always spawn pp on startup
+		// SpawnPolypeptide(transform);
 	}
 
 	private void SubscribeToUievents()
@@ -126,8 +128,7 @@ public class PolyPepManager : MonoBehaviour
 	}
 
 
-		// dev: test always spawn pp on startup
-		// SpawnPolypeptide(transform);
+		
 
 
 	public void SpawnPolypeptide(Transform spawnTransform)
