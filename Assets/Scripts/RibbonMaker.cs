@@ -292,3 +292,17 @@ public class RibbonMaker : MonoBehaviour
 
     }
 }
+/* TODO:
+Important:
+- Need to cap the ends of the generated mesh.
+- figure out which points to use as spline control points. 
+    -- one of the bb atoms vs. 
+    -- residue transform vs. 
+    -- average of bbu positions.
+- Calculate when a tube or ribbon starts + ends (Strider's algorithm)
+
+Additional:
+- Mesh vertices are folding within itself (should join interfacting faces and cull the other side of the face. or somehow lerp the verts).
+    -- Maybe sort interpolated cross sections by proximity rather than in order of name/residue as (then again it might not connect properly if that's the case)
+    -- Alternatively could use the tube vert point cloud and do delaunay triangulation to get a non-overlapping faces mesh.
+*/
