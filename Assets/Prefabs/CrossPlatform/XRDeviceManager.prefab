@@ -51,20 +51,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbe73b32ca8104c4a9e5305a9f4520d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ovrPlayerController: {fileID: 0}
-  OvrPlayerGo: {fileID: 0}
-  OvrPlayerCamera: {fileID: 0}
-  vivePlayerGo: {fileID: 0}
-  vivePlayer: {fileID: 0}
-  vivePlayerCamera: {fileID: 0}
-  teleporting: {fileID: 0}
-  teleportArea: {fileID: 0}
+  _ovrPlayerCamera: {fileID: 0}
+  OvrRightHandAnchor: {fileID: 0}
+  OvrLeftHandAnchor: {fileID: 0}
   uiContainer: {fileID: 0}
   menus: []
-  OvrEventSystem: {fileID: 0}
-  ViveEventSystem: {fileID: 0}
   usingOculus: 0
   usingVive: 0
   DebugOculusAsVive: 0
-  OvrRightHandAnchor: {fileID: 0}
-  OvrLeftHandAnchor: {fileID: 0}
+  teleportAreaTarget: {fileID: 0}

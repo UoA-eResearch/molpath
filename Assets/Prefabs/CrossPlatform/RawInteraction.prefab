@@ -54,7 +54,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackingSpace: {fileID: 0}
   primaryButton: 8192
+  DebugPrimaryButton: 49
   secondaryButton: 16384
+  DebugSecondaryButton: 50
   aButton: 1
   bButton: 2
   excludeLayers:
@@ -204,7 +206,6 @@ MonoBehaviour:
   myHitPos: {x: 0, y: 0, z: 0}
   remoteGrab: {fileID: 0}
   remoteGrabDistance: 0
-  remoteGrabStrength: 5
   activeController: 0
 --- !u!114 &114745009893417280
 MonoBehaviour:

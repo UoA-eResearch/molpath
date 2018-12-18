@@ -116,6 +116,7 @@ MonoBehaviour:
   remoteGrabDistance: 0
   remoteGrabStrength: 5
   activeController: {fileID: 0}
+  remoteGrabController: {fileID: 0}
 --- !u!114 &114716812845003604
 MonoBehaviour:
   m_ObjectHideFlags: 1

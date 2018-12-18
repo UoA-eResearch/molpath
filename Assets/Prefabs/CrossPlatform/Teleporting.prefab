@@ -1315,6 +1315,7 @@ MonoBehaviour:
   teleportFadeTime: 0.1
   meshFadeTime: 0.2
   arcDistance: 10
+  UIElement: {fileID: 0}
   onActivateObjectTransform: {fileID: 4870385973459682}
   onDeactivateObjectTransform: {fileID: 4860002431832814}
   activateObjectTime: 0.1

@@ -67,6 +67,8 @@ MonoBehaviour:
   phiPsiDrive: 100
   showDrivenBondsOn: 0
   doCartoonBondRendering: 1
+  allResLabelsOn: 0
+  showPeptidePlanes: 0
   toonRenderScale: 0.002
   phiSliderUI: {fileID: 0}
   psiSliderUI: {fileID: 0}
@@ -76,3 +78,9 @@ MonoBehaviour:
   phiPsiDriveSliderUI: {fileID: 0}
   spawnLengthSliderUI: {fileID: 0}
   jiggleStrengthSliderUI: {fileID: 0}
+  spawnButton: {fileID: 0}
+  vdwToggle: {fileID: 0}
+  hBondToggle: {fileID: 0}
+  dampingToggle: {fileID: 0}
+  SelectAllButton: {fileID: 0}
+  DeselectAllButton: {fileID: 0}
