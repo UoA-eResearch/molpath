@@ -96,7 +96,7 @@ public class RibbonMaker : MonoBehaviour
         TubeVertex[]  tubeVertices =  CreateTubeVertices(interpolatedPositions);
 		// Debug.Log(interpolatedPositions[interpolatedPositions.Length -1]);
 		// Debug.Log(tubeVertices.Length);
-        Show(tubeVertices);
+        CreateTubeMesh(tubeVertices);
     }
 
     private Vector3[] InterpolateControlPoints(List<Transform> controlPoints)
@@ -196,15 +196,23 @@ public class RibbonMaker : MonoBehaviour
 		TubeVertex[] tubeVertices = new TubeVertex[interpolatedPositions.Length];
 		for (int i = 0; i < interpolatedPositions.Length; i++)
         {
-            tubeVertices[i] = new TubeVertex(interpolatedPositions[i], 1.0f);
+            tubeVertices[i] = new TubeVertex(interpolatedPositions[i], tubeRadius);
         }
 		return tubeVertices;
 	}
 
-    /// <summary>
-    /// iterates through tube vertices and does the vertices calcuations for them.
-    /// </summary>
-    private void Show(TubeVertex[] tubeVertices)
+
+    // basically the for calculating negative angles I think. Don't touch this one. Needs to be 2.
+	private float thetaDivider = 2.0f;
+	[Header("Tube params")]
+    [Tooltip("How much flatter the x scale of the tube will be vs the y axis.")]
+	public float tubeXScaleDivider = 1.0f;
+	public float tubeRadius = 0.25f;
+
+	/// <summary>
+	/// iterates through tube vertices and does the vertices calcuations for them.
+	/// </summary>
+	private void CreateTubeMesh(TubeVertex[] tubeVertices)
     {
         if (null == tubeVertices ||
             tubeVertices.Length <= 1)
@@ -218,10 +226,11 @@ public class RibbonMaker : MonoBehaviour
         if (crossSegments != lastCrossSegments)
         {
             crossPoints = new Vector3[crossSegments];
-            float theta = 2.0f * Mathf.PI / crossSegments;
+            float theta = thetaDivider * Mathf.PI / crossSegments;
             for (int c = 0; c < crossSegments; c++)
             {
-                crossPoints[c] = new Vector3(Mathf.Cos(theta * c) / 10.0f, Mathf.Sin(theta * c), 0);
+                // crossPoints[c] = new Vector3(Mathf.Cos(theta * c) / 10.0f, Mathf.Sin(theta * c), 0);
+                crossPoints[c] = new Vector3(Mathf.Cos(theta * c) / tubeXScaleDivider, Mathf.Sin(theta * c), 0);
             }
             lastCrossSegments = crossSegments;
         }
@@ -236,23 +245,26 @@ public class RibbonMaker : MonoBehaviour
         for (int p = 0; p < tubeVertices.Length; p++)
         {
             if (p < tubeVertices.Length - 1)
+            {
+                // if there's a next point, set the rotation of the current tube vertex to aim at the next one.
                 rotation = Quaternion.FromToRotation(Vector3.forward, tubeVertices[p + 1].point - tubeVertices[p].point);
+            }
 
             for (int c = 0; c < crossSegments; c++)
             {
+                // creating a set of cross section vertices
                 int vertexIndex = p * crossSegments + c;
                 meshVertices[vertexIndex] = tubeVertices[p].point + rotation * crossPoints[c] * tubeVertices[p].radius;
                 uvs[vertexIndex] = new Vector2((0.0f + c) / crossSegments, (0.0f + p) / tubeVertices.Length);
-                colors[vertexIndex] = Color.yellow;
+                // colors[vertexIndex] = Color.yellow;
                 // colors[vertexIndex] = tubeVertices[p].color;
-
                 lastVertices[c] = theseVertices[c];
                 theseVertices[c] = p * crossSegments + c;
             }
-            //make triangles
             if (p > 0)
             {
-                for (int c = 0; c < crossSegments; c++)
+				//make triangles
+				for (int c = 0; c < crossSegments; c++)
                 {
                     int start = (p * crossSegments + c) * 6;
                     tris[start] = lastVertices[c];

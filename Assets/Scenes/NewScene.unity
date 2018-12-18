@@ -167,8 +167,8 @@ MonoBehaviour:
   lastCrossSegments: 0
   controlPointTags:
   - amide
-  - 
-  - 
+  tubeXScaleDivider: 1
+  tubeRadius: 0.25
 --- !u!23 &146372776
 MeshRenderer:
   m_ObjectHideFlags: 0
