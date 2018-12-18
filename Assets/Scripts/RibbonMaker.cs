@@ -27,7 +27,7 @@ public class RibbonMaker : MonoBehaviour
 
     // the number of points in between control points
     [Tooltip("Number of interpolation points between control points")]
-    public int numberOfPoints = 5;
+    public int interpolationSteps = 5;
 
     private MeshRenderer _meshRenderer;
     public Material Material;
@@ -36,7 +36,9 @@ public class RibbonMaker : MonoBehaviour
     public int lastCrossSegments;
     private Vector3[] interpolatedPositions;
 
-    public class TubeVertex
+	public List<string> controlPointTags;
+
+	public class TubeVertex
     {
         public Vector3 point = Vector3.zero;
         public float radius = 4f;
@@ -48,10 +50,9 @@ public class RibbonMaker : MonoBehaviour
         }
     }
 
-    private TubeVertex[] tubeVertices;
     private void Start()
     {
-		line.positionCount = controlPoints.Count * numberOfPoints;
+		// line.positionCount = controlPoints.Count * numberOfPoints;
 		_meshRenderer = gameObject.GetComponent<MeshRenderer>();
         _meshRenderer.material = new Material(Material.shader);
     }
@@ -69,44 +70,47 @@ public class RibbonMaker : MonoBehaviour
     {
 		controlPoints.Clear();
 		controlPointGos.Clear();
-		foreach (var amide in GameObject.FindGameObjectsWithTag("amide"))
-        {
-            controlPointGos.Add(amide);
-        }
-        // TODO: interpolates better using just singular point per residue.
-        // TODO: Alternatively, average the residue vertices and use that as the control point.
 
-        // foreach (var calpha in GameObject.FindGameObjectsWithTag("calpha"))
-        // {
-        //     controlPointGos.Add(calpha);
-        // }
-        // foreach (var carbonyl in GameObject.FindGameObjectsWithTag("carbonyl"))
-        // {
-        //     controlPointGos.Add(carbonyl);
-        // }
+		// TODO: interpolates better using just singular point per residue.
+		// TODO: Alternatively, average the residue vertices and use that as the control point.
+		foreach (var tag in controlPointTags) 
+		{
+			foreach (var go in GameObject.FindGameObjectsWithTag(tag))
+			{
+				controlPointGos.Add(go);
+			}
+		}
+
 		// sort control points by otherwise it grabs them out of order
-
-
 		controlPointGos.Sort(SortByName);
 		// add sorted transforms 
         foreach (var controlPointGo in controlPointGos)
         {
+			// Debug.Log(controlPointGo.name);
 			controlPoints.Add(controlPointGo.transform);
 		}
 
-        // C - C - C- C 
-		interpolatedPositions = new Vector3[numberOfPoints * controlPoints.Count];
 
-        tubeVertices = new TubeVertex[numberOfPoints * controlPoints.Count];
-        InterpolateControlPoints(controlPoints);
-        CreateTubeVertices();
-        Show();
+        Vector3[] interpolatedPositions = InterpolateControlPoints(controlPoints);
+		// Debug.Log(interpolatedPositions.Length);
+        TubeVertex[]  tubeVertices =  CreateTubeVertices(interpolatedPositions);
+		// Debug.Log(interpolatedPositions[interpolatedPositions.Length -1]);
+		// Debug.Log(tubeVertices.Length);
+        Show(tubeVertices);
     }
 
-    void InterpolateControlPoints(List<Transform> controlPoints)
+    private Vector3[] InterpolateControlPoints(List<Transform> controlPoints)
     {
-        Vector3 p0, p1, m0, m1;
+        // C - C - C- C 
 
+		// Vector3[] interpolatedPositions = new Vector3[interpolationSteps * controlPoints.Count];
+		// interpolatedPositions[i + j * interpolationSteps] = position;
+
+		// TEST: 
+		Vector3[] interpolatedPositions = new Vector3[((controlPoints.Count-1) * interpolationSteps)];
+		Debug.Log(interpolatedPositions.Length); // 45
+
+        Vector3 p0, p1, m0, m1;
         for (int j = 0; j < controlPoints.Count - 1; j++)
         {
             // check control points
@@ -114,7 +118,8 @@ public class RibbonMaker : MonoBehaviour
                 (j > 0 && controlPoints[j - 1] == null) ||
                 (j < controlPoints.Count - 2 && controlPoints[j + 2] == null))
             {
-                return;
+				Debug.Log("control points wrong index size.");
+                return null;
             }
             // determine control points of segment
             p0 = controlPoints[j].transform.position;
@@ -140,14 +145,14 @@ public class RibbonMaker : MonoBehaviour
             // set points of Hermite curve
             Vector3 position;
             float t;
-            float pointStep = 1.0f / numberOfPoints;
+            float pointStep = 1.0f / interpolationSteps;
 
             if (j == controlPoints.Count - 2)
             {
-                pointStep = 1.0f / (numberOfPoints - 1.0f);
+                pointStep = 1.0f / (interpolationSteps - 1.0f);
                 // last point of last segment should reach p1
             }
-            for (int i = 0; i < numberOfPoints; i++)
+            for (int i = 0; i < interpolationSteps; i++)
             {
                 t = i * pointStep;
                 position = (2.0f * t * t * t - 3.0f * t * t + 1.0f) * p0
@@ -156,49 +161,50 @@ public class RibbonMaker : MonoBehaviour
                     + (t * t * t - t * t) * m1;
                 // line.SetPosition(i + j * numberOfPoints,
                 //     position);
-                interpolatedPositions[i + j * numberOfPoints] = position;
+                interpolatedPositions[(j  * interpolationSteps) + i] = position;
             }
         }
-    }
+		return interpolatedPositions;
+	}
 
 
-    private void OnDrawGizmos()
-    {
-        Debug.Log(tubeVertices.Length);
-        if (tubeVertices.Length > 0)
-        {
-            // foreach (var vertex in tubeVertices)
-            // {
-            //     // Debug.Log(vertex.point);
-            //     Gizmos.color = Color.red;
-            //     Gizmos.DrawSphere(vertex.point, 0.1f);
-            // }
-            for (int i = 0; i < interpolatedPositions.Length - 1; i++)
-            {
-				var vertex1 = interpolatedPositions[i];
-				var vertex2 = interpolatedPositions[i+1];
-				// Debug.Log(vertex.point);
-				Gizmos.color = Color.red;
-				// Gizmos.DrawSphere(vertex, 0.1f);
-				Gizmos.DrawLine(vertex1, vertex2);
+	private void OnDrawGizmos()
+	{
+		if (controlPoints != null)
+		{
+			foreach (var point in controlPoints)
+			{
+				Gizmos.color = Color.green;
+				Gizmos.DrawWireSphere(point.position, 1);
 			}
-        }
-    }
+		}
 
-    private int CreateTubeVertices()
-    {
-        for (int i = 0; i < interpolatedPositions.Length; i++)
+		if (interpolatedPositions != null) 
+		{
+			for (int i = 0; i < interpolatedPositions.Length; i++)
+			{
+				var position = interpolatedPositions[i];
+				Debug.Log(i + " position: " + position);
+				Gizmos.color = Color.blue;
+				Gizmos.DrawCube(position, Vector3.one);
+			}	
+		}
+	}
+
+    private TubeVertex[] CreateTubeVertices(Vector3[] interpolatedPositions)
+	{
+		TubeVertex[] tubeVertices = new TubeVertex[interpolatedPositions.Length];
+		for (int i = 0; i < interpolatedPositions.Length; i++)
         {
-            // Debug.Log(interpolatedPositions[i]);
             tubeVertices[i] = new TubeVertex(interpolatedPositions[i], 1.0f);
         }
-        return interpolatedPositions.Length;
-    }
+		return tubeVertices;
+	}
 
     /// <summary>
     /// iterates through tube vertices and does the vertices calcuations for them.
     /// </summary>
-    private void Show()
+    private void Show(TubeVertex[] tubeVertices)
     {
         if (null == tubeVertices ||
             tubeVertices.Length <= 1)

@@ -157,13 +157,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlPoints: []
+  controlPointGos: []
   alpha: 0.5
   line: {fileID: 146372778}
-  numberOfPoints: 1
+  interpolationSteps: 5
   Material: {fileID: 2100000, guid: f108e6019f4e0564aabc394c65b47af6, type: 2}
   crossSegments: 5
   crossPoints: []
   lastCrossSegments: 0
+  controlPointTags:
+  - amide
+  - 
+  - 
 --- !u!23 &146372776
 MeshRenderer:
   m_ObjectHideFlags: 0
