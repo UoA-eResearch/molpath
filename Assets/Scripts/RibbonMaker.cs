@@ -3,6 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+public class TubeVertex
+{
+	public Vector3 point = Vector3.zero;
+	public float radius = 4f;
+
+	public TubeVertex(Vector3 pt, float r)
+	{
+		point = pt;
+		radius = r;
+	}
+}
+
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class RibbonMaker : MonoBehaviour
@@ -38,27 +50,23 @@ public class RibbonMaker : MonoBehaviour
 
 	public List<string> controlPointTags;
 
-	public class TubeVertex
-    {
-        public Vector3 point = Vector3.zero;
-        public float radius = 4f;
 
-        public TubeVertex(Vector3 pt, float r)
-        {
-            point = pt;
-            radius = r;
-        }
-    }
+	public RibbonMaker(Transform[] controlTransforms)
+	{
+		// pass the residue child obj transforms.
+		GameObject ribbon = new GameObject();
 
-    private void Start()
+		// line.positionCount = controlPoints.Count * numberOfPoints;
+		_meshRenderer = gameObject.GetComponent<MeshRenderer>();
+        _meshRenderer.material = new Material(Material.shader);
+	}
+
+
+	private void Start()
     {
 		// line.positionCount = controlPoints.Count * numberOfPoints;
 		_meshRenderer = gameObject.GetComponent<MeshRenderer>();
         _meshRenderer.material = new Material(Material.shader);
-    }
-
-    void Update()
-    {
     }
 
 	private static int SortByName(GameObject o1, GameObject o2)
