@@ -362,7 +362,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ribbonMaterial: {fileID: 2100000, guid: 406981998f1234442a4f2eb50cfe07e1, type: 2}
   RibbonMaker: {fileID: 419599463}
-  errorThreshold: 400
+  errorThreshold: 20
 --- !u!1001 &483526617
 Prefab:
   m_ObjectHideFlags: 0

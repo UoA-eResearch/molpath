@@ -83,6 +83,9 @@ public class Strider : MonoBehaviour
 						}
 					}
 				}
+				else {
+					Destroy(residue.transform.Find("ribbon").gameObject);
+				}
 			}
 		}
 	}
