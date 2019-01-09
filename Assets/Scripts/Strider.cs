@@ -5,6 +5,8 @@ using UnityEngine;
 public class Strider : MonoBehaviour
 {
 
+	public Material ribbonMaterial;
+
 	public RibbonMaker RibbonMaker;
 
 	public Strider()
@@ -51,7 +53,7 @@ public class Strider : MonoBehaviour
 
 		// iterating entire chain
 		Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
-		for (int i = 0; i < residues.Length; i++)
+		for (int i = 0; i < residues.Length - 1; i++)
 		{
 			Residue residue = residues[i];
 			Residue residueNext = residues[i+1];
@@ -64,8 +66,21 @@ public class Strider : MonoBehaviour
 					var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
 					if (controlPoint && controlPoint2)
 					{
-		List<Transform> ribbonSegmentPoints = new List<Transform>();
-		List<List<Transform>> ribbonSegments = new List<List<Transform>>();
+						Debug.Log("make a ribbon " + residue.name);
+						// List<Transform> ribbonSegmentPoints = new List<Transform>();
+						// List<List<Transform>> ribbonSegments = new List<List<Transform>>();
+						if (!residue.transform.Find("ribbon"))
+						{
+							// make a ribbon
+							GameObject ribbon = new GameObject("ribbon");
+							ribbon.transform.parent = residue.transform;
+							ribbon.AddComponent<MeshRenderer>();
+							ribbon.AddComponent<MeshFilter>();
+							RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
+							ribbonMaker.Material = ribbonMaterial;
+							ribbonMaker.controlPoints.Add(controlPoint);
+							ribbonMaker.controlPoints.Add(controlPoint2);
+						}
 					}
 				}
 			}
@@ -90,20 +105,23 @@ public class Strider : MonoBehaviour
 		bool isHelical = true;
 		float phi = 60f;
 		float psi = 50f;
-		if (Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(phi, 0, 0), errorThreshold / 2, 'x'))
+		if (!Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(phi, 0, 0), errorThreshold / 2, 'x'))
 		{
+			isHelical = false;
+		}
+		else {
 			// Debug.Log("phi within range" + cfjs[0].targetRotation.eulerAngles.x);
 		}
 
 		// the psi angle is the second angle. (i'm pretty sure.)
 		// Debug.Log("psi x angle" + cfjs[1].targetRotation.eulerAngles.x);
-		if (Utility.VectorInRange(cfjs[1].targetRotation.eulerAngles, new Vector3(psi, 0, 0), errorThreshold / 2, 'x'))
+		if (!Utility.VectorInRange(cfjs[1].targetRotation.eulerAngles, new Vector3(psi, 0, 0), errorThreshold / 2, 'x'))
 		{
-			// Debug.Log("psi x angle in range" + cfjs[1].targetRotation.eulerAngles.x);
+			isHelical = false;
 		}
 		else
 		{
-			isHelical = false;
+			// Debug.Log("psi x angle in range" + cfjs[1].targetRotation.eulerAngles.x);
 		}
 
 		if (isHelical)

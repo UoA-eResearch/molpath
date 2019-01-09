@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class TubeVertex
-{
-	public Vector3 point = Vector3.zero;
-	public float radius = 4f;
-
-	public TubeVertex(Vector3 pt, float r)
-	{
-		point = pt;
-		radius = r;
-	}
-}
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
 public class RibbonMaker : MonoBehaviour
 {
-    //Use the transforms of GameObjects in 3d space as your points or define array with desired points
-    public List<Transform> controlPoints = new List<Transform>();
-    public List<GameObject> controlPointGos = new List<GameObject>();
+	public class TubeVertex
+	{
+		public Vector3 point = Vector3.zero;
+		public float radius = 4f;
+
+		public TubeVertex(Vector3 pt, float r)
+		{
+			point = pt;
+			radius = r;
+		}
+	}
+
+	//Use the transforms of GameObjects in 3d space as your points or define array with desired points
+	public List<Transform> controlPoints = new List<Transform>();
 
     //Store points on the Catmull curve so we can visualize them
     List<Vector3> newPoints = new List<Vector3>();
@@ -50,26 +50,13 @@ public class RibbonMaker : MonoBehaviour
 
 	public List<string> controlPointTags;
 
-
-	public RibbonMaker(Transform root, List<Transform> controlPoints)
-	{
-		this.controlPoints = controlPoints;
-		// expand later for consecutive residues
-
-		GameObject ribbonGo = new GameObject("ribbonGo", typeof(MeshRenderer));
-		ribbonGo.transform.parent = root;
-
-		_meshRenderer = ribbonGo.GetComponent<MeshRenderer>();
-        _meshRenderer.material = new Material(Utility.GenerateDefaultMaterial().shader);
-	}
-
-
 	private void Start()
     {
 		// line.positionCount = controlPoints.Count * numberOfPoints;
 		_meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        _meshRenderer.material = new Material(Material.shader);
-    }
+		_meshRenderer.material = Material;
+		// _meshRenderer.material = new Material(Material.shader);
+	}
 
 	private static int SortByName(GameObject o1, GameObject o2)
 	{
