@@ -271,6 +271,12 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1194373545232712, guid: cd810c17f54bc984192a9d08440e2cc8,
     type: 2}
   m_PrefabInternal: {fileID: 1873065887}
+--- !u!114 &419599463 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114632901777576344, guid: cd810c17f54bc984192a9d08440e2cc8,
+    type: 2}
+  m_PrefabInternal: {fileID: 1873065887}
+  m_Script: {fileID: 11500000, guid: 2b7e5cef6ee69ad429c7ee1fb64d7e4a, type: 3}
 --- !u!114 &419599467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,6 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3f2b2fc8e0bc94f910f8f2131100e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RibbonMaker: {fileID: 419599463}
   errorThreshold: 30
 --- !u!1001 &483526617
 Prefab:

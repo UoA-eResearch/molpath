@@ -51,14 +51,16 @@ public class RibbonMaker : MonoBehaviour
 	public List<string> controlPointTags;
 
 
-	public RibbonMaker(Transform[] controlTransforms)
+	public RibbonMaker(Transform root, List<Transform> controlPoints)
 	{
-		// pass the residue child obj transforms.
-		GameObject ribbon = new GameObject();
+		this.controlPoints = controlPoints;
+		// expand later for consecutive residues
 
-		// line.positionCount = controlPoints.Count * numberOfPoints;
-		_meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        _meshRenderer.material = new Material(Material.shader);
+		GameObject ribbonGo = new GameObject("ribbonGo", typeof(MeshRenderer));
+		ribbonGo.transform.parent = root;
+
+		_meshRenderer = ribbonGo.GetComponent<MeshRenderer>();
+        _meshRenderer.material = new Material(Utility.GenerateDefaultMaterial().shader);
 	}
 
 
@@ -76,29 +78,32 @@ public class RibbonMaker : MonoBehaviour
 
     private void FixedUpdate()
     {
-		controlPoints.Clear();
-		controlPointGos.Clear();
+		// controlPoints.Clear();
+		// controlPointGos.Clear();
 
 		// TODO: interpolates better using just singular point per residue.
 		// TODO: Alternatively, average the residue vertices and use that as the control point.
-		foreach (var tag in controlPointTags) 
-		{
-			foreach (var go in GameObject.FindGameObjectsWithTag(tag))
-			{
-				controlPointGos.Add(go);
-			}
+
+
+		// foreach (var tag in controlPointTags) 
+		// {
+		// 	foreach (var go in GameObject.FindGameObjectsWithTag(tag))
+		// 	{
+		// 		controlPointGos.Add(go);
+		// 	}
+		// }
+
+		// // sort control points by otherwise it grabs them out of order
+		// controlPointGos.Sort(SortByName);
+		// // add sorted transforms 
+        // foreach (var controlPointGo in controlPointGos)
+        // {
+		// 	// Debug.Log(controlPointGo.name);
+		// 	controlPoints.Add(controlPointGo.transform);
+		// }
+        if (controlPoints.Count < 0) {
+			return;
 		}
-
-		// sort control points by otherwise it grabs them out of order
-		controlPointGos.Sort(SortByName);
-		// add sorted transforms 
-        foreach (var controlPointGo in controlPointGos)
-        {
-			// Debug.Log(controlPointGo.name);
-			controlPoints.Add(controlPointGo.transform);
-		}
-
-
         Vector3[] interpolatedPositions = InterpolateControlPoints(controlPoints);
         TubeVertex[]  tubeVertices =  CreateTubeVertices(interpolatedPositions);
 		// Debug.Log(interpolatedPositions[interpolatedPositions.Length -1]);
