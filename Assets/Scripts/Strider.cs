@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,8 +24,8 @@ public class Strider : MonoBehaviour
 		return o1.name.CompareTo(o2.name);
 	}
 
-	private string MakeRibbonKey(int a, int b) {
-		return a + "-" + b;
+	private string MakeRibbonName(int start, int end) {
+		return start + "-" + end;
 	}
 
 
@@ -36,71 +37,67 @@ public class Strider : MonoBehaviour
 	{
 		var points = new List<Transform>();
 		var ribbons = new Dictionary<string, List<Transform>>();
+		var oldRibbons = new Dictionary<string, List<Transform>>();
+
+		var pointIndexes = new List<int[]>();
 
 		int startResidue = 0;
 		int endResidue = 0;
 
-		 // Debug.Log(typeof(string).Assembly.ImageRuntimeVersion);
-
+		// iterating entire chain
 		Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
 		for (int i = 0; i < residues.Length - 1; i++)
 		{
-			var residue = residues[i];
-			if (IsHelical(residue)) {
-				
-			}
-			else {
-				endResidue = i;
-				// do some things
-				
-
-
-				startResidue = i;
+			Residue residue = residues[i];
+			Residue residueNext = residues[i + 1];
+			if (residues[i + 1])
+			{
+				if (IsHelical(residue) && IsHelical(residueNext))
+				{
+					// if residue helical, grab amide and add to segmentpoints.
+					var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
+					var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
+					if (controlPoint && controlPoint2)
+					{
+						// Debug.Log("make a ribbon " + residue.name);
+						if (!residue.transform.Find("ribbon"))
+						{
+							MakeRibbon(residue.transform, controlPoint, controlPoint2);
+						}
+					}
+				}
+				else
+				{
+					Destroy(residue.transform.Find("ribbon").gameObject);
+				}
 			}
 		}
-		// if (false)
-		// {
-		// 	// iterating entire chain
-		// 	Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
-		// 	for (int i = 0; i < residues.Length - 1; i++)
-		// 	{
-		// 		Residue residue = residues[i];
-		// 		Residue residueNext = residues[i + 1];
-		// 		if (residues[i + 1])
-		// 		{
-		// 			if (IsHelical(residue) && IsHelical(residueNext))
-		// 			{
-		// 				// if residue helical, grab amide and add to segmentpoints.
-		// 				var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
-		// 				var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
-		// 				if (controlPoint && controlPoint2)
-		// 				{
-		// 					// Debug.Log("make a ribbon " + residue.name);
+		// garbage collection for ribbons.
+		RemoveOldRibbons(oldRibbons, ribbons);
+		oldRibbons = ribbons;
+	}
 
-		// 					// List<Transform> ribbonSegmentPoints = new List<Transform>();
-		// 					// List<List<Transform>> ribbonSegments = new List<List<Transform>>();
-		// 					if (!residue.transform.Find("ribbon"))
-		// 					{
-		// 						// make a ribbon
-		// 						GameObject ribbon = new GameObject("ribbon");
-		// 						ribbon.transform.parent = residue.transform;
-		// 						ribbon.AddComponent<MeshRenderer>();
-		// 						ribbon.AddComponent<MeshFilter>();
-		// 						RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
-		// 						ribbonMaker.Material = ribbonMaterial;
-		// 						ribbonMaker.controlPoints.Add(controlPoint);
-		// 						ribbonMaker.controlPoints.Add(controlPoint2);
-		// 					}
-		// 				}
-		// 			}
-		// 			else
-		// 			{
-		// 				Destroy(residue.transform.Find("ribbon").gameObject);
-		// 			}
-		// 		}
-		// 	}
+/// <summary>
+/// Compares new ribbon keys with old ones, for any old ribbons that arent found in current iteration destroy the old ribbons.
+/// </summary>
+/// <param name="oldRibbons"></param>
+/// <param name="ribbons"></param>
+	private void RemoveOldRibbons(Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
+	{
+		throw new NotImplementedException();
+	}
 
-		// }
+	private GameObject MakeRibbon(Transform parent, Transform controlPoint, Transform controlPoint2){
+		// make a ribbon
+		GameObject ribbon = new GameObject("ribbon");
+		ribbon.transform.parent = parent.transform;
+		ribbon.AddComponent<MeshRenderer>();
+		ribbon.AddComponent<MeshFilter>();
+		RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
+		ribbonMaker.Material = ribbonMaterial;
+		ribbonMaker.controlPoints.Add(controlPoint);
+		ribbonMaker.controlPoints.Add(controlPoint2);
+		return ribbon;
 	}
 
 	/// <summary>
@@ -109,11 +106,11 @@ public class Strider : MonoBehaviour
 	/// <param name="residue"></param>
 	/// <returns>boolean</returns>
 	private bool IsHelical(Residue residue)
-	{
-		//error threshold.
-		// alpha helical = psi 50, phi 60.
-		// Debug.Log(residue.transform.name);
-		BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
+{
+	//error threshold.
+	// alpha helical = psi 50, phi 60.
+	// Debug.Log(residue.transform.name);
+	BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
 		ConfigurableJoint[] cfjs = residue.transform.GetComponentsInChildren<ConfigurableJoint>();
 
 		// Debug.Log(cfjs[0].targetRotation);
