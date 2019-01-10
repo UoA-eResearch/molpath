@@ -34,7 +34,7 @@ public class Utility : MonoBehaviour{
 				// Debug.Log(target.x - deviation);
 				if (vector.x <= (target.x + deviation) && vector.x >= (target.x - deviation))
 				{
-					Debug.Log("target base range: " + target.x);
+					// Debug.Log("target base range: " + target.x);
 					inRange = true;
 				}
 				else
@@ -63,7 +63,7 @@ public class Utility : MonoBehaviour{
 				}
 				break;
 			default:
-				Debug.Log("no axis specified.");
+				// Debug.Log("no axis specified.");
 				break;
 		}
 		return inRange;

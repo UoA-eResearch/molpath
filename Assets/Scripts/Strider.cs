@@ -49,54 +49,77 @@ public class Strider : MonoBehaviour
 		for (int i = 0; i < residues.Length - 1; i++)
 		{
 			Residue residue = residues[i];
-			Residue residueNext = residues[i + 1];
-			if (residues[i + 1])
+			endResidue = i;
+			if (IsHelical(residue))
 			{
-				if (IsHelical(residue) && IsHelical(residueNext))
-				{
-					// if residue helical, grab amide and add to segmentpoints.
-					var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
-					var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
-					if (controlPoint && controlPoint2)
-					{
-						// Debug.Log("make a ribbon " + residue.name);
-						if (!residue.transform.Find("ribbon"))
-						{
-							MakeRibbon(residue.transform, controlPoint, controlPoint2);
-						}
-					}
-				}
-				else
-				{
-					Destroy(residue.transform.Find("ribbon").gameObject);
-				}
+				// // if residue helical, grab amide and add to segmentpoints.
+				// var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
+				// var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
+				// if (controlPoint && controlPoint2)
+				// {
+				// 	// Debug.Log("make a ribbon " + residue.name);
+				// 	if (!residue.transform.Find("ribbon"))
+				// 	{
+				// 		MakeRibbon(residue.transform, controlPoint, controlPoint2);
+				// 	}
+				// }
+				points.Add(Utility.GetFirstChildContainingText(residue.transform, "amide"));
+			}
+			else
+			{
+				// adding to ribbons duplicate code.
+				ribbons[MakeRibbonName(startResidue, endResidue)] = points;
 			}
 		}
+		// adding to ribbons for final piece if no break in helical pattern
+		ribbons[MakeRibbonName(startResidue, endResidue)] = points;
+		// Debug.Log("end of ribbon. " + points.Count);
+
 		// garbage collection for ribbons.
-		RemoveOldRibbons(oldRibbons, ribbons);
+		RemoveOldRibbons(peptide.transform, oldRibbons, ribbons);
+		MakeNewRibbons(peptide.transform, ribbons);
 		oldRibbons = ribbons;
 	}
 
-/// <summary>
-/// Compares new ribbon keys with old ones, for any old ribbons that arent found in current iteration destroy the old ribbons.
-/// </summary>
-/// <param name="oldRibbons"></param>
-/// <param name="ribbons"></param>
-	private void RemoveOldRibbons(Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
+	/// <summary>
+	/// Compares new ribbon keys with old ones, for any old ribbons that arent found in current iteration destroy the old ribbons.
+	/// </summary>
+	/// <param name="oldRibbons"></param>
+	/// <param name="ribbons"></param>
+	private void RemoveOldRibbons(Transform peptide, Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
 	{
-		throw new NotImplementedException();
+		foreach (var oldRibbon in oldRibbons)
+		{
+			if (!ribbons.ContainsKey(oldRibbon.Key))
+			{
+				Debug.Log("destorying old ribbon: " + oldRibbon.Key);
+				// var x = oldRibbons[oldRibbon.Key];
+				oldRibbons.Remove(oldRibbon.Key);
+				Destroy(peptide.transform.Find(oldRibbon.Key).gameObject);
+			}
+		}
 	}
 
-	private GameObject MakeRibbon(Transform parent, Transform controlPoint, Transform controlPoint2){
+	private void MakeNewRibbons(Transform peptide, Dictionary<string, List<Transform>> ribbons){
+		foreach (var ribbonEntry in ribbons)
+		{
+			Debug.Log("making ribbon" + ribbonEntry.Key);
+			MakeRibbon(peptide, ribbonEntry.Value);
+		}
+	}
+
+	private GameObject MakeRibbon(Transform peptide, List<Transform> points){
 		// make a ribbon
 		GameObject ribbon = new GameObject("ribbon");
-		ribbon.transform.parent = parent.transform;
+		ribbon.transform.parent = peptide.transform;
 		ribbon.AddComponent<MeshRenderer>();
 		ribbon.AddComponent<MeshFilter>();
 		RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
 		ribbonMaker.Material = ribbonMaterial;
-		ribbonMaker.controlPoints.Add(controlPoint);
-		ribbonMaker.controlPoints.Add(controlPoint2);
+		foreach (var point in points)
+		{
+			ribbonMaker.controlPoints.Add(point);
+		}
 		return ribbon;
 	}
 
