@@ -4,23 +4,10 @@ using UnityEngine;
 
 public class Strider : MonoBehaviour
 {
-
 	public Material ribbonMaterial;
-
 	public RibbonMaker RibbonMaker;
-
-	public Strider()
-	{
-	}
-
 	public float errorThreshold = 30f;
-	// Use this for initialization
-	void Start()
-	{
 
-	}
-
-	// Update is called once per frame
 	void Update()
 	{
 		GameObject peptide = GameObject.Find("polyPep_0");
@@ -36,60 +23,91 @@ public class Strider : MonoBehaviour
 		return o1.name.CompareTo(o2.name);
 	}
 
+	private string MakeRibbonKey(int a, int b) {
+		return a + "-" + b;
+	}
+
+
+	/// <summary>
+	/// Iterates a peptide child transforms and creates ribbon instances where bond parameters match
+	/// </summary>
+	/// <param name="peptide"></param>
 	private void AnalyzePeptide(GameObject peptide)
 	{
-		// search immediate children in order.
+		var points = new List<Transform>();
+		var ribbons = new Dictionary<string, List<Transform>>();
 
-		// each res has 3 bbus.
+		int startResidue = 0;
+		int endResidue = 0;
 
-		// patterns are 6 things long.
+		 // Debug.Log(typeof(string).Assembly.ImageRuntimeVersion);
 
-		// var cjPhi_NCa = GetAmideForResidue(resid).GetComponent<ConfigurableJoint>();
-		// cjPhi_NCa.targetRotation = Quaternion.Euler(180.0f - phi, 0, 0);
-
-		// var cjPsi_CaCO = GetCalphaForResidue(resid).GetComponent<ConfigurableJoint>();
-		// cjPsi_CaCO.targetRotation = Quaternion.Euler(180.0f - psi, 0, 0);
-
-
-		// iterating entire chain
 		Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
 		for (int i = 0; i < residues.Length - 1; i++)
 		{
-			Residue residue = residues[i];
-			Residue residueNext = residues[i+1];
-			if (residues[i + 1])
-			{
-				if (IsHelical(residue) && IsHelical(residueNext))
-				{
-					// if residue helical, grab amide and add to segmentpoints.
-					var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
-					var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
-					if (controlPoint && controlPoint2)
-					{
-						Debug.Log("make a ribbon " + residue.name);
-						// List<Transform> ribbonSegmentPoints = new List<Transform>();
-						// List<List<Transform>> ribbonSegments = new List<List<Transform>>();
-						if (!residue.transform.Find("ribbon"))
-						{
-							// make a ribbon
-							GameObject ribbon = new GameObject("ribbon");
-							ribbon.transform.parent = residue.transform;
-							ribbon.AddComponent<MeshRenderer>();
-							ribbon.AddComponent<MeshFilter>();
-							RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
-							ribbonMaker.Material = ribbonMaterial;
-							ribbonMaker.controlPoints.Add(controlPoint);
-							ribbonMaker.controlPoints.Add(controlPoint2);
-						}
-					}
-				}
-				else {
-					Destroy(residue.transform.Find("ribbon").gameObject);
-				}
+			var residue = residues[i];
+			if (IsHelical(residue)) {
+				
+			}
+			else {
+				endResidue = i;
+				// do some things
+				
+
+
+				startResidue = i;
 			}
 		}
+		// if (false)
+		// {
+		// 	// iterating entire chain
+		// 	Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
+		// 	for (int i = 0; i < residues.Length - 1; i++)
+		// 	{
+		// 		Residue residue = residues[i];
+		// 		Residue residueNext = residues[i + 1];
+		// 		if (residues[i + 1])
+		// 		{
+		// 			if (IsHelical(residue) && IsHelical(residueNext))
+		// 			{
+		// 				// if residue helical, grab amide and add to segmentpoints.
+		// 				var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
+		// 				var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
+		// 				if (controlPoint && controlPoint2)
+		// 				{
+		// 					// Debug.Log("make a ribbon " + residue.name);
+
+		// 					// List<Transform> ribbonSegmentPoints = new List<Transform>();
+		// 					// List<List<Transform>> ribbonSegments = new List<List<Transform>>();
+		// 					if (!residue.transform.Find("ribbon"))
+		// 					{
+		// 						// make a ribbon
+		// 						GameObject ribbon = new GameObject("ribbon");
+		// 						ribbon.transform.parent = residue.transform;
+		// 						ribbon.AddComponent<MeshRenderer>();
+		// 						ribbon.AddComponent<MeshFilter>();
+		// 						RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
+		// 						ribbonMaker.Material = ribbonMaterial;
+		// 						ribbonMaker.controlPoints.Add(controlPoint);
+		// 						ribbonMaker.controlPoints.Add(controlPoint2);
+		// 					}
+		// 				}
+		// 			}
+		// 			else
+		// 			{
+		// 				Destroy(residue.transform.Find("ribbon").gameObject);
+		// 			}
+		// 		}
+		// 	}
+
+		// }
 	}
 
+	/// <summary>
+	///  Determines if a residue has helical bonds by looking at joint values within a value range returns true if helical.
+	/// </summary>
+	/// <param name="residue"></param>
+	/// <returns>boolean</returns>
 	private bool IsHelical(Residue residue)
 	{
 		//error threshold.
