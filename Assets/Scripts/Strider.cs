@@ -76,7 +76,7 @@ public class Strider : MonoBehaviour
 		// Debug.Log("end of ribbon. " + points.Count);
 
 		// garbage collection for ribbons.
-		RemoveOldRibbons(peptide.transform, oldRibbons, ribbons);
+		ComparePrevRibbons(peptide.transform, oldRibbons, ribbons);
 		MakeNewRibbons(peptide.transform, ribbons);
 		oldRibbons = ribbons;
 	}
@@ -86,7 +86,7 @@ public class Strider : MonoBehaviour
 	/// </summary>
 	/// <param name="oldRibbons"></param>
 	/// <param name="ribbons"></param>
-	private void RemoveOldRibbons(Transform peptide, Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
+	private void ComparePrevRibbons(Transform peptide, Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
 	{
 		foreach (var oldRibbon in oldRibbons)
 		{
@@ -96,6 +96,9 @@ public class Strider : MonoBehaviour
 				// var x = oldRibbons[oldRibbon.Key];
 				oldRibbons.Remove(oldRibbon.Key);
 				Destroy(peptide.transform.Find(oldRibbon.Key).gameObject);
+			}
+			else {
+				ribbons.Remove(oldRibbon.Key);
 			}
 		}
 	}
