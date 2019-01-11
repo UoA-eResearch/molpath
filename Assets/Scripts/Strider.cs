@@ -12,14 +12,12 @@ public class Strider : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		Profiler.BeginSample("Ribbon creation");
 		GameObject peptide = GameObject.Find("polyPep_0");
 		if (peptide)
 		{
 			// Debug.Log("peptide has spawned");
 			AnalyzePeptide(peptide);
 		}
-		Profiler.EndSample();
 	}
 
 	private static int SortByName(GameObject o1, GameObject o2)
