@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class Strider : MonoBehaviour
 {
@@ -9,14 +10,16 @@ public class Strider : MonoBehaviour
 	public RibbonMaker RibbonMaker;
 	public float errorThreshold = 30f;
 
-	void Update()
+	private void FixedUpdate()
 	{
+		Profiler.BeginSample("Ribbon creation");
 		GameObject peptide = GameObject.Find("polyPep_0");
 		if (peptide)
 		{
 			// Debug.Log("peptide has spawned");
 			AnalyzePeptide(peptide);
 		}
+		Profiler.EndSample();
 	}
 
 	private static int SortByName(GameObject o1, GameObject o2)
@@ -36,14 +39,14 @@ public class Strider : MonoBehaviour
 	private void AnalyzePeptide(GameObject peptide)
 	{
 		var points = new List<Transform>();
-		var ribbons = new Dictionary<string, List<Transform>>();
-		var oldRibbons = new Dictionary<string, List<Transform>>();
+		var ribbonsToAdd = new Dictionary<string, List<Transform>>();
+		var ribbonsExisting = new Dictionary<string, List<Transform>>();
 
 		var pointIndexes = new List<int[]>();
 
 		int startResidue = 0;
 		int endResidue = 0;
-
+		string ribbonKey = "";
 		// iterating entire chain
 		Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
 		for (int i = 0; i < residues.Length - 1; i++)
@@ -52,53 +55,61 @@ public class Strider : MonoBehaviour
 			endResidue = i;
 			if (IsHelical(residue))
 			{
-				// // if residue helical, grab amide and add to segmentpoints.
-				// var controlPoint = Utility.GetFirstChildContainingText(residue.transform, "amide");
-				// var controlPoint2 = Utility.GetFirstChildContainingText(residueNext.transform, "amide");
-				// if (controlPoint && controlPoint2)
-				// {
-				// 	// Debug.Log("make a ribbon " + residue.name);
-				// 	if (!residue.transform.Find("ribbon"))
-				// 	{
-				// 		MakeRibbon(residue.transform, controlPoint, controlPoint2);
-				// 	}
-				// }
 				points.Add(Utility.GetFirstChildContainingText(residue.transform, "amide"));
 			}
 			else
 			{
-				// adding to ribbons duplicate code.
-				ribbons[MakeRibbonName(startResidue, endResidue)] = points;
+				// only add if doesn't exist.
+				ribbonKey = MakeRibbonName(startResidue, endResidue);
+				if (!ribbonsExisting.ContainsKey(ribbonKey)) {
+					ribbonsToAdd[ribbonKey] = points;
+				}
 			}
 		}
 		// adding to ribbons for final piece if no break in helical pattern
-		ribbons[MakeRibbonName(startResidue, endResidue)] = points;
-		// Debug.Log("end of ribbon. " + points.Count);
+		// only add if doesn't exist.
+		ribbonKey = MakeRibbonName(startResidue, endResidue);
+		if (!ribbonsExisting.ContainsKey(ribbonKey))
+		{
+			ribbonsToAdd[ribbonKey] = points;
+		}
 
-		// garbage collection for ribbons.
-		ComparePrevRibbons(peptide.transform, oldRibbons, ribbons);
-		MakeNewRibbons(peptide.transform, ribbons);
-		oldRibbons = ribbons;
+		ProcessRibbonChanges(peptide.transform, ribbonsToAdd, ribbonsExisting);
+		MakeNewRibbons(peptide.transform, ribbonsToAdd);
 	}
 
-	/// <summary>
-	/// Compares new ribbon keys with old ones, for any old ribbons that arent found in current iteration destroy the old ribbons.
-	/// </summary>
-	/// <param name="oldRibbons"></param>
-	/// <param name="ribbons"></param>
-	private void ComparePrevRibbons(Transform peptide, Dictionary<string, List<Transform>> oldRibbons, Dictionary<string, List<Transform>> ribbons)
+/// <summary>
+/// Removes old ribbons, reduces new ribbons to be added 
+/// </summary>
+/// <param name="root"></param>
+/// <param name="ribbonsToAdd"></param>
+/// <param name="ribbonsExisting"></param>
+	private void ProcessRibbonChanges(Transform root, Dictionary<string, List<Transform>> ribbonsToAdd, Dictionary<string, List<Transform>> ribbonsExisting)
 	{
-		foreach (var oldRibbon in oldRibbons)
+		// compare old with new, destroy olds not present in using UnityEngine;
+		foreach (var ribbonExisting in ribbonsExisting)
 		{
-			if (!ribbons.ContainsKey(oldRibbon.Key))
+			if (!ribbonsToAdd.ContainsKey(ribbonExisting.Key))
 			{
-				Debug.Log("destorying old ribbon: " + oldRibbon.Key);
-				// var x = oldRibbons[oldRibbon.Key];
-				oldRibbons.Remove(oldRibbon.Key);
-				Destroy(peptide.transform.Find(oldRibbon.Key).gameObject);
+				var ribbonToDelete = root.Find(ribbonExisting.Key);
+				if (ribbonToDelete)
+				{
+					Destroy(ribbonToDelete);
+				}
 			}
-			else {
-				ribbons.Remove(oldRibbon.Key);
+		}
+
+		// compare new with olds. remove olds from new as they already exist.
+		// in theory shouldn't need to do this part as the entry validation is already done in analyzePeptide.
+		foreach (var ribbonToAdd in ribbonsToAdd)
+		{
+			if (ribbonsExisting.ContainsKey(ribbonToAdd.Key))
+			{
+				ribbonsToAdd.Remove(ribbonToAdd.Key);
+			}
+			else
+			{
+				ribbonsExisting[ribbonToAdd.Key] = ribbonToAdd.Value;
 			}
 		}
 	}
@@ -106,14 +117,20 @@ public class Strider : MonoBehaviour
 	private void MakeNewRibbons(Transform peptide, Dictionary<string, List<Transform>> ribbons){
 		foreach (var ribbonEntry in ribbons)
 		{
-			Debug.Log("making ribbon" + ribbonEntry.Key);
-			MakeRibbon(peptide, ribbonEntry.Value);
+			// Debug.Log("making ribbon" + ribbonEntry.Key);
+			if (peptide.transform.Find(ribbonEntry.Key)) {
+				// Debug.Log("ribbon exists, not creating new ribbon.");
+			}
+			else
+			{
+				MakeRibbon(peptide, ribbonEntry.Key, ribbonEntry.Value);
+			}
 		}
 	}
 
-	private GameObject MakeRibbon(Transform peptide, List<Transform> points){
+	private GameObject MakeRibbon(Transform peptide, string ribbonName, List<Transform> points){
 		// make a ribbon
-		GameObject ribbon = new GameObject("ribbon");
+		GameObject ribbon = new GameObject(ribbonName);
 		ribbon.transform.parent = peptide.transform;
 		ribbon.AddComponent<MeshRenderer>();
 		ribbon.AddComponent<MeshFilter>();
@@ -132,11 +149,11 @@ public class Strider : MonoBehaviour
 	/// <param name="residue"></param>
 	/// <returns>boolean</returns>
 	private bool IsHelical(Residue residue)
-{
-	//error threshold.
-	// alpha helical = psi 50, phi 60.
-	// Debug.Log(residue.transform.name);
-	BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
+	{
+		//error threshold.
+		// alpha helical = psi 50, phi 60.
+		// Debug.Log(residue.transform.name);
+		BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
 		ConfigurableJoint[] cfjs = residue.transform.GetComponentsInChildren<ConfigurableJoint>();
 
 		// Debug.Log(cfjs[0].targetRotation);
@@ -153,7 +170,8 @@ public class Strider : MonoBehaviour
 		{
 			isHelical = false;
 		}
-		else {
+		else
+		{
 			// Debug.Log("phi within range" + cfjs[0].targetRotation.eulerAngles.x);
 		}
 

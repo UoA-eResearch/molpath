@@ -105,7 +105,14 @@ public class RibbonMaker : MonoBehaviour
 		// Vector3[] interpolatedPositions = new Vector3[interpolationSteps * controlPoints.Count];
 		// interpolatedPositions[i + j * interpolationSteps] = position;
 
-		Vector3[] interpolatedPositions = new Vector3[((controlPoints.Count - 1) * interpolationSteps)];
+        int interpolationPositionsLength = ((controlPoints.Count - 1) * interpolationSteps);
+		// Vector3[] interpolatedPositions = new Vector3[((controlPoints.Count - 1) * interpolationSteps)];
+        if (interpolationPositionsLength < 0)
+        {
+			return new Vector3[0];
+		}
+        Debug.Log(interpolationPositionsLength);
+		Vector3[] interpolatedPositions = new Vector3[interpolationPositionsLength];
 		// Debug.Log(interpolatedPositions.Length); // 45
 
 		Vector3 p0, p1, m0, m1;
@@ -192,6 +199,7 @@ public class RibbonMaker : MonoBehaviour
     private TubeVertex[] CreateTubeVertices(Vector3[] interpolatedPositions)
 	{
         // Debug.Log(interpolatedPositions);
+        Debug.Log(interpolatedPositions.Length);
 		TubeVertex[] tubeVertices = new TubeVertex[interpolatedPositions.Length];
 		for (int i = 0; i < interpolatedPositions.Length; i++)
         {
