@@ -28,7 +28,7 @@ namespace ViveInputs
         [Tooltip("Maximum raycast distance")]
         public float raycastDistance = 500;
 
-        public RawInteraction myRawInteraction;
+        public ViveRawInteraction myRawInteraction;
 
 
         public ViveSelectionPointer viveSelectionPointer;
