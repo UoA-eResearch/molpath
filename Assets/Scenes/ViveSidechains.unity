@@ -932,6 +932,11 @@ Prefab:
       propertyPath: Material
       value: 
       objectReference: {fileID: 2100000, guid: c9e6294c9d11cb8d11006bf944295342, type: 2}
+    - target: {fileID: 114632901777576344, guid: cd810c17f54bc984192a9d08440e2cc8,
+        type: 2}
+      propertyPath: interpolationSteps
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cd810c17f54bc984192a9d08440e2cc8, type: 2}
   m_IsPrefabAsset: 0

@@ -20,6 +20,8 @@ public class RibbonMaker : MonoBehaviour
 		}
 	}
 
+	public int vertexCalculations = 0;
+
 	//Use the transforms of GameObjects in 3d space as your points or define array with desired points
 	public List<Transform> controlPoints = new List<Transform>();
 
@@ -65,34 +67,12 @@ public class RibbonMaker : MonoBehaviour
 
     private void FixedUpdate()
     {
-		// controlPoints.Clear();
-		// controlPointGos.Clear();
-
-		// TODO: interpolates better using just singular point per residue.
-		// TODO: Alternatively, average the residue vertices and use that as the control point.
-
-
-		// foreach (var tag in controlPointTags) 
-		// {
-		// 	foreach (var go in GameObject.FindGameObjectsWithTag(tag))
-		// 	{
-		// 		controlPointGos.Add(go);
-		// 	}
-		// }
-
-		// // sort control points by otherwise it grabs them out of order
-		// controlPointGos.Sort(SortByName);
-		// // add sorted transforms 
-        // foreach (var controlPointGo in controlPointGos)
-        // {
-		// 	// Debug.Log(controlPointGo.name);
-		// 	controlPoints.Add(controlPointGo.transform);
-		// }
-        if (controlPoints.Count < 0) {
+		if (controlPoints.Count < 0) {
 			return;
 		}
         Vector3[] interpolatedPositions = InterpolateControlPoints(controlPoints);
         TubeVertex[]  tubeVertices =  CreateTubeVertices(interpolatedPositions);
+        Debug.Log(tubeVertices.Length * crossSegments);
 		// Debug.Log(interpolatedPositions[interpolatedPositions.Length -1]);
 		// Debug.Log(tubeVertices.Length);
         CreateTubeMesh(tubeVertices);
@@ -111,7 +91,6 @@ public class RibbonMaker : MonoBehaviour
         {
 			return new Vector3[0];
 		}
-        Debug.Log(interpolationPositionsLength);
 		Vector3[] interpolatedPositions = new Vector3[interpolationPositionsLength];
 		// Debug.Log(interpolatedPositions.Length); // 45
 
@@ -198,8 +177,6 @@ public class RibbonMaker : MonoBehaviour
 
     private TubeVertex[] CreateTubeVertices(Vector3[] interpolatedPositions)
 	{
-        // Debug.Log(interpolatedPositions);
-        Debug.Log(interpolatedPositions.Length);
 		TubeVertex[] tubeVertices = new TubeVertex[interpolatedPositions.Length];
 		for (int i = 0; i < interpolatedPositions.Length; i++)
         {
