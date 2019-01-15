@@ -9,7 +9,7 @@ using ViveInputs;
 
 namespace ControllerSelection
 {
-    public class ViveSystemManager : MonoBehaviour
+	public class ViveSetupManager : MonoBehaviour
     {
         [Header("Oculus References")]
         private OVRPlayerController _ovrPlayerController;
@@ -115,14 +115,14 @@ namespace ControllerSelection
 
         public bool DebugOculusAsVive = false;
 
-        private static ViveSystemManager _instance;
-        public static ViveSystemManager instance
+        private static ViveSetupManager _instance;
+        public static ViveSetupManager instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<ViveSystemManager>();
+                    _instance = FindObjectOfType<ViveSetupManager>();
                 }
                 return _instance;
             }
@@ -162,16 +162,17 @@ namespace ControllerSelection
 		void Awake()
         {
             // Handling UI 
-            if (uiContainer == null)
-            {
-                uiContainer = GameObject.Find("UiContainer");
-            }
+            // if (uiContainer == null)
+            // {
+            //     uiContainer = GameObject.Find("UiContainer");
+            // }
 
 			// handling ui outside the ui container.
 			uis = GameObject.FindGameObjectsWithTag("UI");
 
             if (UnityEngine.XR.XRDevice.model.Contains("Vive") && !DebugOculusAsVive)
             {
+                Debug.Log("using vive setup");
                 ViveSceneSetup();
                 usingVive = true;
             }
@@ -183,15 +184,13 @@ namespace ControllerSelection
             {
                 DesktopSceneSetup();
             }
-
-            // hacking way of adding a no-menu option for menu cycling.
-            menus.Add(uiContainer);
-            menus.Add(null);
-
-            SetUpTeleporting();
+            // SetUpTeleporting();
         }
 
-        private void ViveSceneSetup()
+		/// <summary>
+		/// Turns of OVR input module. Turns on ViveInputModule
+		/// </summary>
+		private void ViveSceneSetup()
         {
             ovrInputModule.gameObject.SetActive(false);
             viveInputModule.gameObject.SetActive(true);
@@ -199,7 +198,7 @@ namespace ControllerSelection
             ovrPlayerController.gameObject.SetActive(false);
             vivePlayer.gameObject.SetActive(true);
 
-            SetUIToHandPosition();
+            // SetUIToHandPosition();
 
             // currently all the canvases are set to oculus transforms/tracking space etc.
             ConfigureCanvasesForVive(vivePlayerCamera);
@@ -220,7 +219,9 @@ namespace ControllerSelection
             ovrPlayerController.gameObject.SetActive(true);
 
             // Camera stuff
-            SetUIToWorldPosition();
+
+            // SetUIToWorldPosition();
+
             // accessing ovr camera rig left/right eye camera gets centre eye camera by default.
             ConfigureCanvasesForVive(ovrPlayerCamera);
 
@@ -292,71 +293,64 @@ namespace ControllerSelection
                 if (ui.GetComponent<Canvas>()) {
 					ui.GetComponent<Canvas>().worldCamera = camera;
                 }
-                // if (ui.GetComponent<ViveRaycaster>() == null){
-				// 	ui.AddComponent<ViveRaycaster>();
-				// }
-            }
-			// Canvas[] canvases = uiContainer.GetComponentsInChildren<Canvas>();
-            // foreach (var canvas in canvases)
-            // {
-            //     canvas.worldCamera = camera;
-            // }
-        }
-
-        private GameObject CycleMenu()
-        {
-            // switch off current menu
-            activeMenuIndex = activeMenuIndex % menus.Count;
-            if (menus[activeMenuIndex] != null)
-            {
-                menus[activeMenuIndex].SetActive(false);
-            }
-
-            // update index and active new menu
-            activeMenuIndex++;
-            activeMenuIndex %= menus.Count;
-            if (menus[activeMenuIndex] != null)
-            {
-                menus[activeMenuIndex].SetActive(true);
-                return menus[activeMenuIndex];
-            }
-            return null;
-        }
-
-        private void SwapMenuHand(GameObject menu, Hand hand)
-        {
-            if (!menu)
-            {
-                return;
-            }
-            if (menu.transform.parent && menu.transform.parent != hand.transform)
-            {
-                return;
-            }
-            var positionOffset = menu.transform.localPosition;
-            menu.transform.parent = hand.transform;
-            menu.transform.localPosition = positionOffset;
-        }
-
-        private void UpdateMenuPosition()
-        {
-            foreach (Hand hand in vivePlayer.hands)
-            {
-                if (hand.controller != null)
-                {
-                    if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu))
-                    {
-                        GameObject newMenu = CycleMenu();
-                        SwapMenuHand(newMenu, hand);
-                    }
-                }
             }
         }
+
+        // private GameObject CycleMenu()
+        // {
+        //     // switch off current menu
+        //     activeMenuIndex = activeMenuIndex % menus.Count;
+        //     if (menus[activeMenuIndex] != null)
+        //     {
+        //         menus[activeMenuIndex].SetActive(false);
+        //     }
+
+        //     // update index and active new menu
+        //     activeMenuIndex++;
+        //     activeMenuIndex %= menus.Count;
+        //     if (menus[activeMenuIndex] != null)
+        //     {
+        //         menus[activeMenuIndex].SetActive(true);
+        //         return menus[activeMenuIndex];
+        //     }
+        //     return null;
+        // }
+
+        // private void SwapMenuHand(GameObject menu, Hand hand)
+        // {
+        //     if (!menu)
+        //     {
+        //         return;
+        //     }
+        //     if (menu.transform.parent && menu.transform.parent != hand.transform)
+        //     {
+        //         return;
+        //     }
+        //     var positionOffset = menu.transform.localPosition;
+        //     menu.transform.parent = hand.transform;
+        //     menu.transform.localPosition = positionOffset;
+        // }
+
+        // private void UpdateMenuPosition()
+        // {
+        //     foreach (Hand hand in vivePlayer.hands)
+        //     {
+        //         if (hand.controller != null)
+        //         {
+        //             if (hand.controller.GetPressDown(EVRButtonId.k_EButton_ApplicationMenu))
+        //             {
+        //                 GameObject newMenu = CycleMenu();
+        //                 SwapMenuHand(newMenu, hand);
+        //             }
+        //         }
+        //     }
+        // }
 
         // Update is called once per frame
         void Update()
         {
-            UpdateMenuPosition();
+            // UpdateMenuPosition();
+
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
