@@ -187,7 +187,7 @@ namespace ViveInputs
             {
                 activeHand = ViveInputHelpers.GetHandForButton(SteamVR_Controller.ButtonMask.Touchpad, activeHand);
 
-                viveSelectionPointer.activeHand = activeHand;
+                // viveSelectionPointer.activeHand = activeHand;
             }
 
             m_LastMousePosition = m_MousePosition;

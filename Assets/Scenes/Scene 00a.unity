@@ -3306,6 +3306,68 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: -100
   m_TargetDisplay: 0
+--- !u!1001 &213923247
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890956295941332, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+      propertyPath: m_RootOrder
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 114107963391425522, guid: 00651c7bc44012749b046a1220e5f3f8,
+        type: 2}
+      propertyPath: _ovrPlayerCamera
+      value: 
+      objectReference: {fileID: 82558281}
+    - target: {fileID: 114107963391425522, guid: 00651c7bc44012749b046a1220e5f3f8,
+        type: 2}
+      propertyPath: OvrRightHandAnchor
+      value: 
+      objectReference: {fileID: 1732572769}
+    - target: {fileID: 114107963391425522, guid: 00651c7bc44012749b046a1220e5f3f8,
+        type: 2}
+      propertyPath: OvrLeftHandAnchor
+      value: 
+      objectReference: {fileID: 1104117587}
+    - target: {fileID: 114107963391425522, guid: 00651c7bc44012749b046a1220e5f3f8,
+        type: 2}
+      propertyPath: teleportAreaTarget
+      value: 
+      objectReference: {fileID: 1326997174}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 00651c7bc44012749b046a1220e5f3f8, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1 &216239448
 GameObject:
   m_ObjectHideFlags: 0
@@ -19999,6 +20061,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 462066, guid: ce816f2e6abb0504092c23ed9b970dfd,
     type: 2}
   m_PrefabInternal: {fileID: 2117203875}
+--- !u!4 &1325695752 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4707060579228660, guid: 81f0d94a4ef78884692fafaeec72795a,
+    type: 2}
+  m_PrefabInternal: {fileID: 1916640482}
 --- !u!1 &1326997174
 GameObject:
   m_ObjectHideFlags: 0
@@ -27118,6 +27185,48 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1758000295}
   m_CullTransparentMesh: 0
+--- !u!1001 &1759534195
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1325695752}
+    m_Modifications:
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 475244, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7a135b1a2cb9c8f488d4dd00c55ab283, type: 2}
+  m_IsPrefabAsset: 0
 --- !u!1 &1762794662
 GameObject:
   m_ObjectHideFlags: 0
@@ -29507,11 +29616,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 22
       objectReference: {fileID: 0}
-    - target: {fileID: 114972848687434128, guid: 81f0d94a4ef78884692fafaeec72795a,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81f0d94a4ef78884692fafaeec72795a, type: 2}
   m_IsPrefabAsset: 0
@@ -30447,55 +30551,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2013209425}
   m_CullTransparentMesh: 0
---- !u!1 &2013363095
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2013363097}
-  - component: {fileID: 2013363096}
-  m_Layer: 0
-  m_Name: ViveSetupManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2013363096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2013363095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dec75bb25fba2e4a814cbe815d28633, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _ovrPlayerCamera: {fileID: 82558281}
-  OvrRightHandAnchor: {fileID: 1732572769}
-  OvrLeftHandAnchor: {fileID: 1104117587}
-  uiContainer: {fileID: 0}
-  menus: []
-  usingOculus: 0
-  usingVive: 0
-  DebugOculusAsVive: 0
-  teleportAreaTarget: {fileID: 0}
---- !u!4 &2013363097
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2013363095}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 21
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2017496240
 GameObject:
   m_ObjectHideFlags: 0

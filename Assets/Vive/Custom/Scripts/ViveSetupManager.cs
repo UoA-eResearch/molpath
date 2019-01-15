@@ -184,7 +184,7 @@ namespace ControllerSelection
             {
                 DesktopSceneSetup();
             }
-            // SetUpTeleporting();
+            SetUpTeleporting();
         }
 
 		/// <summary>
@@ -245,7 +245,7 @@ namespace ControllerSelection
             if (usingVive)
             {
                 teleport.gameObject.SetActive(true);
-                teleportArea.gameObject.SetActive(true);
+                // teleportArea.gameObject.SetActive(true);
 
                 // attempt to position and scale teleport area to match floor size.
                 if (!teleportAreaTarget)
@@ -254,9 +254,15 @@ namespace ControllerSelection
                 }
                 if (teleportAreaTarget)
                 {
-                    teleportArea.transform.position = teleportAreaTarget.transform.position + new Vector3(0, 0.002f, 0);
-                    teleportArea.transform.localScale = teleportAreaTarget.transform.localScale;
-                }
+                    Debug.Log(teleportAreaTarget.name);
+					// clone the floor, disable renderer, add teleport area component
+					var teleportAreaGo = GameObject.Instantiate(teleportAreaTarget);
+					teleportAreaGo.name = teleportAreaTarget.name + "-TeleportArea";
+					teleportAreaGo.transform.position = teleportAreaTarget.transform.position + new Vector3(0, 0.01f, 0);
+					teleportAreaGo.GetComponent<MeshRenderer>().enabled = false;
+					teleportAreaGo.AddComponent<TeleportArea>();
+					teleportAreaGo.SetActive(true);
+				}
             }
             if (usingOculus)
             {
