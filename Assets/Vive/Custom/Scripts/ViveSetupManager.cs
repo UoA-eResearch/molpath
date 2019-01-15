@@ -294,10 +294,15 @@ namespace ControllerSelection
 
         private void ConfigureCanvasesForVive(Camera camera)
         {
-			foreach (var ui in uis)
+            foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
             {
-                if (ui.GetComponent<Canvas>()) {
-					ui.GetComponent<Canvas>().worldCamera = camera;
+                Debug.Log(canvas.gameObject.name);
+                if (!canvas.gameObject.GetComponent<ViveRaycaster>())
+                {
+					canvas.gameObject.AddComponent<ViveRaycaster>();
+				}
+                if (canvas.GetComponent<Canvas>()) {
+					canvas.GetComponent<Canvas>().worldCamera = camera;
                 }
             }
         }
