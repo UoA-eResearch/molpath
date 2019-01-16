@@ -19,7 +19,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4835303894661248}
-  - component: {fileID: 114613130250821054}
   - component: {fileID: 120596027384618710}
   - component: {fileID: 114623430461272546}
   m_Layer: 0
@@ -66,8 +65,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1094602352984390}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -4}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4250727317984524}
@@ -116,23 +115,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1711283207476116}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114613130250821054
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1094602352984390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12283131fa5724f44b343883ae474072, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trackingSpace: {fileID: 0}
-  linePointer: {fileID: 120596027384618710}
-  gazePointer: {fileID: 4250727317984524}
-  rayDrawDistance: 10
-  gazeDrawDistance: 3
-  activeController: 0
 --- !u!114 &114623430461272546
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -145,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myLineRenderer: {fileID: 120596027384618710}
-  distance: 0
+  distance: 10
   activeHand: {fileID: 0}
 --- !u!120 &120596027384618710
 LineRenderer:
@@ -184,8 +166,8 @@ LineRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: -4}
+  - {x: 0, y: 0, z: 6}
   m_Parameters:
     serializedVersion: 2
     widthMultiplier: 0.02
