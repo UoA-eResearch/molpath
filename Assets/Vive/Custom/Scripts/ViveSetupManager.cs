@@ -25,6 +25,20 @@ namespace ControllerSelection
                 return _ovrPlayerController;
             }
         }
+
+        private PolyPepManager _polyPepManager;
+        public PolyPepManager polyPepManager
+        {
+            get
+            {
+                if (!_polyPepManager)
+                {
+                    _polyPepManager = FindObjectOfType<PolyPepManager>();
+                }
+				return _polyPepManager;
+            }
+        }
+
         private GameObject _ovrPlayerGo;
         public GameObject ovrPlayerGo
         {
@@ -206,6 +220,13 @@ namespace ControllerSelection
             // disable multiple audio listeners.
             vivePlayer.audioListener.GetComponent<AudioListener>().enabled = false;
 
+            if (polyPepManager)
+            {
+                // Debug.Log(polyPepManager.name);
+				polyPepManager.myPlayerController = Player.instance.gameObject;
+                Debug.Log(polyPepManager.myPlayerController.name );
+			}
+
             usingVive = true;
             usingOculus = false;
         }
@@ -365,6 +386,11 @@ namespace ControllerSelection
             {
                 DebugWithVive();
             }
+
+            if (polyPepManager.myPlayerController == null)
+            {
+				polyPepManager.myPlayerController = Player.instance.gameObject;
+			}
         }
 
 		/// <summary>
