@@ -21,7 +21,13 @@ namespace ViveInputs
             }
         }
 
-        public static Hand GetHandForButton(ulong button, Hand oldHand)
+		/// <summary>
+		/// checks player instance has hand component class, then checks for controller class, if button pressed by hand then return that hand. Checks left then right. If both are false/nonexistent then returns old hand
+		/// </summary>
+		/// <param name="button"></param>
+		/// <param name="oldHand"></param>
+		/// <returns></returns>
+		public static Hand GetHandForButton(ulong button, Hand oldHand)
         {
             if (Player.instance.leftHand)
             {
@@ -33,7 +39,7 @@ namespace ViveInputs
                     }
                 }
             }
-            if (Player.instance.leftHand)
+            if (Player.instance.rightHand)
             {
                 if (Player.instance.rightHand.controller != null)
                 {
