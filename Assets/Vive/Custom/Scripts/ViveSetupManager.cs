@@ -67,6 +67,19 @@ namespace ControllerSelection
         public GameObject OvrRightHandAnchor;
         public GameObject OvrLeftHandAnchor;
 
+        public OVRPointerVisualizer _ovrPointerVisualizer;
+        public OVRPointerVisualizer ovrPointerVisualizer
+        {
+            get
+            {
+                if (!_ovrPointerVisualizer)
+                {
+                    _ovrPointerVisualizer = FindObjectOfType<OVRPointerVisualizer>();
+                }
+                return _ovrPointerVisualizer;
+            }
+        }
+
         [Header("Vive References")]
         private Player _vivePlayer;
         public Player vivePlayer
@@ -224,7 +237,14 @@ namespace ControllerSelection
             {
                 // Debug.Log(polyPepManager.name);
 				polyPepManager.myPlayerController = Player.instance.gameObject;
-                Debug.Log(polyPepManager.myPlayerController.name );
+			}
+            if (ovrPointerVisualizer.gameObject.activeInHierarchy)
+            {
+				ovrPointerVisualizer.gameObject.SetActive(false);
+			}
+            if (ovrPointerVisualizer.enabled)
+            {
+				ovrPointerVisualizer.enabled = false;
 			}
 
             usingVive = true;
