@@ -291,11 +291,13 @@ namespace ViveInputs
             }
             if (remoteGrab.GetComponent<Canvas>() || remoteGrab.gameObject.layer == 11)
             {
-                Debug.Log(Player.instance.hmdTransform.transform.name);
-				var relativePos = Player.instance.hmdTransform.position;
-				Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-				remoteGrab.transform.rotation = rotation;
-				// remoteGrab.transform.rotation = lookAt;
+                // Debug.Log(Player.instance.hmdTransform.transform.name);
+				// var relativePos = Player.instance.hmdTransform.position;
+				// Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+				// remoteGrab.transform.rotation = rotation;
+				// // remoteGrab.transform.rotation = lookAt;
+                // TODO: make canvas face player here. Make sure it's the parent so that all UIs are offset equally.
+                Debug.Log("make canvas face player here.");
 			}
         }
 
