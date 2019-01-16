@@ -16,20 +16,19 @@ namespace ViveInputs
 
         [Header("Vive Selection")]
         [Tooltip("Primary selection button")]
-        public ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
+        private ulong touchpad = SteamVR_Controller.ButtonMask.Touchpad;
 
         [Tooltip("Trigger button")]
-        public ulong trigger = SteamVR_Controller.ButtonMask.Trigger;
+        private ulong trigger = SteamVR_Controller.ButtonMask.Trigger;
 
-        public ulong grip = SteamVR_Controller.ButtonMask.Grip;
+        private ulong grip = SteamVR_Controller.ButtonMask.Grip;
 
         [Tooltip("Layers to exclude from raycast")]
         public LayerMask excludeLayers;
         [Tooltip("Maximum raycast distance")]
         public float raycastDistance = 500;
 
-        public ViveRawInteraction myRawInteraction;
-
+        public ViveRawInteraction myViveRawInteraction;
 
         public ViveSelectionPointer viveSelectionPointer;
 
@@ -99,19 +98,14 @@ namespace ViveInputs
 
         void Awake()
         {
-            if (vivePlayer == null)
+            if (!vivePlayer)
             {
-                vivePlayerGo = GameObject.Find("VivePlayer");
-
-                if (vivePlayerGo)
-                {
-                    vivePlayer = vivePlayerGo.GetComponent<Player>();
-                    if (vivePlayer)
-                    {
-                        viveLeftHand = vivePlayer.leftHand;
-                        viveRightHand = vivePlayer.rightHand;
-                    }
-                }
+				vivePlayer = Player.instance;
+                if (vivePlayer)
+				{
+					viveLeftHand = vivePlayer.leftHand;
+					viveRightHand = vivePlayer.rightHand;
+				}
             }
             if (remoteGrabDestinationGo == null)
             {
@@ -124,6 +118,20 @@ namespace ViveInputs
             {
                 activeController = Player.instance.leftHand;
             }
+            
+            if (!viveSelectionPointer)
+            {
+				viveSelectionPointer = FindObjectOfType<ViveSelectionPointer>();
+			}
+
+            if (!myViveRawInteraction)
+            {
+				myViveRawInteraction = GetComponent<ViveRawInteraction>();
+			}
+            if (!myViveRawInteraction)
+            {
+				myViveRawInteraction = FindObjectOfType<ViveRawInteraction>();
+			}
         }
 
         void OnEnable()
@@ -265,7 +273,7 @@ namespace ViveInputs
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            myRawInteraction.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
+            myViveRawInteraction.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
             BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
@@ -279,28 +287,16 @@ namespace ViveInputs
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
                 //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
-                myRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
+                myViveRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
             }
-            else
+            if (remoteGrab.GetComponent<Canvas>() || remoteGrab.gameObject.layer == 11)
             {
-                // not bu - UI - make the 'front' face the pointer
-                // flipped because go was initially set up with z facing away
-                //Use pointer position
-                //Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
-                //Use HMD (possibly better - maybe a bit queasy)
-                Vector3 lookAwayPos = Vector3.zero;
-                if (IsHandUI(remoteGrab.transform))
-                {
-                    // TODO: Add consideration in calculation that it's attached to hand transform.
-                    lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
-                    remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
-                }
-                else
-                {
-                    lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.forward;
-                    remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
-                }
-            }
+                Debug.Log(Player.instance.hmdTransform.transform.name);
+				var relativePos = Player.instance.hmdTransform.position;
+				Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+				remoteGrab.transform.rotation = rotation;
+				// remoteGrab.transform.rotation = lookAt;
+			}
         }
 
 
@@ -329,11 +325,13 @@ namespace ViveInputs
         void Update()
         {
             activeController = ViveInputHelpers.GetHandForButton(touchpad, activeController);
-
+            if (!activeController)
+            {
+				return;
+			}
             Ray pointer;
             pointer = ViveInputHelpers.GetSelectionRay(activeController.transform);
             RaycastHit hit; // Was anything hit?
-
 
             if (Physics.Raycast(pointer, out hit, raycastDistance, ~excludeLayers))
             {
@@ -343,7 +341,7 @@ namespace ViveInputs
                 // assumes vivePlayer script always attached to a gameObject.
                 if (vivePlayer.gameObject != null)
                 {
-                    if (vivePlayer.gameObject.activeInHierarchy && !IsHandUI(hit.transform))
+                    if (vivePlayer.gameObject.activeInHierarchy)
                     {
                         ProcessViveInputOnTarget(hit);
                     }

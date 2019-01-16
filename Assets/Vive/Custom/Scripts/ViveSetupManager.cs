@@ -296,7 +296,6 @@ namespace ControllerSelection
         {
             foreach (var canvas in GameObject.FindObjectsOfType<Canvas>())
             {
-                Debug.Log(canvas.gameObject.name);
                 if (!canvas.gameObject.GetComponent<ViveRaycaster>())
                 {
 					canvas.gameObject.AddComponent<ViveRaycaster>();
@@ -361,14 +360,17 @@ namespace ControllerSelection
         void Update()
         {
             // UpdateMenuPosition();
-
+            // Debug.Log("current event system: " + EventSystem.current.gameObject.transform.parent.name);
             if (DebugOculusAsVive)
             {
                 DebugWithVive();
             }
         }
 
-        private void DebugWithVive()
+		/// <summary>
+		/// Uses vive positional tracking to control the oculus avatar for movement.
+		/// </summary>
+		private void DebugWithVive()
         {
             if (vivePlayer.gameObject.activeInHierarchy == false)
             {
