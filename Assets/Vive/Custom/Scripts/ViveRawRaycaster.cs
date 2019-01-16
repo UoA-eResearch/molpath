@@ -290,14 +290,24 @@ namespace ViveInputs
                 myViveRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
             }
             if (remoteGrab.GetComponent<Canvas>() || remoteGrab.gameObject.layer == 11)
-            {
-                // Debug.Log(Player.instance.hmdTransform.transform.name);
-				// var relativePos = Player.instance.hmdTransform.position;
-				// Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-				// remoteGrab.transform.rotation = rotation;
-				// // remoteGrab.transform.rotation = lookAt;
-                // TODO: make canvas face player here. Make sure it's the parent so that all UIs are offset equally.
-                Debug.Log("make canvas face player here.");
+			{
+				// UI - make the 'front' face the pointer
+				// flipped because UI GO was initially set up with z facing away
+
+				//Use pointer position
+				//Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + pointer.direction;
+
+				//Use HMD (possibly better - maybe a bit queasy)
+				Vector3 lookAwayPos = remoteGrab.gameObject.transform.position + Player.instance.hmdTransform.position;
+
+				// use the transform of the GO this script is attached to (RawInteraction) as proxy for storing target rotation :)
+				transform.position = remoteGrab.position;
+				transform.LookAt(lookAwayPos, Vector3.up);
+
+				// lerp to target - eases the rotation of the UI - useful when remote grab just initiated
+				// remoteGrab.gameObject.transform.rotation = Quaternion.Lerp(remoteGrab.gameObject.transform.rotation, transform.rotation, Time.deltaTime * 10.0f);
+				//remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
+				remoteGrab.rotation = Quaternion.Euler(pointer.direction);
 			}
         }
 
