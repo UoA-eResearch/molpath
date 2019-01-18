@@ -232,23 +232,38 @@ namespace ViveInputs
 
             // Test remote grab stuff
             //left
-            if (vivePlayer.GetHairTriggerDown(viveLeftHand))
-            {
-                InitializeRemoteGrab(hit, viveLeftHand.transform);
-                // SetRemoteGrab(hit.point, viveLeftHand.transform);
-            }
-            if (vivePlayer.GetHairTriggerUp(viveLeftHand))
-            {
-                ClearRemoteGrab();
-            }
 
-            // right
-            if (Player.instance.GetHairTriggerDown(viveRightHand))
+            // Not working as intended.
+            // if (vivePlayer.GetHairTriggerDown(viveLeftHand))
+            // {
+            //     Debug.Log("LEFT HAND TRIGGER DOWN");
+            //     InitializeRemoteGrab(hit, viveLeftHand.transform);
+            //     // SetRemoteGrab(hit.point, viveLeftHand.transform);
+            // }
+            // if (vivePlayer.GetHairTriggerUp(viveLeftHand))
+            // {
+            //     ClearRemoteGrab();
+            // }
+
+            // right - working as intended
+            // if (vivePlayer.GetHairTriggerDown(viveRightHand))
+            // {
+            //     Debug.Log("RIGHT HAND TRIGGER DOWN");
+            //     InitializeRemoteGrab(hit, viveRightHand.transform);
+            //     // SetRemoteGrab(hit.point, viveRightHand.transform);
+            // }
+            // if (vivePlayer.GetHairTriggerUp(viveRightHand))
+            // {
+            //     ClearRemoteGrab();
+            // }
+
+            if (vivePlayer.GetHairTriggerDown(activeController))
             {
-                InitializeRemoteGrab(hit, viveRightHand.transform);
+                Debug.Log("RIGHT HAND TRIGGER DOWN");
+                InitializeRemoteGrab(hit, activeController.transform);
                 // SetRemoteGrab(hit.point, viveRightHand.transform);
             }
-            if (vivePlayer.GetHairTriggerUp(viveRightHand))
+            if (vivePlayer.GetHairTriggerUp(activeController))
             {
                 ClearRemoteGrab();
             }
