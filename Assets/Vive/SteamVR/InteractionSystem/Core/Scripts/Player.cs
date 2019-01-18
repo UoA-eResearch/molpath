@@ -418,6 +418,17 @@ namespace Valve.VR.InteractionSystem
             return false;
         }
 
+        public bool GetGripIsSqueezing(Hand hand)
+        {
+            if (hand)
+            {
+                if (hand.controller != null)
+                {
+					return hand.controller.GetPress(EVRButtonId.k_EButton_Grip);
+                }
+            }
+            return false;
+        }
         public bool GetHairTriggerDown(Hand hand)
         {
             if (hand)
@@ -464,6 +475,7 @@ namespace Valve.VR.InteractionSystem
         }
 
 
+
         public bool GetPressUp(Hand hand, ulong button)
         {
             if (hand)
@@ -478,5 +490,80 @@ namespace Valve.VR.InteractionSystem
             }
             return false;
         }
-    }
+
+        public bool GetPressDownB(Hand hand, ulong button)
+        {
+            if (hand)
+            {
+                if (hand.controller != null)
+                {
+                    Debug.Log("hand not null");
+                    if (hand.controller.GetPressDown(button))
+                    {
+						var yAxis = hand.controller.GetAxis(EVRButtonId.k_EButton_SteamVR_Touchpad).y;
+                        Debug.Log(yAxis);
+                        if (yAxis < 0)
+                        {
+							return true;
+						}
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool GetPressDownA(Hand hand, ulong button)
+        {
+            if (hand)
+            {
+                if (hand.controller != null)
+                {
+                    Debug.Log("hand not null");
+                    if (hand.controller.GetPressDown(button))
+                    {
+						var yAxis = hand.controller.GetAxis(EVRButtonId.k_EButton_SteamVR_Touchpad).y;
+                        Debug.Log(yAxis);
+                        if (yAxis > 0)
+                        {
+							return true;
+						}
+                    }
+                }
+            }
+            return false;
+        }
+		private void Update()
+		{
+            // TODO: Finish this off.
+            // TODO: switch from hardcoded nested searchfor thumb pad to move into button hints class.
+            if (Player.instance)
+            {
+				if (Player.instance.leftHand)
+                {
+					var left = Player.instance.leftHand.transform;
+					var handModel = FindNameContaining("hand", left);
+					if (handModel)
+                    {
+                        Debug.Log(handModel.name);
+                        if (FindNameContaining("rendermodel", handModel))
+                        {
+							var renderModel = FindNameContaining("rendermodel", handModel);
+						}
+                    }
+                }
+            }
+		}
+        
+        private static Transform FindNameContaining(string name, Transform root = null)
+        {
+            foreach (Transform child in root)
+            {
+                if (child.name.ToLower().Contains("hand"))
+                {
+					return child;
+				}
+			}
+			return null;
+		}
+	}
 }
