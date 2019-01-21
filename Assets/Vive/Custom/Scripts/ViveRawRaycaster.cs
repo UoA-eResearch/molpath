@@ -224,6 +224,7 @@ namespace ViveInputs
             // while debugging
             if (!mimicOculusControls)
             {
+<<<<<<< HEAD
 				mimicOculusControls = true;
 			}
 
@@ -291,6 +292,21 @@ namespace ViveInputs
 					ClearRemoteGrab();
 				}
 			}
+=======
+                // dont show selection highlight if remote grabbing.
+                onHoverExit.Invoke(lastHit);
+            }
+            lastHit = hit.transform;
+            if (vivePlayer.GetHairTriggerDown(activeController))
+            {
+                InitializeRemoteGrab(hit, activeController.transform);
+                // SetRemoteGrab(hit.point, viveRightHand.transform);
+            }
+            if (vivePlayer.GetHairTriggerUp(activeController))
+            {
+                ClearRemoteGrab();
+            }
+>>>>>>> vive
         }
 
         private void ViveRemoteGrab(Ray pointer)
@@ -350,29 +366,6 @@ namespace ViveInputs
 			}
         }
 
-
-
-        private bool IsHandUI(Transform target)
-        {
-            bool isHandUi = false;
-            // checks if transform is on VR UI layer and if it's a child of a hand.
-            if (viveLeftHand || viveRightHand)
-            {
-                if (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform)
-                {
-                    isHandUi = true;
-                }
-            }
-            // if (target.transform.parent)
-            // {
-            //     if (target.transform.parent.parent.GetComponent<OVRGrabber>() != null)
-            //     {
-            //         isHandUi = true;
-            //     }
-            // }
-            return isHandUi;
-        }
-
         void Update()
         {
             activeController = ViveInputHelpers.GetHandForButton(touchpad, activeController);
@@ -430,7 +423,7 @@ namespace ViveInputs
             {
                 viveSelectionPointer.distance = 10.0f;
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (!vivePlayer.GetHairTrigger(viveLeftHand) && !vivePlayer.GetHairTrigger(viveRightHand))
+                if (!vivePlayer.GetHairTrigger(activeController))
                 {
                     ClearLastHit();
                 }
@@ -438,7 +431,7 @@ namespace ViveInputs
             //REMOTE GRAB UPDATE (outside of hit test)
             if (remoteGrab)
             {
-                if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
+                if (vivePlayer.GetHairTrigger(activeController))
                 {
                     ViveRemoteGrab(pointer);
                 }
