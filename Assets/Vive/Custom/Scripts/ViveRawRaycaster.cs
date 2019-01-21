@@ -224,7 +224,6 @@ namespace ViveInputs
             // while debugging
             if (!mimicOculusControls)
             {
-<<<<<<< HEAD
 				mimicOculusControls = true;
 			}
 
@@ -292,21 +291,6 @@ namespace ViveInputs
 					ClearRemoteGrab();
 				}
 			}
-=======
-                // dont show selection highlight if remote grabbing.
-                onHoverExit.Invoke(lastHit);
-            }
-            lastHit = hit.transform;
-            if (vivePlayer.GetHairTriggerDown(activeController))
-            {
-                InitializeRemoteGrab(hit, activeController.transform);
-                // SetRemoteGrab(hit.point, viveRightHand.transform);
-            }
-            if (vivePlayer.GetHairTriggerUp(activeController))
-            {
-                ClearRemoteGrab();
-            }
->>>>>>> vive
         }
 
         private void ViveRemoteGrab(Ray pointer)
