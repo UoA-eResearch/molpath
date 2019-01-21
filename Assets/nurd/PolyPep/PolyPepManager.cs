@@ -11,6 +11,7 @@ public class PolyPepManager : MonoBehaviour {
 	public List<PolyPepBuilder> allPolyPepBuilders = new List<PolyPepBuilder>();
 
 	public SideChainBuilder sideChainBuilder;
+	public ElectrostaticsManager electrostaticsManager;
 
 	public bool collidersOn = false;
 	public float vdwScale = 1.0f;
@@ -54,8 +55,8 @@ public class PolyPepManager : MonoBehaviour {
 	private Transform snapshotCameraResetTransform;
 
 	public GameObject UI;
-	public GameObject UIPanel02;
-	public GameObject UIPanel03;
+	public GameObject UIPanelSideChains;
+	public GameObject UIPanelCamera;
 	public GameObject UIPanelInfo;
 	private Transform UIInfoActiveTf;
 	private Transform UIInfoNotActiveTf;
@@ -93,13 +94,16 @@ public class PolyPepManager : MonoBehaviour {
 		temp = GameObject.Find("SideChainBuilder");
 		sideChainBuilder = temp.GetComponent<SideChainBuilder>();
 
+		temp = GameObject.Find("ElectrostaticsManager");
+		electrostaticsManager = temp.GetComponent<ElectrostaticsManager>();
+
 		UI = GameObject.Find("UI");
 
-		UIPanel02 = GameObject.Find("UI_Panel02");
-		UIPanel02.SetActive(false);
+		UIPanelSideChains = GameObject.Find("UI_PanelSideChains");
+		UIPanelSideChains.SetActive(false);
 
-		UIPanel03 = GameObject.Find("UI_Panel03");
-		UIPanel03.SetActive(false);
+		UIPanelCamera = GameObject.Find("UI_PanelCamera");
+		UIPanelCamera.SetActive(false);
 
 		UIPanelInfo = GameObject.Find("UI_PanelInfo");
 		UIInfoActiveTf = GameObject.Find("InfoActivePos").transform;
@@ -128,7 +132,7 @@ public class PolyPepManager : MonoBehaviour {
 			vdwSliderUI.GetComponent<Slider>().value = 10;
 			hbondSliderUI.GetComponent<Slider>().value = 50;
 			phiPsiDriveSliderUI.GetComponent<Slider>().value = 50;
-			spawnLengthSliderUI.GetComponent<Slider>().value = 9; //10
+			spawnLengthSliderUI.GetComponent<Slider>().value = 6; //10
 			jiggleStrengthSliderUI.GetComponent<Slider>().value = 0;
 
 			//temp = GameObject.Find("Slider_ResStart");
@@ -167,7 +171,7 @@ public class PolyPepManager : MonoBehaviour {
 			int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
 			//Debug.Log(spawnTransform.position);
 
-			Vector3 offset = -spawnTransform.transform.right * (numResidues-1) * 0.2f;
+			Vector3 offset = -spawnTransform.transform.right * (numResidues - 1) * 0.2f;
 			// offset to try to keep new pp in sensible position
 			// working solution - no scale, centre of mass / springs ...
 			//spawnTransform.transform.position += offset; // NO! this is a reference not a copy!
@@ -180,7 +184,7 @@ public class PolyPepManager : MonoBehaviour {
 
 			ppb_cs.sideChainBuilder = sideChainBuilder;
 		}
-		
+
 	}
 
 	void OnDrawGizmos()
@@ -296,6 +300,16 @@ public class PolyPepManager : MonoBehaviour {
 		}
 	}
 
+	public void SelectionInvertFromUI()
+	{
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			_ppb.InvertSelection();
+		}
+	}
+
+
+
 	public void SetSelectionDriveFromUI (bool value)
 	{
 		//Debug.Log("hello from the manager! ---> SetSelectionDriveOffFromUI");
@@ -303,6 +317,14 @@ public class PolyPepManager : MonoBehaviour {
 		{
 			_ppb.SetPhiPsiDriveForSelection(value);
 			_ppb.UpdateRenderModeAllBbu();
+		}
+	}
+
+	public void UpdateElectroStaticsOnOnFromUI(bool value)
+	{
+		if (electrostaticsManager.ElectrostaticsOn != value)
+		{
+			electrostaticsManager.SwitchElectrostatics();
 		}
 	}
 
@@ -403,7 +425,7 @@ public class PolyPepManager : MonoBehaviour {
 
 	public void MutateSelectedResiduesFromUI()
 	{
-		Debug.Log("Mutate: " + UISelectedAminoAcid);
+		//Debug.Log("Mutate: " + UISelectedAminoAcid);
 
 		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
 		{
@@ -528,7 +550,7 @@ public class PolyPepManager : MonoBehaviour {
 					if (_residueGo.GetComponent<Residue>().type != selectedAminoAcidStr)
 					{
 						// selected residue type is different => replace sidechain
-						Debug.Log ("Click from UI: " + UISelectedAminoAcid + " " + selectedAminoAcidStr);
+						//Debug.Log ("Click from UI: " + UISelectedAminoAcid + " " + selectedAminoAcidStr);
 						_ppb.sideChainBuilder.BuildSideChain(_ppb.gameObject, _residueGo.GetComponent<Residue>().resid, selectedAminoAcidStr);
 					}
 					else
@@ -553,9 +575,52 @@ public class PolyPepManager : MonoBehaviour {
 
 	}
 
+	public void MakeDisulphideFromUI()
+	{
+		int numSelectedCYS = 0;
+		GameObject pp1 = gameObject;
+		GameObject pp2 = gameObject;
+		int resid1 = 0, resid2 = 0;
+
+
+		foreach (PolyPepBuilder _ppb in allPolyPepBuilders)
+		{
+			foreach (GameObject _residueGo in _ppb.chainArr)
+			{
+				if (_residueGo.GetComponent<Residue>().residueSelected == true)
+				{
+					bool notDisulphideBonded = !_residueGo.GetComponent<Residue>().disulphidePartnerResidue;
+					if ((_residueGo.GetComponent<Residue>().type == "CYS") && notDisulphideBonded)
+					{
+						if (numSelectedCYS == 0)
+						{
+							// store 1st candidate
+							pp1 = _ppb.gameObject;
+							resid1 = _residueGo.GetComponent<Residue>().resid;
+						}
+						if (numSelectedCYS == 1)
+						{
+							// store 2nd candidate
+							pp2 = _ppb.gameObject;
+							resid2 = _residueGo.GetComponent<Residue>().resid;
+						}
+						numSelectedCYS++;
+					}
+
+				}
+			}
+		}
+		//Debug.Log("Make Disulphide " + numSelectedCYS + " CYS residues selected");
+		if (numSelectedCYS == 2)
+		{
+				sideChainBuilder.MakeDisulphide(pp1, resid1, pp2, resid2);
+		}
+	}
+
+
 	public void UpdateAminoAcidSelFromUI()
 	{
-		Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
+		//Debug.Log("UI selected amino acid = " + UISelectedAminoAcid);
 	}
 
 	public void UpdateShowHAtomsFromUI(bool value)
@@ -584,7 +649,7 @@ public class PolyPepManager : MonoBehaviour {
 
 	public void UpdateTestToggleFromUI(bool value)
 	{
-		Debug.Log("Click from UI: " + value);
+		//Debug.Log("Click from UI: " + value);
 		if (value == true)
 		{
 			
@@ -598,26 +663,26 @@ public class PolyPepManager : MonoBehaviour {
 	public void TogglePanel02FromUI(bool value)
 	{
 		//Debug.Log("Click from TogglePanel02FromUI: " + value);
-		UIPanel02.SetActive(value);
+		UIPanelSideChains.SetActive(value);
 		
 	}
 
 	private void UpdatePanel02Pos()
 	{
-		if (UIPanel02.activeSelf == true)
+		if (UIPanelSideChains.activeSelf == true)
 		{
-			UIPanel02.transform.position = Vector3.Lerp(UIPanel02.transform.position, (UI.transform.position + (UI.transform.forward * 0.01f) + (UI.transform.right * 1.36f)), ((Time.deltaTime / 0.01f) * 0.05f));
+			UIPanelSideChains.transform.position = Vector3.Lerp(UIPanelSideChains.transform.position, (UI.transform.position + (UI.transform.forward * 0.01f) + (UI.transform.right * 1.36f)), ((Time.deltaTime / 0.01f) * 0.05f));
 		}
-		if (UIPanel02.activeSelf == false)
+		if (UIPanelSideChains.activeSelf == false)
 		{
-			UIPanel02.transform.position = Vector3.Lerp(UIPanel02.transform.position, UI.transform.position + (UI.transform.forward * 0.01f), ((Time.deltaTime / 0.01f) * 0.05f));
+			UIPanelSideChains.transform.position = Vector3.Lerp(UIPanelSideChains.transform.position, UI.transform.position + (UI.transform.forward * 0.01f), ((Time.deltaTime / 0.01f) * 0.05f));
 		}
 	}
 
 	public void TogglePanel03FromUI(bool value)
 	{
 		//Debug.Log("Click from TogglePanel03FromUI: " + value);
-		UIPanel03.SetActive(value);
+		UIPanelCamera.SetActive(value);
 
 		mySnapshotCamera.transform.position = snapshotCameraResetTransform.position;
 		mySnapshotCamera.transform.rotation = snapshotCameraResetTransform.rotation; 
@@ -632,13 +697,13 @@ public class PolyPepManager : MonoBehaviour {
 
 	private void UpdatePanel03Pos()
 	{
-		if (UIPanel03.activeSelf == true)
+		if (UIPanelCamera.activeSelf == true)
 		{
-			UIPanel03.transform.position = Vector3.Lerp(UIPanel03.transform.position, (UI.transform.position + (UI.transform.forward * 0.01f) + (UI.transform.right * -1.15f)), ((Time.deltaTime / 0.01f) * 0.05f));
+			UIPanelCamera.transform.position = Vector3.Lerp(UIPanelCamera.transform.position, (UI.transform.position + (UI.transform.forward * 0.01f) + (UI.transform.right * -1.15f)), ((Time.deltaTime / 0.01f) * 0.05f));
 		}
-		if (UIPanel03.activeSelf == false)
+		if (UIPanelCamera.activeSelf == false)
 		{
-			UIPanel03.transform.position = Vector3.Lerp(UIPanel03.transform.position, UI.transform.position + (UI.transform.forward * 0.01f), ((Time.deltaTime / 0.01f) * 0.05f));
+			UIPanelCamera.transform.position = Vector3.Lerp(UIPanelCamera.transform.position, UI.transform.position + (UI.transform.forward * 0.01f), ((Time.deltaTime / 0.01f) * 0.05f));
 		}
 	}
 
