@@ -281,26 +281,12 @@ namespace ViveInputs
 					onHoverExit.Invoke(lastHit);
 				}
 				lastHit = hit.transform;
-
-				// Test remote grab stuff
-				//left
-				if (vivePlayer.GetHairTriggerDown(viveLeftHand))
+				if (vivePlayer.GetHairTriggerDown(activeController))
 				{
-					InitializeRemoteGrab(hit, viveLeftHand.transform);
-					// SetRemoteGrab(hit.point, viveLeftHand.transform);
-				}
-				if (vivePlayer.GetHairTriggerUp(viveLeftHand))
-				{
-					ClearRemoteGrab();
-				}
-
-				// right
-				if (Player.instance.GetHairTriggerDown(viveRightHand))
-				{
-					InitializeRemoteGrab(hit, viveRightHand.transform);
+					InitializeRemoteGrab(hit, activeController.transform);
 					// SetRemoteGrab(hit.point, viveRightHand.transform);
 				}
-				if (vivePlayer.GetHairTriggerUp(viveRightHand))
+				if (vivePlayer.GetHairTriggerUp(activeController))
 				{
 					ClearRemoteGrab();
 				}
