@@ -424,7 +424,6 @@ namespace Valve.VR.InteractionSystem
             {
                 if (hand.controller != null)
                 {
-                    Debug.Log(hand.transform.name + " is not null");
                     if (hand.controller.GetHairTriggerDown())
                     {
                         return true;

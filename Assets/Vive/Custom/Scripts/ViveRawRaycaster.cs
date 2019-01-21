@@ -229,37 +229,8 @@ namespace ViveInputs
                 onHoverExit.Invoke(lastHit);
             }
             lastHit = hit.transform;
-
-            // Test remote grab stuff
-            //left
-
-            // Not working as intended.
-            // if (vivePlayer.GetHairTriggerDown(viveLeftHand))
-            // {
-            //     Debug.Log("LEFT HAND TRIGGER DOWN");
-            //     InitializeRemoteGrab(hit, viveLeftHand.transform);
-            //     // SetRemoteGrab(hit.point, viveLeftHand.transform);
-            // }
-            // if (vivePlayer.GetHairTriggerUp(viveLeftHand))
-            // {
-            //     ClearRemoteGrab();
-            // }
-
-            // right - working as intended
-            // if (vivePlayer.GetHairTriggerDown(viveRightHand))
-            // {
-            //     Debug.Log("RIGHT HAND TRIGGER DOWN");
-            //     InitializeRemoteGrab(hit, viveRightHand.transform);
-            //     // SetRemoteGrab(hit.point, viveRightHand.transform);
-            // }
-            // if (vivePlayer.GetHairTriggerUp(viveRightHand))
-            // {
-            //     ClearRemoteGrab();
-            // }
-
             if (vivePlayer.GetHairTriggerDown(activeController))
             {
-                Debug.Log("RIGHT HAND TRIGGER DOWN");
                 InitializeRemoteGrab(hit, activeController.transform);
                 // SetRemoteGrab(hit.point, viveRightHand.transform);
             }
@@ -326,29 +297,6 @@ namespace ViveInputs
 			}
         }
 
-
-
-        private bool IsHandUI(Transform target)
-        {
-            bool isHandUi = false;
-            // checks if transform is on VR UI layer and if it's a child of a hand.
-            if (viveLeftHand || viveRightHand)
-            {
-                if (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform)
-                {
-                    isHandUi = true;
-                }
-            }
-            // if (target.transform.parent)
-            // {
-            //     if (target.transform.parent.parent.GetComponent<OVRGrabber>() != null)
-            //     {
-            //         isHandUi = true;
-            //     }
-            // }
-            return isHandUi;
-        }
-
         void Update()
         {
             activeController = ViveInputHelpers.GetHandForButton(touchpad, activeController);
@@ -406,7 +354,7 @@ namespace ViveInputs
             {
                 viveSelectionPointer.distance = 10.0f;
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (!vivePlayer.GetHairTrigger(viveLeftHand) && !vivePlayer.GetHairTrigger(viveRightHand))
+                if (!vivePlayer.GetHairTrigger(activeController))
                 {
                     ClearLastHit();
                 }
@@ -414,7 +362,7 @@ namespace ViveInputs
             //REMOTE GRAB UPDATE (outside of hit test)
             if (remoteGrab)
             {
-                if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
+                if (vivePlayer.GetHairTrigger(activeController))
                 {
                     ViveRemoteGrab(pointer);
                 }
