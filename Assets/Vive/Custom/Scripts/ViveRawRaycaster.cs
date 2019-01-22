@@ -28,8 +28,9 @@ namespace ViveInputs
         [Tooltip("Maximum raycast distance")]
         public float raycastDistance = 500;
 
-		public bool mimicOculusControls;
-		public ViveRawInteraction myViveRawInteraction;
+		public bool touchpadOverloads = false;
+		public bool keyboardControls = true;
+		public ViveRawInteraction viveRawInteration;
 
         public ViveSelectionPointer viveSelectionPointer;
 
@@ -125,13 +126,13 @@ namespace ViveInputs
 				viveSelectionPointer = FindObjectOfType<ViveSelectionPointer>();
 			}
 
-            if (!myViveRawInteraction)
+            if (!viveRawInteration)
             {
-				myViveRawInteraction = GetComponent<ViveRawInteraction>();
+				viveRawInteration = GetComponent<ViveRawInteraction>();
 			}
-            if (!myViveRawInteraction)
+            if (!viveRawInteration)
             {
-				myViveRawInteraction = FindObjectOfType<ViveRawInteraction>();
+				viveRawInteration = FindObjectOfType<ViveRawInteraction>();
 			}
         }
 
@@ -218,78 +219,112 @@ namespace ViveInputs
 
         private void ProcessViveInputOnTarget(RaycastHit hit)
         {
-            // TODO: Make function calls from either all player.instance or viveplayer.
-            // Vive handling
-
-            // while debugging
-            if (!mimicOculusControls)
-            {
-				mimicOculusControls = true;
+			// TODO: Make function calls from either all player.instance or viveplayer.
+			if (remoteGrab == null)
+			{
+				onHoverEnter.Invoke(hit.transform);
 			}
 
-            if (mimicOculusControls)
-            {
-                // if grip(s) squeezed toggle A/B functionality on
-                Debug.Log("mimicking");
-                if (vivePlayer.GetGripIsSqueezing(viveLeftHand))
-                {
-					Debug.Log("pressing grip");
-                    if (vivePlayer.GetPressDown(viveLeftHand, SteamVR_Controller.ButtonMask.Touchpad))
-                    {
-						Debug.Log("pressing touchpad + grip");
-						if (vivePlayer.GetPressDownB(viveLeftHand, SteamVR_Controller.ButtonMask.Touchpad))
-                        {
-                            Debug.Log("left b press (lower half)");
-                        }
-						if (vivePlayer.GetPressDownA(viveLeftHand, SteamVR_Controller.ButtonMask.Touchpad))
-                        {
-                            Debug.Log("Left a press (upper half)");
-                        }
-					}
-                }
-                if (vivePlayer.GetGripIsSqueezing(viveRightHand))
-                {
-					Debug.Log("pressing grip");
-                    if (vivePlayer.GetPressDown(viveRightHand, SteamVR_Controller.ButtonMask.Touchpad))
-                    {
-						Debug.Log("pressing touchpad + grip");
-						if (vivePlayer.GetPressDownB(viveRightHand, SteamVR_Controller.ButtonMask.Touchpad))
-                        {
-                            Debug.Log("right b press (lower half)");
-                        }
-						if (vivePlayer.GetPressDownA(viveRightHand, SteamVR_Controller.ButtonMask.Touchpad))
-                        {
-                            Debug.Log("right a press (upper half)");
-                        }
-					}
-                }
-                else
-                {
-                    // implement basic functionality.
-                }
-            }
-            else
+			if (lastHit != null && lastHit != hit.transform)
 			{
-				if (remoteGrab == null)
-				{
-					onHoverEnter.Invoke(hit.transform);
-				}
+				// dont show selection highlight if remote grabbing.
+				onHoverExit.Invoke(lastHit);
+			}
+			lastHit = hit.transform;
 
-				if (lastHit != null && lastHit != hit.transform)
+			if (keyboardControls)
+			{
+				// some test keyboard inputs 1,2, 3, 4
+				if (Input.GetKeyDown(KeyCode.Alpha1))
 				{
-					// dont show selection highlight if remote grabbing.
-					onHoverExit.Invoke(lastHit);
+					Debug.Log("1");
+					primaryDown = lastHit;
 				}
-				lastHit = hit.transform;
-				if (vivePlayer.GetHairTriggerDown(activeController))
+				if (Input.GetKeyDown(KeyCode.Alpha2))
 				{
-					InitializeRemoteGrab(hit, activeController.transform);
-					// SetRemoteGrab(hit.point, viveRightHand.transform);
+					Debug.Log("2");
+					secondaryDown = lastHit;
 				}
-				if (vivePlayer.GetHairTriggerUp(activeController))
+				if (Input.GetKeyDown(KeyCode.Alpha3))
 				{
-					ClearRemoteGrab();
+					Debug.Log("3");
+					aDown = lastHit;
 				}
+				if (Input.GetKeyDown(KeyCode.Alpha4))
+				{
+					Debug.Log("4");
+					bDown = lastHit;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha1))
+				{
+					Debug.Log("up");
+					primaryDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha2))
+				{
+					Debug.Log("up");
+					secondaryDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha3))
+				{
+					Debug.Log("up");
+					aDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha4))
+				{
+					Debug.Log("up");
+					bDown = null;
+				}
+				if (aDown)
+				{
+					Debug.Log("invoking a down");
+					onHoverADown.Invoke(aDown);
+					viveRawInteration.OnHoverADown(aDown);
+				}
+				if (bDown)
+				{
+					Debug.Log("invoking b down");
+					onHoverBDown.Invoke(bDown);
+					viveRawInteration.OnHoverBDown(bDown);
+				}
+				if (primaryDown && !secondaryDown)
+				{
+					// tractor beam stub
+				}
+				else if (secondaryDown && !primaryDown)
+				{
+					// tactor time iterates?
+				}
+			}
+            if (touchpadOverloads)
+            {
+				if (vivePlayer.GetGripIsSqueezing(activeController))
+				{
+					Debug.Log("pressing grip");
+					if (vivePlayer.GetPressDown(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+					{
+						Debug.Log("pressing touchpad + grip");
+						if (vivePlayer.GetPressDownB(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+						{
+							Debug.Log("right b press (lower half)");
+						}
+						if (vivePlayer.GetPressDownA(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+						{
+							Debug.Log("right a press (upper half)");
+						}
+					}
+				}
+            }
+
+            // standard vive inputs
+			if (vivePlayer.GetHairTriggerDown(activeController))
+			{
+				InitializeRemoteGrab(hit, activeController.transform);
+				// SetRemoteGrab(hit.point, viveRightHand.transform);
+			}
+			if (vivePlayer.GetHairTriggerUp(activeController))
+			{
+				ClearRemoteGrab();
 			}
         }
 
@@ -312,7 +347,7 @@ namespace ViveInputs
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            myViveRawInteraction.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
+            viveRawInteration.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
             BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
@@ -326,7 +361,7 @@ namespace ViveInputs
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
                 //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
-                myViveRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
+                viveRawInteration.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
             }
             if (remoteGrab.GetComponent<Canvas>() || remoteGrab.gameObject.layer == 11)
 			{
