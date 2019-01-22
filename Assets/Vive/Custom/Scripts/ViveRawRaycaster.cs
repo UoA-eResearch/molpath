@@ -28,7 +28,9 @@ namespace ViveInputs
         [Tooltip("Maximum raycast distance")]
         public float raycastDistance = 500;
 
-        public ViveRawInteraction myViveRawInteraction;
+		public bool touchpadOverloads = false;
+		public bool keyboardControls = true;
+		public ViveRawInteraction viveRawInteration;
 
         public ViveSelectionPointer viveSelectionPointer;
 
@@ -124,13 +126,13 @@ namespace ViveInputs
 				viveSelectionPointer = FindObjectOfType<ViveSelectionPointer>();
 			}
 
-            if (!myViveRawInteraction)
+            if (!viveRawInteration)
             {
-				myViveRawInteraction = GetComponent<ViveRawInteraction>();
+				viveRawInteration = GetComponent<ViveRawInteraction>();
 			}
-            if (!myViveRawInteraction)
+            if (!viveRawInteration)
             {
-				myViveRawInteraction = FindObjectOfType<ViveRawInteraction>();
+				viveRawInteration = FindObjectOfType<ViveRawInteraction>();
 			}
         }
 
@@ -217,41 +219,113 @@ namespace ViveInputs
 
         private void ProcessViveInputOnTarget(RaycastHit hit)
         {
-            // Vive handling
-            if (remoteGrab == null)
+			// TODO: Make function calls from either all player.instance or viveplayer.
+			if (remoteGrab == null)
+			{
+				onHoverEnter.Invoke(hit.transform);
+			}
+
+			if (lastHit != null && lastHit != hit.transform)
+			{
+				// dont show selection highlight if remote grabbing.
+				onHoverExit.Invoke(lastHit);
+			}
+			lastHit = hit.transform;
+
+			if (keyboardControls)
+			{
+				// some test keyboard inputs 1,2, 3, 4
+				if (Input.GetKeyDown(KeyCode.Alpha1))
+				{
+					Debug.Log("1");
+					primaryDown = lastHit;
+				}
+				if (Input.GetKeyDown(KeyCode.Alpha2))
+				{
+					Debug.Log("2");
+					secondaryDown = lastHit;
+				}
+				if (Input.GetKeyDown(KeyCode.Alpha3))
+				{
+					Debug.Log("3");
+					aDown = lastHit;
+				}
+				if (Input.GetKeyDown(KeyCode.Alpha4))
+				{
+					Debug.Log("4");
+					bDown = lastHit;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha1))
+				{
+					Debug.Log("up");
+					primaryDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha2))
+				{
+					Debug.Log("up");
+					secondaryDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha3))
+				{
+					Debug.Log("up");
+					aDown = null;
+				}
+				if (Input.GetKeyUp(KeyCode.Alpha4))
+				{
+					Debug.Log("up");
+					bDown = null;
+				}
+				if (aDown)
+				{
+					Debug.Log("invoking a down");
+					onHoverADown.Invoke(aDown);
+					viveRawInteration.OnHoverADown(aDown);
+				}
+				if (bDown)
+				{
+					Debug.Log("invoking b down");
+					onHoverBDown.Invoke(bDown);
+					viveRawInteration.OnHoverBDown(bDown);
+				}
+				if (primaryDown && !secondaryDown)
+				{
+					// tractor beam stub
+				}
+				else if (secondaryDown && !primaryDown)
+				{
+					// tactor time iterates?
+				}
+			}
+            if (touchpadOverloads)
             {
-                onHoverEnter.Invoke(hit.transform);
+				if (vivePlayer.GetGripIsSqueezing(activeController))
+				{
+					Debug.Log("pressing grip");
+					if (vivePlayer.GetPressDown(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+					{
+						Debug.Log("pressing touchpad + grip");
+						if (vivePlayer.GetPressDownB(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+						{
+							Debug.Log("right b press (lower half)");
+						}
+						if (vivePlayer.GetPressDownA(activeController, SteamVR_Controller.ButtonMask.Touchpad))
+						{
+							Debug.Log("right a press (upper half)");
+						}
+					}
+				}
             }
 
-            if (lastHit != null && lastHit != hit.transform)
-            {
-                // dont show selection highlight if remote grabbing.
-                onHoverExit.Invoke(lastHit);
-            }
-            lastHit = hit.transform;
-
-            // Test remote grab stuff
-            //left
-            if (vivePlayer.GetHairTriggerDown(viveLeftHand))
-            {
-                InitializeRemoteGrab(hit, viveLeftHand.transform);
-                // SetRemoteGrab(hit.point, viveLeftHand.transform);
-            }
-            if (vivePlayer.GetHairTriggerUp(viveLeftHand))
-            {
-                ClearRemoteGrab();
-            }
-
-            // right
-            if (Player.instance.GetHairTriggerDown(viveRightHand))
-            {
-                InitializeRemoteGrab(hit, viveRightHand.transform);
-                // SetRemoteGrab(hit.point, viveRightHand.transform);
-            }
-            if (vivePlayer.GetHairTriggerUp(viveRightHand))
-            {
-                ClearRemoteGrab();
-            }
+            // standard vive inputs
+			if (vivePlayer.GetHairTriggerDown(activeController))
+			{
+				InitializeRemoteGrab(hit, activeController.transform);
+				// SetRemoteGrab(hit.point, viveRightHand.transform);
+			}
+			if (vivePlayer.GetHairTriggerUp(activeController))
+			{
+				ClearRemoteGrab();
+			}
         }
 
         private void ViveRemoteGrab(Ray pointer)
@@ -273,7 +347,7 @@ namespace ViveInputs
             prevPointer = pointer;
             remoteGrabTargetPos = (pointer.origin + (remoteGrabDistance * pointer.direction));
             // tractor beam to destination (mostly tangential to pointer axis (pitch / yaw movement)
-            myViveRawInteraction.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
+            viveRawInteration.RemoteGrabPositionalInteration(remoteGrab, remoteGrabTargetPos);
             BackboneUnit bu = remoteGrab.gameObject.GetComponent<BackboneUnit>();
             if (bu != null)
             {
@@ -287,7 +361,7 @@ namespace ViveInputs
                 Vector3 vCurrent = remoteGrabControllerCurrentQ.eulerAngles; // Quaternion.ToEulerAngles(q); 
                 //Debug.Log(vInit.z + " -> " + vCurrent.z + " d = " + vDelta.z);
                 float zRot = vDelta.z;
-                myViveRawInteraction.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
+                viveRawInteration.RemoteGrabRotationalInteration(zRot, remoteGrab, pointer);
             }
             if (remoteGrab.GetComponent<Canvas>() || remoteGrab.gameObject.layer == 11)
 			{
@@ -309,29 +383,6 @@ namespace ViveInputs
 				//remoteGrab.gameObject.transform.LookAt(lookAwayPos, Vector3.up);
 				remoteGrab.rotation = Quaternion.Euler(pointer.direction);
 			}
-        }
-
-
-
-        private bool IsHandUI(Transform target)
-        {
-            bool isHandUi = false;
-            // checks if transform is on VR UI layer and if it's a child of a hand.
-            if (viveLeftHand || viveRightHand)
-            {
-                if (target.gameObject.layer == 11 && target.transform.parent == viveLeftHand.transform || target.transform.transform.parent == viveRightHand.transform)
-                {
-                    isHandUi = true;
-                }
-            }
-            // if (target.transform.parent)
-            // {
-            //     if (target.transform.parent.parent.GetComponent<OVRGrabber>() != null)
-            //     {
-            //         isHandUi = true;
-            //     }
-            // }
-            return isHandUi;
         }
 
         void Update()
@@ -391,7 +442,7 @@ namespace ViveInputs
             {
                 viveSelectionPointer.distance = 10.0f;
                 // if aiming at nothing and trigger is not held down: clear the last hit/remote grabbed object.
-                if (!vivePlayer.GetHairTrigger(viveLeftHand) && !vivePlayer.GetHairTrigger(viveRightHand))
+                if (!vivePlayer.GetHairTrigger(activeController))
                 {
                     ClearLastHit();
                 }
@@ -399,7 +450,7 @@ namespace ViveInputs
             //REMOTE GRAB UPDATE (outside of hit test)
             if (remoteGrab)
             {
-                if (vivePlayer.GetHairTrigger(viveLeftHand) || vivePlayer.GetHairTrigger(viveRightHand))
+                if (vivePlayer.GetHairTrigger(activeController))
                 {
                     ViveRemoteGrab(pointer);
                 }

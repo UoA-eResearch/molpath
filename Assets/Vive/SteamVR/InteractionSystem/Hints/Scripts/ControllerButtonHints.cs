@@ -193,6 +193,144 @@ namespace Valve.VR.InteractionSystem
             }
         }
 
+        private void AddCustomControllerInfo(EVRButtonId buttonID)
+        {
+            Transform buttonTransform = null;
+            List<MeshRenderer> buttonRenderers = new List<MeshRenderer>();
+
+            string buttonDebug = "Looking for button: " + buttonID;
+
+            EVRButtonId searchButtonID = buttonID;
+            if (buttonID == EVRButtonId.k_EButton_Grip && SteamVR.instance.hmd_TrackingSystemName.ToLowerInvariant().Contains("oculus"))
+            {
+                searchButtonID = EVRButtonId.k_EButton_Axis2;
+            }
+            ulong buttonMaskForID = (1ul << (int)searchButtonID);
+
+            foreach (KeyValuePair<string, ulong> componentButtonMask in componentButtonMasks)
+            {
+                if ((componentButtonMask.Value & buttonMaskForID) == buttonMaskForID)
+                {
+                    buttonDebug += "\nFound component: " + componentButtonMask.Key + " " + componentButtonMask.Value;
+                    Transform componentTransform = renderModel.FindComponent(componentButtonMask.Key);
+
+                    buttonTransform = componentTransform;
+
+                    buttonDebug += "\nFound componentTransform: " + componentTransform + " buttonTransform: " + buttonTransform;
+
+                    buttonRenderers.AddRange(componentTransform.GetComponentsInChildren<MeshRenderer>());
+                }
+            }
+
+            buttonDebug += "\nFound " + buttonRenderers.Count + " renderers for " + buttonID;
+            foreach (MeshRenderer renderer in buttonRenderers)
+            {
+                buttonDebug += "\n\t" + renderer.name;
+            }
+
+            HintDebugLog(buttonDebug);
+
+            if (buttonTransform == null)
+            {
+                HintDebugLog("Couldn't find buttonTransform for " + buttonID);
+                return;
+            }
+
+            ButtonHintInfo hintInfo = new ButtonHintInfo();
+            buttonHintInfos.Add(buttonID, hintInfo);
+
+            hintInfo.componentName = buttonTransform.name;
+            hintInfo.renderers = buttonRenderers;
+
+            //Get the local transform for the button
+            hintInfo.localTransform = buttonTransform.Find(SteamVR_RenderModel.k_localTransformName);
+
+            OffsetType offsetType = OffsetType.Right;
+            switch (buttonID)
+            {
+                case EVRButtonId.k_EButton_SteamVR_Trigger:
+                    {
+                        offsetType = OffsetType.Right;
+                    }
+                    break;
+                case EVRButtonId.k_EButton_ApplicationMenu:
+                    {
+                        offsetType = OffsetType.Right;
+                    }
+                    break;
+                case EVRButtonId.k_EButton_System:
+                    {
+                        offsetType = OffsetType.Right;
+                    }
+                    break;
+                case Valve.VR.EVRButtonId.k_EButton_Grip:
+                    {
+                        offsetType = OffsetType.Forward;
+                    }
+                    break;
+                case Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad:
+                    {
+                        offsetType = OffsetType.Up;
+                    }
+                    break;
+            }
+
+            //Offset for the text end transform
+            switch (offsetType)
+            {
+                case OffsetType.Forward:
+                    hintInfo.textEndOffsetDir = hintInfo.localTransform.forward;
+                    break;
+                case OffsetType.Back:
+                    hintInfo.textEndOffsetDir = -hintInfo.localTransform.forward;
+                    break;
+                case OffsetType.Right:
+                    hintInfo.textEndOffsetDir = hintInfo.localTransform.right;
+                    break;
+                case OffsetType.Up:
+                    hintInfo.textEndOffsetDir = hintInfo.localTransform.up;
+                    break;
+            }
+
+            //Create the text hint object
+            Vector3 hintStartPos = hintInfo.localTransform.position + (hintInfo.localTransform.forward * 0.01f);
+            hintInfo.textHintObject = GameObject.Instantiate(textHintPrefab, hintStartPos, Quaternion.identity) as GameObject;
+            hintInfo.textHintObject.name = "Hint_" + hintInfo.componentName + "_Start";
+            hintInfo.textHintObject.transform.SetParent(textHintParent);
+            hintInfo.textHintObject.layer = gameObject.layer;
+            hintInfo.textHintObject.tag = gameObject.tag;
+
+            //Get all the relevant child objects
+            hintInfo.textStartAnchor = hintInfo.textHintObject.transform.Find("Start");
+            hintInfo.textEndAnchor = hintInfo.textHintObject.transform.Find("End");
+            hintInfo.canvasOffset = hintInfo.textHintObject.transform.Find("CanvasOffset");
+            hintInfo.line = hintInfo.textHintObject.transform.Find("Line").GetComponent<LineRenderer>();
+            hintInfo.textCanvas = hintInfo.textHintObject.GetComponentInChildren<Canvas>();
+            hintInfo.text = hintInfo.textCanvas.GetComponentInChildren<Text>();
+            hintInfo.textMesh = hintInfo.textCanvas.GetComponentInChildren<TextMesh>();
+
+            hintInfo.textHintObject.SetActive(false);
+
+            hintInfo.textStartAnchor.position = hintStartPos;
+
+            if (hintInfo.text != null)
+            {
+                hintInfo.text.text = hintInfo.componentName;
+            }
+
+            if (hintInfo.textMesh != null)
+            {
+                hintInfo.textMesh.text = hintInfo.componentName;
+            }
+
+            centerPosition += hintInfo.textStartAnchor.position;
+
+            // Scale hint components to match player size
+            hintInfo.textCanvas.transform.localScale = Vector3.Scale(hintInfo.textCanvas.transform.localScale, player.transform.localScale);
+            hintInfo.textStartAnchor.transform.localScale = Vector3.Scale(hintInfo.textStartAnchor.transform.localScale, player.transform.localScale);
+            hintInfo.textEndAnchor.transform.localScale = Vector3.Scale(hintInfo.textEndAnchor.transform.localScale, player.transform.localScale);
+            hintInfo.line.transform.localScale = Vector3.Scale(hintInfo.line.transform.localScale, player.transform.localScale);
+        }
 
         //-------------------------------------------------
         private void CreateAndAddButtonInfo(EVRButtonId buttonID)
