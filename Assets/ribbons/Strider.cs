@@ -8,7 +8,7 @@ public class Strider : MonoBehaviour
 {
 	public Material ribbonMaterial;
 	public RibbonMaker RibbonMaker;
-	public float errorThreshold = 30f;
+	public float errorThreshold = 4f;
 
 	private void FixedUpdate()
 	{
@@ -154,40 +154,17 @@ public class Strider : MonoBehaviour
 		// Debug.Log(residue.transform.name);
 		BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
 		ConfigurableJoint[] cfjs = residue.transform.GetComponentsInChildren<ConfigurableJoint>();
-
 		// Debug.Log(cfjs[0].targetRotation);
-
 		// this is so it fits to the plot being 180 degrees I suppose?
-		// if (cfjs[0].targetRotation.eulerAngles.x <= Quaternion.Euler(180.0f - 50, 0, 0)) 
-
+		// if (cfjs[0].targetRotation.eulerAngles.x <= Quaternion.Euler(180.0f - 50, 0, 0))
 		// if (Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(180.0f - 60, 0, 0), 5f, 'x')) 
-
 		bool isHelical = true;
-		float phi = 60f;
-		float psi = 50f;
-		if (!Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(phi, 0, 0), errorThreshold / 2, 'x'))
+		float phi = 47;
+		float psi = 57;
+		Debug.Log("assessing phi and psi joints for pattern structure" + residue.name);
+		if (!Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(phi, 0, 0), errorThreshold / 2, 'x') || !Utility.VectorInRange(cfjs[1].targetRotation.eulerAngles, new Vector3(psi, 0, 0), errorThreshold / 2, 'x'))
 		{
 			isHelical = false;
-		}
-		else
-		{
-			// Debug.Log("phi within range" + cfjs[0].targetRotation.eulerAngles.x);
-		}
-
-		// the psi angle is the second angle. (i'm pretty sure.)
-		// Debug.Log("psi x angle" + cfjs[1].targetRotation.eulerAngles.x);
-		if (!Utility.VectorInRange(cfjs[1].targetRotation.eulerAngles, new Vector3(psi, 0, 0), errorThreshold / 2, 'x'))
-		{
-			isHelical = false;
-		}
-		else
-		{
-			// Debug.Log("psi x angle in range" + cfjs[1].targetRotation.eulerAngles.x);
-		}
-
-		if (isHelical)
-		{
-			// Debug.Log("both bond angles are within correct range for helical pattern" + cfjs[0].targetRotation.eulerAngles.x + "," + cfjs[1].targetRotation.eulerAngles.x);
 		}
 		return isHelical;
 	}

@@ -29,9 +29,9 @@ public class Utility : MonoBehaviour{
 		switch (axis)
 		{
 			case 'x':
-				// Debug.Log(vector);
-				// Debug.Log(target.x + deviation);
-				// Debug.Log(target.x - deviation);
+				Debug.Log(vector);
+				Debug.Log(target.x + deviation);
+				Debug.Log(target.x - deviation);
 				if (vector.x <= (target.x + deviation) && vector.x >= (target.x - deviation))
 				{
 					// Debug.Log("target base range: " + target.x);

@@ -237,53 +237,53 @@ namespace ViveInputs
 				// some test keyboard inputs 1,2, 3, 4
 				if (Input.GetKeyDown(KeyCode.Alpha1))
 				{
-					Debug.Log("1");
+					// Debug.Log("1");
 					primaryDown = lastHit;
 				}
 				if (Input.GetKeyDown(KeyCode.Alpha2))
 				{
-					Debug.Log("2");
+					// // Debug.Log("2");
 					secondaryDown = lastHit;
 				}
 				if (Input.GetKeyDown(KeyCode.Alpha3))
 				{
-					Debug.Log("3");
+					// Debug.Log("3");
 					aDown = lastHit;
 				}
 				if (Input.GetKeyDown(KeyCode.Alpha4))
 				{
-					Debug.Log("4");
+					// Debug.Log("4");
 					bDown = lastHit;
 				}
 				if (Input.GetKeyUp(KeyCode.Alpha1))
 				{
-					Debug.Log("up");
+					// Debug.Log("up");
 					primaryDown = null;
 				}
 				if (Input.GetKeyUp(KeyCode.Alpha2))
 				{
-					Debug.Log("up");
+					// Debug.Log("up");
 					secondaryDown = null;
 				}
 				if (Input.GetKeyUp(KeyCode.Alpha3))
 				{
-					Debug.Log("up");
+					// Debug.Log("up");
 					aDown = null;
 				}
 				if (Input.GetKeyUp(KeyCode.Alpha4))
 				{
-					Debug.Log("up");
+					// Debug.Log("up");
 					bDown = null;
 				}
 				if (aDown)
 				{
-					Debug.Log("invoking a down");
+					// Debug.Log("invoking a down");
 					onHoverADown.Invoke(aDown);
 					viveRawInteration.OnHoverADown(aDown);
 				}
 				if (bDown)
 				{
-					Debug.Log("invoking b down");
+					// Debug.Log("invoking b down");
 					onHoverBDown.Invoke(bDown);
 					viveRawInteration.OnHoverBDown(bDown);
 				}
