@@ -168,4 +168,9 @@ public class Strider : MonoBehaviour
 		}
 		return isHelical;
 	}
+
+	private void Start() {
+		var ppm = GameObject.Find("PolyPepManager");
+		ppm.GetComponent<PolyPepManager>().SpawnPolypeptide(ppm.transform);
+	}
 }

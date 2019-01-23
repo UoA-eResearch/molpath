@@ -168,6 +168,7 @@ public class PolyPepManager : MonoBehaviour {
 	{
 		//if (!collidersOn)
 		{
+			Debug.Log("spawning");
 			int numResidues = (int)spawnLengthSliderUI.GetComponent<Slider>().value;
 			//Debug.Log(spawnTransform.position);
 
@@ -175,6 +176,7 @@ public class PolyPepManager : MonoBehaviour {
 			// offset to try to keep new pp in sensible position
 			// working solution - no scale, centre of mass / springs ...
 			//spawnTransform.transform.position += offset; // NO! this is a reference not a copy!
+			polyPepBuilder_pf.SetActive(true);
 			GameObject ppb = Instantiate(polyPepBuilder_pf, spawnTransform.transform.position + offset, Quaternion.identity);
 			PolyPepBuilder ppb_cs = ppb.GetComponent<PolyPepBuilder>();
 			ppb_cs.numResidues = numResidues;
