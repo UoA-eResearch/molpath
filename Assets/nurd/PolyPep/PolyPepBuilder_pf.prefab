@@ -158,6 +158,9 @@ MonoBehaviour:
   carbonylPf: {fileID: 1106350776754678, guid: be5cfe1926cf4d24bb8c219702f2b5be, type: 2}
   residuePf: {fileID: 1903836867372088, guid: 97b0f9eb19d5deb4e893480dc6a04b42, type: 2}
   hBondPsPf: {fileID: 1013763304498548, guid: e3ee753fcb9055e4d83b3dc736c5d1fe, type: 2}
+  myPolyPepManager: {fileID: 0}
+  sideChainBuilder: {fileID: 0}
+  buildTransform: {fileID: 0}
   numResidues: 30
   polyArr: []
   chainArr: []
@@ -166,6 +169,5 @@ MonoBehaviour:
   hbondBackboneSj_HC: []
   hbondBackboneSj_NO: []
   hbondStrength: 0
-  drivePhiPsiMaxForce: 200
-  drivePhiPsiPosSpring: 200
   drivePhiPsiPosDamper: 1
+  drivePhiPsiPosDamperPassive: 0

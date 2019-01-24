@@ -73,13 +73,15 @@ public class RibbonMaker : MonoBehaviour
 
 		// TODO: interpolates better using just singular point per residue.
 		// TODO: Alternatively, average the residue vertices and use that as the control point.
-		foreach (var tag in controlPointTags) 
-		{
-			foreach (var go in GameObject.FindGameObjectsWithTag(tag))
-			{
-				controlPointGos.Add(go);
-			}
-		}
+
+
+		// foreach (var tag in controlPointTags) 
+		// {
+		// 	foreach (var go in GameObject.FindGameObjectsWithTag(tag))
+		// 	{
+		// 		controlPointGos.Add(go);
+		// 	}
+		// }
 
 		// sort control points by otherwise it grabs them out of order
 		controlPointGos.Sort(SortByName);

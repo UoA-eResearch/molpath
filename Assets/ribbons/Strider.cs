@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.UI;
 
 public class Strider : MonoBehaviour
 {
@@ -10,15 +11,6 @@ public class Strider : MonoBehaviour
 	public RibbonMaker RibbonMaker;
 	public float errorThreshold = 4f;
 
-	private void FixedUpdate()
-	{
-		GameObject peptide = GameObject.Find("polyPep_0");
-		if (peptide)
-		{
-			// Debug.Log("peptide has spawned");
-			AnalyzePeptide(peptide);
-		}
-	}
 
 	private static int SortByName(GameObject o1, GameObject o2)
 	{
@@ -29,7 +21,6 @@ public class Strider : MonoBehaviour
 		return start + "-" + end;
 	}
 
-
 	/// <summary>
 	/// Iterates a peptide child transforms and creates ribbon instances where bond parameters match
 	/// </summary>
@@ -37,41 +28,43 @@ public class Strider : MonoBehaviour
 	private void AnalyzePeptide(GameObject peptide)
 	{
 		var points = new List<Transform>();
-		var ribbonsToAdd = new Dictionary<string, List<Transform>>();
+		Dictionary<string, List<Transform>> ribbonsToAdd = new Dictionary<string, List<Transform>>();
 		var ribbonsExisting = new Dictionary<string, List<Transform>>();
 
 		var pointIndexes = new List<int[]>();
 
 		int startResidue = 0;
 		int endResidue = 0;
-		string ribbonKey = "";
+		string key = "";
 		// iterating entire chain
 		Residue[] residues = peptide.transform.GetComponentsInChildren<Residue>();
 		for (int i = 0; i < residues.Length - 1; i++)
 		{
 			Residue residue = residues[i];
 			endResidue = i;
+			Debug.Log(residue.name + IsHelical(residue));
 			if (IsHelical(residue))
 			{
+				key += i + "-";
 				points.Add(Utility.GetFirstChildContainingText(residue.transform, "amide"));
 			}
 			else
 			{
 				// only add if doesn't exist.
-				ribbonKey = MakeRibbonName(startResidue, endResidue);
-				if (!ribbonsExisting.ContainsKey(ribbonKey)) {
-					ribbonsToAdd[ribbonKey] = points;
+				// ribbonKey = MakeRibbonName(startResidue, endResidue);
+				if (!ribbonsExisting.ContainsKey(key)) {
+					ribbonsToAdd[key] = points;
 				}
 			}
+			Debug.Log(points.Count);
 		}
 		// adding to ribbons for final piece if no break in helical pattern
 		// only add if doesn't exist.
-		ribbonKey = MakeRibbonName(startResidue, endResidue);
-		if (!ribbonsExisting.ContainsKey(ribbonKey))
+		// key = MakeRibbonName(startResidue, endResidue);
+		if (!ribbonsExisting.ContainsKey(key))
 		{
-			ribbonsToAdd[ribbonKey] = points;
+			ribbonsToAdd[key] = points;
 		}
-		Debug.Log(points.Count);
 
 		ProcessRibbonChanges(peptide.transform, ribbonsToAdd, ribbonsExisting);
 		MakeNewRibbons(peptide.transform, ribbonsToAdd);
@@ -135,10 +128,11 @@ public class Strider : MonoBehaviour
 		ribbon.AddComponent<MeshFilter>();
 		RibbonMaker ribbonMaker = ribbon.AddComponent<RibbonMaker>();
 		ribbonMaker.Material = ribbonMaterial;
-		foreach (var point in points)
-		{
-			ribbonMaker.controlPoints.Add(point);
-		}
+		ribbonMaker.controlPoints = points;
+		// foreach (var point in points)
+		// {
+		// 	ribbonMaker.controlPoints.Add(point);
+		// }
 		return ribbon;
 	}
 
@@ -149,28 +143,53 @@ public class Strider : MonoBehaviour
 	/// <returns>boolean</returns>
 	private bool IsHelical(Residue residue)
 	{
-		//error threshold.
-		// alpha helical = psi 50, phi 60.
-		// Debug.Log(residue.transform.name);
 		BackboneUnit[] bbus = residue.transform.GetComponentsInChildren<BackboneUnit>();
 		ConfigurableJoint[] cfjs = residue.transform.GetComponentsInChildren<ConfigurableJoint>();
-		// Debug.Log(cfjs[0].targetRotation);
-		// this is so it fits to the plot being 180 degrees I suppose?
-		// if (cfjs[0].targetRotation.eulerAngles.x <= Quaternion.Euler(180.0f - 50, 0, 0))
-		// if (Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(180.0f - 60, 0, 0), 5f, 'x')) 
-		bool isHelical = true;
-		float phi = 47;
-		float psi = 57;
-		Debug.Log("assessing phi and psi joints for pattern structure" + residue.name);
-		if (!Utility.VectorInRange(cfjs[0].targetRotation.eulerAngles, new Vector3(phi, 0, 0), errorThreshold / 2, 'x') || !Utility.VectorInRange(cfjs[1].targetRotation.eulerAngles, new Vector3(psi, 0, 0), errorThreshold / 2, 'x'))
-		{
-			isHelical = false;
-		}
-		return isHelical;
+		// float psi = 57;
+		// float phi = 47;
+		float psi = 0;
+		float phi = 0;
+		var curPsiRotation = cfjs[0].targetRotation.eulerAngles;
+		var curPhiRotation = cfjs[1].targetRotation.eulerAngles;
+		var phiTargRotation = new Vector3(phi, 0, 0);
+		var psiTargRotation = new Vector3(psi, 0, 0);
+		var deviation = errorThreshold / 2;
+		var axis = 'x';
+		return (Utility.VectorInRange(curPsiRotation, phiTargRotation, deviation, axis) && Utility.VectorInRange(curPhiRotation, psiTargRotation, deviation, axis));
 	}
 
 	private void Start() {
 		var ppm = GameObject.Find("PolyPepManager");
 		ppm.GetComponent<PolyPepManager>().SpawnPolypeptide(ppm.transform);
+	}
+
+	public RawInteraction rawInteraction;
+	public PolyPepManager ppm;
+	public Toggle testDriveElement;
+	private void FixedUpdate()
+	{
+		GameObject peptide = GameObject.Find("polyPep_0");
+		if (peptide)
+		{
+			// Debug.Log("peptide has spawned");
+			AnalyzePeptide(peptide);
+		}
+
+		// tests
+		// var residues = FindObjectsOfType<Residue>();
+		// if (residues.Length > 3)
+		// {
+		// 	foreach (var residueGo in residues)
+		// 	{
+		// 		Debug.Log(residueGo.name);
+		// 		foreach (var bbuGo in residueGo.GetComponent<Residue>().backboneAtomsList)
+		// 		{
+		// 			// Debug.Log(bbuGo.name);
+		// 			// rawInteraction.OnHoverBDown(bbuGo);
+		// 			// testDriveElement.isOn = true;
+		// 		}
+		// 	}
+		// }
+		
 	}
 }

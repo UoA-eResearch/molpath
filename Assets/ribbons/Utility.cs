@@ -23,49 +23,24 @@ public class Utility : MonoBehaviour{
 		}
 		return null;
 	}
-	public static bool VectorInRange(Vector3 vector, Vector3 target, float deviation, char axis)
+	public static bool VectorInRange(Vector3 curRotation, Vector3 targetRotation, float deviation, char axis)
 	{
-		bool inRange = false;
 		switch (axis)
 		{
+			// Debug.Log(vector);
+			// Debug.Log(target.x + deviation);
+			// Debug.Log(target.x - deviation);
 			case 'x':
-				Debug.Log(vector);
-				Debug.Log(target.x + deviation);
-				Debug.Log(target.x - deviation);
-				if (vector.x <= (target.x + deviation) && vector.x >= (target.x - deviation))
-				{
-					// Debug.Log("target base range: " + target.x);
-					inRange = true;
-				}
-				else
-				{
-					inRange = false;
-				}
-				break;
+				// Debug.Log(curRotation);
+				// Debug.Log(targetRotation);
+				// Debug.Log(curRotation.x <= (targetRotation.x + deviation) && curRotation.x >= (targetRotation.x - deviation));
+				return (curRotation.x <= (targetRotation.x + deviation) && curRotation.x >= (targetRotation.x - deviation));
 			case 'y':
-				if (vector.y <= (target.y + deviation) && vector.y >= (target.y - deviation))
-				{
-					inRange = true;
-				}
-				else
-				{
-					inRange = false;
-				}
-				break;
+				return (curRotation.y <= (targetRotation.y + deviation) && curRotation.y >= (targetRotation.y - deviation));
 			case 'z':
-				if (vector.z <= (target.z + deviation) && vector.z >= (target.z - deviation))
-				{
-					inRange = true;
-				}
-				else
-				{
-					inRange = false;
-				}
-				break;
+				return (curRotation.z <= (targetRotation.z + deviation) && curRotation.z >= (targetRotation.z - deviation));
 			default:
-				// Debug.Log("no axis specified.");
-				break;
+				return false;
 		}
-		return inRange;
 	}
 }
